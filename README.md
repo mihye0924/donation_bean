@@ -1,30 +1,23 @@
-# React + TypeScript + Vite
+# donation_bean  
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+### 🖥️ 프로젝트 소개
+>  기부를 목적으로 제작한 기부콩 사이트 입니다.
 
-Currently, two official plugins are available:
+### 🕰️ 개발기간
+> 기간: 2024-02-15 ~
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🧑‍🤝‍🧑 멤버구성
+- 팀원1: 박지원 -
+- 팀원2: 조미혜 -
+- 팀원3: 황웅희 -
 
-## Expanding the ESLint configuration
+### ⚙️ 작업환경
+- 작업툴 : vscode, figma
+- font-end: react, typescript, zustand, styled-component
+- back-end: node, express, mysql
+- 배포: vercel, cloudtype(mysql)
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+### 📌 주요기능
 
-- Configure the top-level `parserOptions` property like this:
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+### 🔗 사이트 링크
