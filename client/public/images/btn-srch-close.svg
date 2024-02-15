@@ -1,0 +1,13 @@
+<svg id="구성_요소_229_4" data-name="구성 요소 229 – 4" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+    <defs>
+        <style>
+            .cls-1,.cls-2{fill:none}.cls-2{stroke:#222;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-width:2px}
+        </style>
+    </defs>
+    <g id="icon_cancel" transform="translate(4 4)">
+        <path id="Rectangle" class="cls-1" transform="translate(.043 .043)" d="M0 0h10v10H0z"/>
+        <path id="Path_8" data-name="Path 8" class="cls-2" d="m0 0 16 16"/>
+        <path id="Path_8-2" data-name="Path 8" class="cls-2" d="m0 2.829 16-16" transform="translate(0 13.171)"/>
+    </g>
+    <path id="사각형_13121" data-name="사각형 13121" class="cls-1" d="M0 0h24v24H0z"/>
+</svg>
