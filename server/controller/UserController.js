@@ -1,27 +1,17 @@
-import * as DetailRepository from "../repository/DetailRepository.js";
+import * as UserRepository from "../repository/UserRepository.js";
+import bcryptjs from "bcrypt";
+export async function insertUser(req, res) {
+  const { user_id, user_pw, user_phone, user_name, user_email } = req.body;
 
-export async function getDetail(req, res) {
-  const { isbn } = req.params;
-  const result = await DetailRepository.getDetail(isbn);
-  res.json(result);
-}
-
-export async function insertReview(req, res) {
-  let { uid, isbn, title, content, point } = req.body;
-  console.log(req.body);
-  const row = await DetailRepository.insertReview(
-    uid,
-    isbn,
-    title,
-    content,
-    point
+  const hashPass = bcryptjs.hashSync(user_pw, 8);
+  let result = await UserRepository.insertUser(
+    user_name,
+    user_id,
+    hashPass,
+    user_email,
+    user_phone
   );
-  if (row === "ok") {
-    res.json(row);
-  }
+  if (result === "ok") res.json({ ok: true });
 }
 
-export async function getReview(req, res) {
-  const result = await DetailRepository.getReview(req.params.isbn);
-  res.json(result);
-}
+/* user_name,user_id,user_pw,user_email,user_nick,user_phone */
