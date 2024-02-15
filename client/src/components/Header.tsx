@@ -100,6 +100,19 @@ const Header = () => {
 
 export default Header
 
+const sizes = {
+  desktop: "1024px",
+  tablet: "768px",
+  mobile: "375px"
+};
+
+// 미디어 쿼리를 위한 도우미 함수
+const media = {
+  desktop: `(max-width: ${sizes.desktop})`,
+  tablet: `(max-width: ${sizes.tablet})`,
+  mobile: `(max-width: ${sizes.mobile})`,
+};
+
 const HeaderWrap = styled.header` 
   background: #fff;
   position: fixed;
@@ -111,7 +124,7 @@ const HeaderWrap = styled.header`
     font-size: 32px;
     font-weight: 700; 
     color: #f56400; 
-    @media only screen and (max-width: 375px) {  
+    @media ${media.mobile}{  
       font-size: 24px;
     }
   }
@@ -130,7 +143,7 @@ const HeaderWrap = styled.header`
       background-color: transparent;
       border: 0;
     }
-    @media only screen and (max-width: 375px) {
+     @media ${media.mobile}{  
       gap: 20px;
       > span { 
         font-size: 16px;
@@ -147,7 +160,7 @@ const HeaderBorder = styled.div`
   }
 `
 const HeaderNav = styled.nav`
-  max-width: 1140px;
+  max-width: ${sizes.desktop};
   width: 100%;
   height: 80px;
   gap: 10px;
@@ -173,7 +186,7 @@ const HeaderNav = styled.nav`
         height: 15px;
         background: #f7cdcd;
         margin: 0 15px;
-        @media only screen and (max-width: 375px) {  
+         @media ${media.mobile}{    
           height: 10px;
         }
       }
@@ -223,7 +236,7 @@ const HeaderNav = styled.nav`
     }
   }
   
-  @media only screen and (max-width: 375px) {  
+   @media ${media.mobile}{    
     height: 60px;
     ul { 
       li > a{
@@ -252,7 +265,7 @@ const HeaderNav = styled.nav`
   }
 ` 
 const HeaderSubNav = styled.nav`
-  max-width: 1140px; 
+  max-width: ${sizes.desktop}; 
   width: 100%;
   margin: 0 auto;
   ul {
@@ -303,7 +316,7 @@ const HeaderSubNav = styled.nav`
         }
       }
     }
-    @media only screen and (max-width: 375px) {
+     @media ${media.mobile}{  
       height: 50px; 
       justify-content: center;
       li {
