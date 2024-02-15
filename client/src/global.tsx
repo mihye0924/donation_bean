@@ -75,5 +75,6 @@ a{
 input,textarea  {
     font-family: 'NanumSquareNeo-Variable';  
     border: 0;
+    margin: 0;
 }
 `;
