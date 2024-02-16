@@ -1,16 +1,16 @@
 import styled from "styled-components"
 
 interface AccordionProps {
-  children: JSX.Element
+  children: JSX.Element | null;
   title: string;
   onClick?: () => void; 
-  active: boolean;
-  toggle?: boolean;
+  active?: boolean;
+  toggle?: boolean; 
 }
 
 const Accordion = (props: AccordionProps) => { 
   return (
-    <AccordionWrap className={!props.active ? 'active' : ''}>
+    <AccordionWrap className={ props.active ? '' : 'active'}>
       <AccordionHeader>
         <h1>{props.title}</h1>
         {
@@ -36,6 +36,7 @@ const AccordionWrap = styled.div`
     }
     .accord_body { 
       height: 0;
+      border-top: 0;
       padding: 0 20px;
       transition: all 0.5s ease-in-out;
     }
@@ -66,8 +67,8 @@ const AccordionBody = styled.div`
   background-color: #fff;
   overflow: hidden;
   border-radius: 0 0 15px 15px;
-  height:  auto;
   border-top: 1px solid #f1f1f1;
+  height:  auto;
   padding: 20px;
   line-height: 1.5;
 `
