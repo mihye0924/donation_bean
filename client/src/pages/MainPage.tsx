@@ -1,5 +1,4 @@
 import Radio from "@/components/Radio"
-import { useState } from "react"
 import styled from "styled-components"
 
 const RadioList = [
@@ -7,14 +6,14 @@ const RadioList = [
         keyId: 0,
         label: '전체1',
         id: 'option1',
-        value: 'options1',
+        value: 'option1',
         imgUrl: 'img'
     },
     {
         keyId: 1,
         label: '전체1',
         id: 'option2',
-        value: 'option2',
+        value: 'option3',
         imgUrl: 'img'
     },
     {
@@ -41,7 +40,6 @@ const RadioList = [
 ]
 
 const MainPage = () =>  {
-    const [radioValue, setRadioValue] = useState(false)
     return(
         <>
             {/* 슬라이드 확정시 변경 */}
@@ -52,22 +50,20 @@ const MainPage = () =>  {
             </SlideList>
             <RadioWrap>
                 <form>
-                    {
-                        RadioList.map((item,index) => {
+                {
+                        RadioList.map((item) => {
                             return (
                                 <Radio 
                                     key={item.keyId}
                                     label={item.label}
                                     id={item.id} 
                                     value={item.value} 
-                                    name="기부리스트" 
                                     imgUrl={item.imgUrl} 
-                                    aria-checked={radioValue ? true : false}
-                                    onChange={(e) => setRadioValue(e.target.value)}
+                                    name="기부리스트" 
                                 />
                             )
                         })
-                    }
+                    } 
                 </form>
             </RadioWrap>
         </>
