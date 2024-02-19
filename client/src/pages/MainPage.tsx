@@ -1,4 +1,6 @@
+import CardList from "@/components/CardLise"
 import Radio from "@/components/Radio"
+import { useState } from "react"
 import styled from "styled-components"
 
 const RadioList = [
@@ -38,10 +40,83 @@ const RadioList = [
         imgUrl: 'img'
     }
 ]
+const CardItemList = [
+    {
+        id: 0,
+        to:"/",
+        imgSrc:"./", 
+        imgUrl:"./" ,
+        title:"sdadasdasd\nasdsa",
+        agency:"sadsads",
+        day:1231,
+        price:2313
+    },
+    {
+        id: 0,
+        to:"/",
+        imgSrc:"./", 
+        imgUrl:"./" ,
+        title:"sdadasdasd\nasdsa",
+        agency:"sadsads",
+        day:1231,
+        price:2313
+    },
+    {
+        id: 0,
+        to:"/",
+        imgSrc:"./", 
+        imgUrl:"./" ,
+        title:"sdadasdasd\nasdsa",
+        agency:"sadsads",
+        day:1231,
+        price:2313
+    },
+    {
+        id: 0,
+        to:"/",
+        imgSrc:"./", 
+        imgUrl:"./" ,
+        title:"sdadasdasd\nasdsa",
+        agency:"sadsads",
+        day:1231,
+        price:2313
+    },
+    {
+        id: 0,
+        to:"/",
+        imgSrc:"./", 
+        imgUrl:"./" ,
+        title:"sdadasdasd\nasdsa",
+        agency:"sadsads",
+        day:1231,
+        price:2313
+    },
+    {
+        id: 0,
+        to:"/",
+        imgSrc:"./", 
+        imgUrl:"./" ,
+        title:"sdadasdasd\nasdsa",
+        agency:"sadsads",
+        day:1231,
+        price:2313
+    },
+    {
+        id: 0,
+        to:"/",
+        imgSrc:"./", 
+        imgUrl:"./" ,
+        title:"sdadasdasd\nasdsa",
+        agency:"sadsads",
+        day:1231,
+        price:2313
+    }
+]
 
 const MainPage = () =>  {
+    const [radioActive, setRadioActive] = useState<number>();
     return(
-        <>
+        <MainInner>
             {/* 슬라이드 확정시 변경 */}
             <SlideList>
                 <div>
@@ -51,41 +126,72 @@ const MainPage = () =>  {
             <RadioWrap>
                 <form>
                 {
-                        RadioList.map((item) => {
+                        RadioList.map((item, index) => {
                             return (
                                 <Radio 
+                                    className={radioActive === index ? "active" : ""}
                                     key={item.keyId}
                                     label={item.label}
                                     id={item.id} 
                                     value={item.value} 
                                     imgUrl={item.imgUrl} 
                                     name="기부리스트" 
+                                    onChange={() => setRadioActive(index)}
                                 />
                             )
                         })
                     } 
                 </form>
             </RadioWrap>
-        </>
+            <CardWrap>
+                {
+                    CardItemList.map((item) => {
+                        return (
+                            <CardList 
+                                key={item.id}
+                                to={item.to}
+                                imgSrc={item.imgSrc} 
+                                imgUrl={item.imgUrl} 
+                                title={item.title}
+                                agency={item.agency}
+                                day={item.day}
+                                price={item.price}
+                            />
+                        )
+                    })
+                }
+            </CardWrap>
+        </MainInner>
     )
 }
 export default MainPage 
 
-const SlideList = styled.div`
-    max-width: 1140px;
+const MainInner = styled.div`
+    max-width: 1200px;
     width: 100%;
-    height: 500px;
     margin: 0 auto;
+`
+const SlideList = styled.div`
+    height: 500px;
     background-color: #ddd;
 `
 
 const RadioWrap = styled.div`
-    max-width: 1140px;
-    width: 100%;
-    height: 500px;
-    margin: 60px auto 0;
+    margin: 60px auto 20px;
+    radio.active {
+        border-color: blue;
+    }
     form {
         display: flex;
         gap: 8px;
+    }
+`
+
+const CardWrap = styled.ul`
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    li {
+        flex: 0 1 calc((100% / 4) - 20px)
     }
 `

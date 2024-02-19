@@ -1,7 +1,7 @@
 import styled from "styled-components"
 
 
-interface RadioProps {
+interface SelectProps {
     label: string;
     value: string;
     name: string;
@@ -11,11 +11,11 @@ interface RadioProps {
     onChange: () => void;
 }
 
-const Radio = (props: RadioProps) => { 
+const Select = (props: SelectProps) => { 
   return (
-      <RadioItem htmlFor={props.id} className={props.className}>
+      <SelectItem htmlFor={props.id} className={props.className}>
           <input 
-              type="radio" 
+              type="select" 
               id={props.id}
               name={props.name}
               value={props.value}
@@ -23,13 +23,13 @@ const Radio = (props: RadioProps) => {
           />
           <i className={props.imgUrl} />
           {props.label}
-      </RadioItem>
+      </SelectItem>
   )
 }
 
-export default Radio
+export default Select
 
-const RadioItem = styled.label`
+const SelectItem = styled.label`
       border: 1px solid #ddd;
       border-radius: 20px;
       padding: 8px 6px;
