@@ -101,7 +101,7 @@ const Header = () => {
 export default Header
 
 const sizes = {
-  desktop: "1024px",
+  desktop: "1200px",
   tablet: "768px",
   mobile: "375px"
 };
@@ -138,7 +138,7 @@ const HeaderWrap = styled.header`
       display: inline-block;
       font-family: 'NanumSquareNeo-Variable';
       font-weight: 600;
-      font-size: 20px;
+      font-size: 18px;
       color: #00ab33;
       background-color: transparent;
       border: 0;
@@ -176,7 +176,7 @@ const HeaderNav = styled.nav`
     li > a {
       font-family: 'NanumSquareNeo-Variable';
       font-weight: 600;
-      font-size: 20px;
+      font-size: 18px;
     }
     li:first-child { 
       &::after {
@@ -297,7 +297,7 @@ const HeaderSubNav = styled.nav`
         background-color: transparent;
         border: 0;
         font-family: 'NanumSquareNeo-Variable'; 
-        font-size: 20px; 
+        font-size: 18px; 
         white-space: pre; 
       }
       &.active {
