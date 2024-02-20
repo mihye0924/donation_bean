@@ -41,6 +41,17 @@ const Accordion = (props: AccordionProps) => {
 }
 
 export default Accordion
+const sizes = {
+  desktop: "1200px",
+  tablet: "768px",
+  mobile: "375px"
+}; 
+// 미디어 쿼리를 위한 도우미 함수
+const media = {
+desktop: `(max-width: ${sizes.desktop})`,
+tablet: `(max-width: ${sizes.tablet})`,
+mobile: `(max-width: ${sizes.mobile})`,
+}; 
 
 const AccordionWrap = styled.div`
   &.active {
@@ -78,6 +89,15 @@ const AccordionHeader =  styled.div`
     border: 0;
     cursor: pointer;
   }
+    @media ${media.tablet}{ 
+      h1 { 
+        font-size: 16px;
+      }
+      button {
+         width: 15px;
+         height: 15px;
+      }
+    }
 `
 const AccordionBody = styled.div`
   background-color: #fff;
@@ -87,5 +107,8 @@ const AccordionBody = styled.div`
   height:  auto;
   padding: 50px 70px;
   line-height: 1.5;
+  @media ${media.tablet}{ 
+    padding: 20px;  
+    }
 `
  
