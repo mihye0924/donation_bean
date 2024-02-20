@@ -7,18 +7,20 @@ interface RadioProps {
     id: string;
     imgUrl?: string; 
     className: string
+    type?: string;
     onChange: () => void;
     type?: string;
 }
 
 const Radio = (props: RadioProps) => { 
-  return ( 
+  return (
       <>
-      {(()=>{ 
-        switch(props.type) {
-          case "image":
-            return ( 
-              <RadioItem htmlFor={props.id} className={props.className}>
+        {
+          (() => {
+            switch (props.type) {
+              case "image": 
+              return(
+                <RadioItem htmlFor={props.id} className={props.className}>
                   <input 
                       type="radio" 
                       id={props.id}
@@ -29,30 +31,41 @@ const Radio = (props: RadioProps) => {
                   <i className={props.imgUrl} />
                   {props.label}
               </RadioItem>
-            )
-          case "round":
-            return(
-              <RadioRound className={props.className}>
-                <input 
-                    type="radio" 
-                    id={props.id}
-                    name={props.name}
-                    value={props.value}
-                    onChange={props.onChange}
-                />  
-                <label htmlFor={props.id}>{props.label}</label>
-            </RadioRound>
-            )
-          default: 
-           break;
+              )
+              case "round": 
+              return(
+                <RadioRound className={props.className}>
+                  <input 
+                      type="radio" 
+                      id={props.id}
+                      name={props.name}
+                      value={props.value}
+                      onChange={props.onChange}
+                  />
+                  <label htmlFor={props.id}>{props.label}</label> 
+              </RadioRound>
+              )
+              default:
+                break;
+            }
+          })()
         }
-      })()}
-    </>
+      </>
   )
 }
 
 export default Radio
-
+const sizes = {
+  desktop: "1200px",
+  tablet: "768px",
+  mobile: "375px"
+}; 
+// 미디어 쿼리를 위한 도우미 함수
+const media = {
+desktop: `(max-width: ${sizes.desktop})`,
+tablet: `(max-width: ${sizes.tablet})`,
+mobile: `(max-width: ${sizes.mobile})`,
+}; 
 const RadioItem = styled.label`
     border: 1px solid #ddd;
     border-radius: 20px;
@@ -63,7 +76,7 @@ const RadioItem = styled.label`
 `
 const RadioRound = styled.div`
   position: relative; 
-  margin-left: 30px;
+  margin-left: 30px; 
   input{ 
       position: absolute;
       width: 1px;
@@ -103,5 +116,11 @@ const RadioRound = styled.div`
     }
     label {
       cursor: pointer;
+      white-space: pre;
+    }
+    @media ${media.tablet}{ 
+      label {
+        font-size: 14px;
+      }
     }
 `
