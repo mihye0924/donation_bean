@@ -1,5 +1,6 @@
 import CardList from "@/components/CardLise"
 import Radio from "@/components/Radio"
+import Select from "@/components/Select"
 import { useState } from "react"
 import styled from "styled-components"
 
@@ -49,7 +50,8 @@ const CardItemList = [
         title:"sdadasdasd\nasdsa",
         agency:"sadsads",
         day:1231,
-        price:2313
+        price:2313,
+        percentage: 50
     },
     {
         id: 0,
@@ -59,7 +61,8 @@ const CardItemList = [
         title:"sdadasdasd\nasdsa",
         agency:"sadsads",
         day:1231,
-        price:2313
+        price:2313,
+        percentage: 50
     },
     {
         id: 0,
@@ -69,7 +72,8 @@ const CardItemList = [
         title:"sdadasdasd\nasdsa",
         agency:"sadsads",
         day:1231,
-        price:2313
+        price:2313,
+        percentage: 50
     },
     {
         id: 0,
@@ -79,7 +83,8 @@ const CardItemList = [
         title:"sdadasdasd\nasdsa",
         agency:"sadsads",
         day:1231,
-        price:2313
+        price:2313,
+        percentage: 50
     },
     {
         id: 0,
@@ -89,7 +94,8 @@ const CardItemList = [
         title:"sdadasdasd\nasdsa",
         agency:"sadsads",
         day:1231,
-        price:2313
+        price:2313,
+        percentage: 50
     },
     {
         id: 0,
@@ -99,7 +105,8 @@ const CardItemList = [
         title:"sdadasdasd\nasdsa",
         agency:"sadsads",
         day:1231,
-        price:2313
+        price:2313,
+        percentage: 50
     },
     {
         id: 0,
@@ -109,10 +116,20 @@ const CardItemList = [
         title:"sdadasdasd\nasdsa",
         agency:"sadsads",
         day:1231,
-        price:2313
+        price:2313,
+        percentage: 50
     }
 ]
-
+const selectOptions = [
+    {
+        value: "123",
+        label: "123"
+    },
+    {
+        value: "12",
+        label: "13"
+    }
+]
 const MainPage = () =>  {
     const [radioActive, setRadioActive] = useState<number>();
     return(
@@ -123,6 +140,12 @@ const MainPage = () =>  {
 
                 </div>
             </SlideList>
+            <SelectWrap>
+                <Select 
+                    selectOptions={selectOptions}
+                    size={300}
+                />
+            </SelectWrap>
             <RadioWrap>
                 <form>
                 {
@@ -157,6 +180,7 @@ const MainPage = () =>  {
                                 agency={item.agency}
                                 day={item.day}
                                 price={item.price}
+                                percentage={item.percentage}
                             />
                         )
                     })
@@ -174,6 +198,9 @@ const MainInner = styled.div`
 `
 const SlideList = styled.div`
     height: 500px;
+    background-color: #ddd;
+`
+const SelectWrap = styled.div`
     background-color: #ddd;
 `
 

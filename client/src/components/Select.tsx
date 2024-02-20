@@ -1,40 +1,44 @@
-import styled from "styled-components"
+import styled from "styled-components";
+import ReactSelect, { StylesConfig } from 'react-select'
 
-
-interface SelectProps {
-    label: string;
-    value: string;
-    name: string;
-    id: string;
-    imgUrl: string; 
-    className: string
-    onChange: () => void;
+interface Option {
+  value: string;
+  label: string;
 }
+interface SelectProps {
+  selectOptions: Option[];
+  color?: string;
+  isFixed?: boolean;
+  isDisabled?: boolean;
+  size: number;
+  onChange?: (selectedOption: Option) => void;
+}
+const customStyles = (props: SelectProps): StylesConfig<Option, false> => ({
+  control: (provided) => ({
+    ...provided,
+    width: `${props.size}px`, // 동적으로 너비 설정
+  }),
+  indicatorSeparator: () => ({
+    display: 'none',
+  }),
+});
 
 const Select = (props: SelectProps) => { 
   return (
-      <SelectItem htmlFor={props.id} className={props.className}>
-          <input 
-              type="select" 
-              id={props.id}
-              name={props.name}
-              value={props.value}
-              onChange={props.onChange}
-          />
-          <i className={props.imgUrl} />
-          {props.label}
-      </SelectItem>
+    <SelectItem>
+      <ReactSelect 
+        options={props.selectOptions}
+        closeMenuOnSelect={true}
+        onChange={() => props.onChange}
+        defaultValue={props.selectOptions[0]}
+        styles={customStyles(props)}
+      /> 
+    </SelectItem>
   )
 }
 
 export default Select
 
-const SelectItem = styled.label`
-      border: 1px solid #ddd;
-      border-radius: 20px;
-      padding: 8px 6px;
-      &.active {
-        border-color: blue;
-      }
-  }
+const SelectItem = styled.div`
+  display: inline-block
 `

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import styled from "styled-components"
+import Progressbar from "./Progressbar";
 
 
 interface CardProps {
@@ -10,7 +11,7 @@ interface CardProps {
     agency: string;
     day: number;
     price: number;
-
+    percentage: number;
 }
 const CardList = (props: CardProps) => { 
   return (
@@ -28,9 +29,9 @@ const CardList = (props: CardProps) => {
                     <span>{props.agency}</span>
                 </TextTop>
                 <TextBottom>
-                    <ProgressBar />
-                    <div>
-                        <p className="percent">63%</p>
+                    <Progressbar percentage={props.percentage} />
+                    <div className="text-list">
+                        <p className="percent">{props.percentage}%</p>
                         <p className="price"><span>{props.price}</span>원</p>
                     </div>
                 </TextBottom>
@@ -77,18 +78,15 @@ const TopTitle = styled.div`
     }
 `
 const TextBottom = styled.div`
-    div {
+    .text-list {
+        margin-top: 6px;
         display: flex;
         justify-content: space-between;
         p {
-            font-size: 18px
+            font-size: 18px;
+            &.percent {
+                color: #00B2FF;
+            }
         }
     }
-`
-// 미정
-const ProgressBar = styled.div`
-    width: 100%;
-    height: 4px;
-    background-color: blue;
-    margin-bottom: 6px;
 `
