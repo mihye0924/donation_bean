@@ -6,22 +6,37 @@ interface AccordionProps {
   onClick?: () => void; 
   active?: boolean;
   toggle?: boolean; 
+  type?: string;
 }
 
 const Accordion = (props: AccordionProps) => { 
-  return (
-    <AccordionWrap className={ props.active ? '' : 'active'}>
-      <AccordionHeader>
-        <h1>{props.title}</h1>
-        {
-          props.toggle &&
-          <button onClick={props.onClick}></button>
+  return ( 
+    <AccordionWrap 
+      className={`${props.active ? '' : 'active'} ${props.type ? 'row': ''}`}
+      > 
+      {
+          props.type === "custom" ?
+          <div> 
+            {props.children}
+          </div> 
+          :
+          <div>
+            { 
+              <AccordionHeader>
+              <h1>{props.title}</h1>
+              {
+                props.toggle &&
+                <button onClick={props.onClick}></button>
+              }
+            </AccordionHeader>
+            }
+            <AccordionBody className="accord_body">
+              {props.children}
+            </AccordionBody>
+          </div>
         }
-      </AccordionHeader>
-      <AccordionBody className="accord_body">
-        {props.children}
-      </AccordionBody>
-    </AccordionWrap>
+    </AccordionWrap> 
+      
   )
 }
 
@@ -37,10 +52,10 @@ const AccordionWrap = styled.div`
     .accord_body { 
       height: 0;
       border-top: 0;
-      padding: 0 20px;
+      padding: 0 70px;
       transition: all 0.5s ease-in-out;
     }
-  }
+  } 
 `
 
 const AccordionHeader =  styled.div`
@@ -61,6 +76,7 @@ const AccordionHeader =  styled.div`
     width: 25px;
     height: 25px;
     border: 0;
+    cursor: pointer;
   }
 `
 const AccordionBody = styled.div`
@@ -69,6 +85,7 @@ const AccordionBody = styled.div`
   border-radius: 0 0 15px 15px;
   border-top: 1px solid #f1f1f1;
   height:  auto;
-  padding: 20px;
+  padding: 50px 70px;
   line-height: 1.5;
 `
+ 
