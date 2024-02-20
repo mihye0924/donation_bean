@@ -8,8 +8,7 @@ interface RadioProps {
     imgUrl?: string; 
     className: string
     type?: string;
-    onChange: () => void;
-    type?: string;
+    onChange: () => void; 
 }
 
 const Radio = (props: RadioProps) => { 
