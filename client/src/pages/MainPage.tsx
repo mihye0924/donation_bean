@@ -15,7 +15,7 @@ const RadioList = [
         keyId: 1,
         label: '전체1',
         id: 'option2',
-        value: 'option3',
+        value: 'option2',
         imgUrl: 'img'
     },
     {
@@ -134,7 +134,8 @@ const MainPage = () =>  {
                                     label={item.label}
                                     id={item.id} 
                                     value={item.value} 
-                                    imgUrl={item.imgUrl} 
+                                    imgUrl={item.imgUrl}  
+                                    type="image"
                                     name="기부리스트" 
                                     onChange={() => setRadioActive(index)}
                                 />
