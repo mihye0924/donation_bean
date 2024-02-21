@@ -100,16 +100,31 @@ const Header = () => {
 
 export default Header
 
+const sizes = {
+  desktop: "1200px",
+  tablet: "768px",
+  mobile: "375px"
+};
+
+// 미디어 쿼리를 위한 도우미 함수
+const media = {
+  desktop: `(max-width: ${sizes.desktop})`,
+  tablet: `(max-width: ${sizes.tablet})`,
+  mobile: `(max-width: ${sizes.mobile})`,
+};
+
 const HeaderWrap = styled.header` 
   background: #fff;
   position: fixed;
   width: 100%;
+    top: 0;
+    z-index: 5;
   h1 {
     font-family: 'yg-jalnan';
     font-size: 32px;
     font-weight: 700; 
     color: #f56400; 
-    @media only screen and (max-width: 375px) {  
+    @media ${media.mobile}{  
       font-size: 24px;
     }
   }
@@ -123,12 +138,12 @@ const HeaderWrap = styled.header`
       display: inline-block;
       font-family: 'NanumSquareNeo-Variable';
       font-weight: 600;
-      font-size: 20px;
+      font-size: 18px;
       color: #00ab33;
       background-color: transparent;
       border: 0;
     }
-    @media only screen and (max-width: 375px) {
+     @media ${media.mobile}{  
       gap: 20px;
       > span { 
         font-size: 16px;
@@ -145,7 +160,7 @@ const HeaderBorder = styled.div`
   }
 `
 const HeaderNav = styled.nav`
-  max-width: 1140px;
+  max-width: ${sizes.desktop};
   width: 100%;
   height: 80px;
   gap: 10px;
@@ -161,7 +176,7 @@ const HeaderNav = styled.nav`
     li > a {
       font-family: 'NanumSquareNeo-Variable';
       font-weight: 600;
-      font-size: 20px;
+      font-size: 18px;
     }
     li:first-child { 
       &::after {
@@ -171,7 +186,7 @@ const HeaderNav = styled.nav`
         height: 15px;
         background: #f7cdcd;
         margin: 0 15px;
-        @media only screen and (max-width: 375px) {  
+         @media ${media.mobile}{    
           height: 10px;
         }
       }
@@ -221,7 +236,7 @@ const HeaderNav = styled.nav`
     }
   }
   
-  @media only screen and (max-width: 375px) {  
+   @media ${media.mobile}{    
     height: 60px;
     ul { 
       li > a{
@@ -250,7 +265,7 @@ const HeaderNav = styled.nav`
   }
 ` 
 const HeaderSubNav = styled.nav`
-  max-width: 1140px; 
+  max-width: ${sizes.desktop}; 
   width: 100%;
   margin: 0 auto;
   ul {
@@ -282,7 +297,7 @@ const HeaderSubNav = styled.nav`
         background-color: transparent;
         border: 0;
         font-family: 'NanumSquareNeo-Variable'; 
-        font-size: 20px; 
+        font-size: 18px; 
         white-space: pre; 
       }
       &.active {
@@ -301,7 +316,7 @@ const HeaderSubNav = styled.nav`
         }
       }
     }
-    @media only screen and (max-width: 375px) {
+     @media ${media.mobile}{  
       height: 50px; 
       justify-content: center;
       li {
