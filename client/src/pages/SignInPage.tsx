@@ -1,6 +1,5 @@
 import useMutation from "@/hooks/useMutation";
 import { getUser } from "@/util/userinfo";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
