@@ -4,14 +4,14 @@ import jwt from "jsonwebtoken";
 
 export async function getId(req, res) {
   const { id } = req.query;
-
+  console.log(id);
+  if (!id) return res.json({ join: "중복체크전" });
   const result = await UserRepository.getId(id);
-
-  if (result.cnt === 0) {
-    return res.json({ ok: false });
+  if (result.cnt === 1) {
+    return res.json({ join: false });
   }
-  if (result.cnt > 0) {
-    res.json({ ok: true });
+  if (result.cnt === 0) {
+    return res.json({ join: true });
   }
 }
 

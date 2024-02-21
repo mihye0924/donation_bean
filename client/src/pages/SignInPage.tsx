@@ -1,6 +1,10 @@
 import useMutation from "@/hooks/useMutation";
-import { useCallback, useState } from "react";
+import { getUser } from "@/util/userinfo";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axios from "axios";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 interface IFormData {
@@ -13,13 +17,45 @@ interface IFormData {
   user_name: string;
 }
 
+interface IResponse {
+  join: string | boolean;
+}
+
 const SignInPage = () => {
   const [currentSelect, setCurrentSelect] = useState("");
-  const [mutation, { loading, data, error }] = useMutation(
-    `http://localhost:8081/user/signin`
-  );
-  const { register, handleSubmit, setValue, setFocus, reset } =
+  const [idExist, setIdExist] = useState(true);
+  const [queryData, setQueryData] = useState<IResponse>();
+  const [singInMutation, { loading: mutationLoading, data: mutationData }] =
+    useMutation(`http://localhost:8081/user/signin`);
+  /*  const queryClient = useQueryClient();
+  const { data: queryData, isLoading } = useQuery<IResponse>({
+    queryKey: ["idExist"],
+    queryFn: () =>
+      axios
+        .get(`http://localhost:8081/user/signin?id=${watch("user_id")}`)
+        .then((res) => res.data),
+  }); */
+
+  const onIdExistClick = useCallback(() => {
+    axios
+      .get(`http://localhost:8081/user/signin?id=${watch("user_id")}`)
+      .then((res) => setQueryData(res.data));
+  }, []);
+
+  useEffect(() => {
+    if (queryData && queryData.join) {
+      setIdExist(false);
+      return alert("사용 가능한 아이디입니다.");
+    }
+    if (queryData && !queryData.join) {
+      setIdExist(true);
+      return alert("이미 존재하는 아이디입니다.");
+    }
+  }, [queryData]);
+  console.log(queryData);
+  const { register, handleSubmit, setValue, setFocus, reset, watch } =
     useForm<IFormData>();
+
   const onSelectChange = useCallback(
     (e: React.ChangeEvent<HTMLSelectElement>) => {
       setValue("emailDomain", "");
@@ -28,7 +64,26 @@ const SignInPage = () => {
     []
   );
 
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (mutationData && mutationData.ok) {
+      navigate("/login");
+    }
+  }, [mutationData]);
+
+  const user = getUser();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+  useEffect(() => {
+    setIdExist(true);
+  }, [watch("user_id")]);
+
   const onValid = (data: IFormData) => {
+    if (idExist === true) return alert("중복 확인을 해주세요");
     const {
       user_id,
       user_pw,
@@ -44,23 +99,23 @@ const SignInPage = () => {
       return setFocus("user_pw_check");
     }
 
-    mutation({
+    singInMutation({
       user_id,
       user_pw,
       user_phone,
       user_name,
       user_email: emailPrefix + "@" + emailDomain,
     });
-    /*       reset();   */
+    reset();
   };
 
   return (
-    <>
+    <HeaderPadding>
       <Wrapper>
         <Center>
           <Title>회원가입</Title>
           <Form onSubmit={handleSubmit(onValid)} action="">
-            <Notice>개인 정보를 입력 해주세요.</Notice>
+            <Notice>개인정보를 입력해 주세요</Notice>
             <div>
               <Label>아이디</Label>
               <DoubleCheck>
@@ -72,7 +127,12 @@ const SignInPage = () => {
                   placeholder="아이디"
                   type="text"
                 />
-                <div>중복확인</div>
+                <div
+                  style={{ background: "lightgray" }}
+                  onClick={onIdExistClick}
+                >
+                  중복확인
+                </div>
               </DoubleCheck>
               <Constraint>영문, 숫자, 영문+숫자로 6~15자 이내</Constraint>
             </div>
@@ -89,7 +149,7 @@ const SignInPage = () => {
                   type="text"
                 />
               </PassCheck>
-              <Constraint>이름을 입력해주세요</Constraint>
+              <Constraint>이름을 입력해 주세요</Constraint>
             </FormBox>
             <FormBox>
               <Label>비밀번호</Label>
@@ -139,7 +199,7 @@ const SignInPage = () => {
                 />
               </PassCheck>
               <Constraint>
-                '-' 기호 없이 전화번호 11자리 입력해주세요
+                '-' 기호 없이 전화번호 11자리 입력해 주세요
               </Constraint>
             </FormBox>
             <FormBox>
@@ -168,20 +228,25 @@ const SignInPage = () => {
             </FormBox>
             <ButtonArea>
               <button type="button">취소</button>
-              <button type="submit">가입</button>
+              <button type="submit">{mutationLoading ? "로딩" : "가입"}</button>
             </ButtonArea>
           </Form>
         </Center>
       </Wrapper>
-    </>
+    </HeaderPadding>
   );
 };
 
 export default SignInPage;
 
+const HeaderPadding = styled.div`
+  padding-top: 200px;
+  padding-bottom: 50px;
+`;
+
 const sizes = {
   tablet: "768px",
-  desktop: "1024px",
+  desktop: "1200px",
 };
 
 // 미디어 쿼리를 위한 도우미 함수
@@ -191,20 +256,14 @@ const media = {
 };
 
 const Wrapper = styled.div`
-  margin-top: 10vh;
-
-  border-radius: 10px;
-  padding-top: 50px;
-  padding-bottom: 40px;
+  padding: 50px 10px 40px 10px;
   font-weight: bold;
-
+  border: none;
+  margin: 0 auto;
   @media ${media.tablet} {
     border: 1px solid black;
+    border-radius: 10px;
     width: 640px;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
     box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
     -webkit-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
@@ -225,6 +284,7 @@ const Title = styled.h1`
     margin-bottom: 40px;
     font-weight: 600;
   }
+  text-align: center;
   font-size: 18px;
   margin-bottom: 40px;
   font-weight: bold;
@@ -236,6 +296,7 @@ const Form = styled.form`
 `;
 
 const Notice = styled.p`
+  text-align: center;
   font-size: 16px;
   margin-bottom: 40px;
 `;
@@ -359,6 +420,7 @@ const ButtonArea = styled.div`
     flex-direction: row;
   }
   button {
+    cursor: pointer;
     @media ${media.tablet} {
       font-weight: 600;
       color: white;
