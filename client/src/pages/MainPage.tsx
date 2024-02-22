@@ -209,6 +209,7 @@ const MainPage = () =>  {
                 <Select 
                     selectOptions={selectOptions}
                     size={300}
+                    onChange={(e) => console.log(e)}
                 />
             </SelectWrap>
             <RadioWrap>
