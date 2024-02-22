@@ -45,7 +45,6 @@ CREATE TABLE user (
   KEY index_user_id (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci; 
 
-
 CREATE TABLE payment (
   payment_no int NOT NULL AUTO_INCREMENT,
   user_id varchar(10) DEFAULT NULL,
@@ -60,6 +59,8 @@ CREATE TABLE payment (
   payment_account_company varchar(10) DEFAULT NULL,
   payment_account_transfer int DEFAULT NULL,
   payment_account_num varchar(100) DEFAULT NULL,
+  payment_birth varchar(10) DEFAULT NULL COMMENT '개인: 생년월일',
+  payment_company_code varchar(20) DEFAULT NULL COMMENT '법인: 사업자등록번호',
   PRIMARY KEY (payment_no),
 	KEY user_id (user_id), 
   CONSTRAINT payment_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id)
