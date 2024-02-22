@@ -1,13 +1,11 @@
 import CardList from "@/components/CardLise"
 import Radio from "@/components/Radio"
 import Select from "@/components/Select"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
-import ReactDOMServer from 'react-dom/server';
+import { Autoplay, Navigation } from 'swiper/modules';
 import 'swiper/css';
-import 'swiper/css/pagination';
 // Radio
 const RadioList = [
     {   
@@ -155,35 +153,56 @@ const SlideList = [
 const MainPage = () =>  {
     // Radio Index
     const [radioActive, setRadioActive] = useState<number>();
-    // Swiper slide 영역
-    const [swiperIndex, setSwiperIndex] = useState<number>(0); // -> 페이지네이션용
-    const onSwiper = (e:any) => {
-        console.log(e)
-        setSwiperIndex(e.realIndex + 1);
-    }
-    const renderProgressbar = (progressbarFillClass:string) => {
-        return ReactDOMServer.renderToStaticMarkup(<span className={progressbarFillClass}>{swiperIndex}</span>);
+    // Swiper slide Index
+    const [swiperIndex, setSwiperIndex] = useState<number>(1); 
+    // Swiper slide progress
+    const progressProgress = useRef<any>(null);
+    const onAutoplayTimeLeft = (s:any, time:any, progress:any) => {
+        progressProgress.current.style.setProperty('--progress', 1 - progress);
+    };
+    // slide 정지 기능
+    const [swiperPause, setSwiperPause] = useState<any>(); 
+    const [pauseNum, setPauseNum] = useState<number>(0); 
+    const handleSlidePause = () => {
+        if(pauseNum === 0) {
+            setPauseNum(1)
+            swiperPause.autoplay.stop();
+        } else {
+            setPauseNum(0)
+            swiperPause.autoplay.start();
+        }
     }
     return(
         <MainInner>
             {/* 슬라이드 확정시 변경 */}{swiperIndex}
             <SwiperWrap>
                 <Swiper
-                    pagination={{clickable: true, type: 'progressbar', renderProgressbar}}
-                    modules={[Pagination]}
-                    loop
-                    onSlideChange={(e) => onSwiper(e)}
+                    spaceBetween={30}
+                    centeredSlides={true}
+                    autoplay={{
+                    delay: 2500,
+                    disableOnInteraction: false,
+                    }}
+                    navigation={true}
+                    modules={[Autoplay, Navigation]}
+                    onSlideChange={(e:any) => setSwiperIndex(e.realIndex + 1)}
+                    onSwiper={(e:any) => setSwiperPause(e)}
+                    onAutoplayTimeLeft={onAutoplayTimeLeft}
                     className="mySwiper"
-                    >
+                >
                         {
                             SlideList.map((item) => {
                                 return (
                                     <SwiperSlide key={item.id}><img src={item.img} alt="배너" />${swiperIndex}</SwiperSlide>
                                 )
                             })
-                        }
-                    <SwiperSlide><img src="/images/slideBanner1.png" alt="배너"/></SwiperSlide>
-
+                        }  
+                    <div className="autoplay-progress" slot="container-end">
+                        <span>{swiperIndex}</span>
+                        <div ref={progressProgress} />
+                        <span>{SlideList.length}</span>
+                        <button onClick={handleSlidePause}>정지</button>
+                    </div>
                 </Swiper>
             </SwiperWrap>
             <SelectWrap>
@@ -282,6 +301,30 @@ const SwiperWrap = styled.div`
                 }
             }
         }
+        .autoplay-progress {
+            position: absolute;
+            right: 16px;
+            bottom: 16px;
+            z-index: 10;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--swiper-theme-color);
+          }
+          
+          .autoplay-progress div {
+            --progress: 0;
+            position: absolute;
+            left: 0;
+            top: 0px;
+            z-index: 10;
+            width: calc(100% * (1 - var(--progress)));
+            height: 2px;
+            background-color: var(--swiper-theme-color);
+          }
     }
 `
 const SelectWrap = styled.div`
