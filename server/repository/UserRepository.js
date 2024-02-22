@@ -1,5 +1,10 @@
 import { db } from "../db/database.js";
 
+export async function getId(id) {
+  const sql = `select count(user_id) as cnt from user where user_id =?`;
+  return db.execute(sql, [id]).then((row) => row[0][0]);
+}
+
 export async function insertUser(
   user_name,
   user_id,
@@ -13,7 +18,7 @@ export async function insertUser(
     .then((row) => "ok");
 }
 
-/* export async function insertReview(id, isbn, title, content, point) {
-    const sql = `INSERT review (id,isbn,title,content,point,rdate)value(?,?,?,?,?,curdate())`;
-    return db.execute(sql, [id, isbn, title, content, point]).then((row) => "ok");
-  } */
+export async function login(id) {
+  const sql = `SELECT count(user_pw) AS cnt,any_value(user_pw) AS pass  FROM user where user_id =?`;
+  return db.execute(sql, [id]).then((row) => row[0][0]);
+}

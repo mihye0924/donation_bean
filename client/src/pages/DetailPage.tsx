@@ -1,46 +1,59 @@
-import Accordion from "@/components/Accordion" 
+import Accordion, { AccordionProps } from "@/components/Accordion" 
 import Button from "@/components/Button"
-import CheckBox from "@/components/CheckBox"
+import CheckBox, { CheckboxProps } from "@/components/CheckBox"
 import Radio from "@/components/Radio"
 import Title from "@/components/Title"
-import { useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import styled from "styled-components"
+import agreeTerms from "@/api/AgreeTerms.json"
+import Progressbar from "@/components/Progressbar" 
+import Select from "@/components/Select" 
+
 
 const StepList = [
     {
         id: 0,
         title: "후원내용",
         content: '1월 29일 제주돌고래 긴급구조단이 종달이 꼬리에 걸린 낚싯줄 제거에 성공했습니다. 아직 종달이 몸과 입에 제거하지 못한 낚싯줄이 남아 있습니다',
-        active: false,
         type: "custom",
-        percent: '4%',
-        period: '2024.02.14 ~ 2024.04.30까지',
+        percent: 4,
+        period: '2024.02.14 ~ 2024.04.30',
         dday: 'D-75',
         current: '398,000',
-        amount: '9,000,000'
+        amount: '9,000,000',
+        active: false, 
+        icon: false,
+        disabled: false,
     },
     {
         id: 1,
         title: "STEP1. 후원분야 선택",
-        active: false
+        active: true,
+        disabled: false,
+        icon: true
     },
     {
         id: 2,
         title: "STEP2. 후원자 정보",
-        active: false
+        active: false,
+        disabled: true,
+        icon: true
     },
     {
         id: 3,
         title: "STEP3. 후원금 납입",
-        active: false
+        active: false,
+        disabled: true,
+        icon: true
     },
     {
         id: 4,
         title: "STEP4. 신청완료",
-        active: false
+        active: false,
+        disabled: true,
+        icon: true
     }
-]
-
+] 
 const Info = [
     {
         id: 0,
@@ -68,16 +81,364 @@ const Info = [
         data: "chomihye0924@daum.net"
     }
 ]
-const DetailPage = () =>  {
-    const [active, setActive] = useState(0)
-    const [toggle, setToggle] = useState(false)  
+const AgreeList = [
+    {
+        id: 0,
+        name: "이용약관",
+        htmlId: "all-agree",
+        type: "round",
+        value: 0,
+        label: "(필수) 기부콩 이용약관에 동의합니다.",
+        checked: false
+    },
+    {
+        id: 1,
+        name: "마케팅동의",
+        htmlId: "marketing_agree",
+        type: "round",
+        value: 1,
+        label: "(선택) 기부콩 마케팅 알림 수신에 동의합니다.",
+        checked: false
+    }
+]
+const CardOptions1 = [
+    {
+        value: "0",
+        label: "선택"
+    },
+    {
+        value: "1",
+        label: "BC카드"
+    },
+    {
+        value: "2",
+        label: "신한카드"
+    },
+    {
+        value: "3",
+        label: "KB국민카드"
+    },
+    {
+        value: "4",
+        label: "KEB하나카드"
+    },
+    {
+        value: "5",
+        label: "현대카드"
+    },
+    {
+        value: "6",
+        label: "롯데카드"
+    },
+    {
+        value: "7",
+        label: "NH카드"
+    },
+    {
+        value: "8",
+        label: "삼성카드"
+    },
+    {
+        value: "9",
+        label: "카카오카드"
+    },
+    {
+        value: "10",
+        label: "한미카드"
+    },
+    {
+        value: "11",
+        label: "수협카드"
+    },
+    {
+        value: "12",
+        label: "우리카드"
+    },
+    {
+        value: "13",
+        label: "제주카드"
+    },
+    {
+        value: "14",
+        label: "광주카드"
+    },
+    {
+        value: "14",
+        label: "전북카드"
+    }
+]
+const CardOptions2 = [
+    {
+        value: "0",
+        label: "월 선택"
+    },
+    {
+        value: "1",
+        label: "1월"
+    },
+    {
+        value: "2",
+        label: "2월"
+    },
+    {
+        value: "3",
+        label: "3월"
+    },
+    {
+        value: "4",
+        label: "4월"
+    },
+    {
+        value: "5",
+        label: "5월"
+    },
+    {
+        value: "6",
+        label: "6월"
+    },
+    {
+        value: "7",
+        label: "7월"
+    },
+    {
+        value: "8",
+        label: "8월"
+    },
+    {
+        value: "9",
+        label: "9월"
+    },
+    {
+        value: "10",
+        label: "10월"
+    },
+    {
+        value: "11",
+        label: "11월"
+    },
+    {
+        value: "12",
+        label: "12월"
+    }
+] 
+const CardOptions3 = [
+    {
+        value: "0",
+        label: "연도 선택"
+    },
+    {
+        value: "1",
+        label: "2024년도"
+    },
+    {
+        value: "2",
+        label: "2025년도"
+    },
+    {
+        value: "3",
+        label: "2026년도"
+    },
+    {
+        value: "4",
+        label: "2027년도"
+    },
+    {
+        value: "5",
+        label: "2028년도"
+    },
+    {
+        value: "6",
+        label: "2029년도"
+    },
+    {
+        value: "7",
+        label: "2030년도"
+    },
+    {
+        value: "8",
+        label: "2031년도"
+    },
+    {
+        value: "9",
+        label: "2032년도"
+    },
+    {
+        value: "10",
+        label: "2033년도"
+    },
+    {
+        value: "11",
+        label: "2034년도"
+    }
+] 
+const AccountOptions = [
+    {
+        value: "0",
+        label: "선택"
+    },
+    {
+        value: "1",
+        label: "산업은행"
+    },
+    {
+        value: "2",
+        label: "기업은행"
+    },
+    {
+        value: "2",
+        label: "KB국민은행"
+    },
+    {
+        value: "3",
+        label: "수협"
+    },
+    {
+        value: "4",
+        label: "NH농협은행"
+    },
+    {
+        value: "5",
+        label: "지역(단위)농협"
+    },
+    {
+        value: "6",
+        label: "우리은행"
+    },
+    {
+        value: "7",
+        label: "스탠다드차타드은행"
+    },
+    {
+        value: "8",
+        label: "KEB하나은행"
+    },
+    {
+        value: "9",
+        label: "신한은행"
+    },
+    {
+        value: "10",
+        label: "한국씨티은행"
+    },
+    {
+        value: "11",
+        label: "대구은행"
+    },
+    {
+        value: "12",
+        label: "부산은행"
+    },
+    {
+        value: "13",
+        label: "광주은행"
+    },
+    {
+        value: "14",
+        label: "제주은행"
+    },
+    {
+        value: "15",
+        label: "전북은행"
+    },
+    {
+        value: "16",
+        label: "경남은행"
+    },
+    {
+        value: "17",
+        label: "새매을금고"
+    },
+    {
+        value: "18",
+        label: "신협"
+    },
+    {
+        value: "19",
+        label: "케이뱅크"
+    },
+    {
+        value: "20",
+        label: "카카오뱅크"
+    },
+]
+const DetailPage = () =>  {   
     const [radioActive1, setRadioActive1] = useState<number>(1);  //후원방식
     const [radioActive2, setRadioActive2] = useState<number>(1);  //결제수단
     const [radioActive3, setRadioActive3] = useState<number>(1);  //카드구분
-    const [price, setPrice] = useState('20,000')
-    const [checkboxActive1, setCheckboxActive1] = useState<boolean>(false);   
-    const [checkboxActive2, setCheckboxActive2] = useState<boolean>(false);  
-    const [checkboxActive3, setCheckboxActive3] = useState<boolean>(false);  
+    const [radioActive4, setRadioActive4] = useState<number>(1);  //이체일
+    const [price, setPrice] = useState('20,000') 
+    const [secondaryDate, setSecondaryDate] = useState<string>()
+    const [list, setList] = useState<AccordionProps[]>([])  
+    const [agreeList, setAgreeList] = useState<CheckboxProps[]>([])
+    const [allAgree, setAllAgree] = useState<boolean>(false) 
+
+    // 둘째주 월요일 찾기
+    function executeOnSecondMonday() {
+        const today = new Date(); 
+        const year = today.getFullYear(); //년
+        const month = today.getMonth() + 2; //월
+        const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const date = firstDayOfMonth.getDate() + (8 - firstDayOfMonth.getDay() + 7) //둘째주 일 
+        setSecondaryDate(`${year}.${month <10 ? "0"+month: month}.${date}`)
+    }
+
+    // 다음
+    const handleNext = useCallback((index: number) => {    
+        const content = document.querySelector(`section > div:nth-child(${index + 1})`);  
+        const location = (content as HTMLElement).offsetTop 
+        StepList.map((item) => {
+            item.id === index ? item.disabled = false : false;
+            item.id === index ? item.active = true : false;
+        })
+        setList([...list])    
+        setTimeout(() => {
+            window.scrollTo({top:location, behavior:'smooth'}); 
+        }, 100);
+    },[list]);
+
+    // 이전
+    const handlePrev = useCallback((index: number) => {    
+        const content = document.querySelector(`section > div:nth-child(${index - 1})`);  
+        const location = (content as HTMLElement).offsetTop 
+        StepList.map((item) => {
+            item.id === index ? item.disabled = false : false;
+            item.id === index ? item.active = true : false;
+        })
+        setList([...list])    
+        setTimeout(() => {
+            window.scrollTo({top:location, behavior:'smooth'}); 
+        }, 100);
+    },[list]);
+
+    // 약관동의-모두동의
+    const handleAllAgree = useCallback(() => {
+        setAllAgree(!allAgree)
+        for(let i = 0; i<agreeList.length; i++) {
+            agreeList[i].checked = !allAgree
+        } 
+    },[agreeList, allAgree])
+
+    // 약관동의-필수,선택
+    const handleCheckBoxChange = useCallback((item: CheckboxProps) => {
+        let count:number = 0  
+        item.checked = !item.checked;
+        setAgreeList([...agreeList]); 
+        
+        agreeList.forEach((item) => { 
+            if(item.checked) {
+                count++
+            } 
+             
+            count < 2 ? setAllAgree(false) : setAllAgree(true)
+        })
+    },[agreeList])
+
+    useEffect(() => {
+    executeOnSecondMonday() 
+    setList(StepList)
+    setAgreeList(AgreeList)
+    },[list, agreeList])
+      
     return(
         <Article>
             <ArticleInner image={'image01.jpg'}>
@@ -88,21 +449,19 @@ const DetailPage = () =>  {
                     </aside>
                     <section>
                         {
-                            StepList.map((item)=> {
+                            list.map((item)=> {
                                 return(
                                     <Accordion   
                                         key={item.id}
                                         title={item.title}
-                                        type={item.type}
-                                        active={
-                                            item.id === 0 ? true : false || 
-                                            toggle && item.id === active || item.active ? true : false
-                                            }
-                                        toggle={item.id !== 0 ? true : false}
-                                        onClick={() => {
-                                            setActive(item.id),
-                                            setToggle(item.active = !item.active)  
+                                        type={item.type} 
+                                        active={item.active}
+                                        icon={item.icon}
+                                        onClick={() => {    
+                                             item.active = !item.active;
+                                             setList([...list])
                                         }}
+                                        disabled={item.disabled}  
                                     >
                                     {(() => {
                                     switch (item.id) {
@@ -110,9 +469,11 @@ const DetailPage = () =>  {
                                         return <Flex>
                                             <div>
                                                 <AccordionBody2>
-                                                    <Percent>{item.percent}</Percent>
-                                                    {/* <PrograssBar /> */}
-                                                    <DonationPeriod>{item.period}</DonationPeriod>
+                                                    <Percent>{item.percent}%</Percent>
+                                                    <Progressbar
+                                                        percentage={Number(item.percent)}
+                                                     />
+                                                    <DonationPeriod>{item.period} 까지</DonationPeriod>
                                                     <DonationDDay>{item.dday}</DonationDDay>
                                                     <DonationCurrent>{item.current}<span>원</span></DonationCurrent>
                                                     <DonationAmout>목표 금액: <span>{item.amount}</span></DonationAmout>
@@ -152,10 +513,10 @@ const DetailPage = () =>  {
                                                     onChange={() => setRadioActive1(2)}
                                                 />
                                             </RadioWrap>
-                                        </Title>
-                                        <Title flexdirection="column" bottomBorder title="기부금액">
+                                        </Title> 
+                                        <Title bottomBorder title="기부금액">
                                             <>
-                                                <InputBox><input type="text" value={price} onChange={() => setPrice(price)}/>원</InputBox>
+                                                <InputBox alignitem="center"><input type="text" value={price} onChange={() => setPrice(price)}/>원</InputBox>
                                                 <AmountButtonBox>
                                                     <Button 
                                                         bg="black"
@@ -181,9 +542,23 @@ const DetailPage = () =>  {
                                                     
                                                 </AmountButtonBox>
                                             </> 
-                                        </Title>
+                                        </Title> 
+                                        {
+                                            radioActive1 === 2 &&
+                                            <PaymentDateBox>
+                                                <Title flex={"1 0 70%"} title="정부기부 기간" bottomBorder>
+                                                    <p className="date">{StepList[0].period}</p>
+                                                </Title>
+                                                <Title flex={"1 0 70%"} title="다음 결제일" bottomBorder>
+                                                    <p className="date">
+                                                        <span>{secondaryDate}</span>
+                                                        <span>(다음달 둘째주 월요일)</span>
+                                                    </p>
+                                                </Title>
+                                            </PaymentDateBox>
+                                        }
                                         <ButtonBox>
-                                            <Button bg="#f56400" color="#fff">다음</Button>
+                                            <Button bg="#f56400" color="#fff" onClick={() => handleNext(Number(item.id) + 1)}>다음</Button>
                                         </ButtonBox>
                                         </>  
                                     case 2:
@@ -198,53 +573,47 @@ const DetailPage = () =>  {
                                             })
                                         } 
                                             <TermsWrap>
-                                                <CheckBox 
-                                                    type="round"
-                                                    className={checkboxActive1 && checkboxActive2 && checkboxActive3 ? "active" : ""}
-                                                    value={checkboxActive1 ? "agree" : ""} 
-                                                    onChange={() => {
-                                                        // setCheckboxActive1(!checkboxActive1)
-                                                        // setCheckboxActive2(!checkboxActive2)
-                                                        // setCheckboxActive3(!checkboxActive3)
-                                                    }} 
-                                                    id="all_agree"
+                                                <CheckBox  
+                                                    type="round" 
+                                                    value={0}
+                                                    htmlId="all_agree"
+                                                    checked={allAgree}
                                                     name="모두동의"
                                                     label="이용약관, 마케팅 알림 수신에 모두 동의합니다"
+                                                    onChange={handleAllAgree} 
                                                 />
-                                                <CheckBox 
-                                                    type="round"
-                                                    className={checkboxActive2 ? "active" : ""}
-                                                    value={checkboxActive2 ? "agree" : ""} 
-                                                    onChange={() => setCheckboxActive2(!checkboxActive2)}  
-                                                    id="agree_term"
-                                                    name="이용약관"
-                                                    label="(필수) 기부콩 이용약관에 동의합니다."
-                                                />
-                                                <CheckBox 
-                                                    type="round"
-                                                    className={checkboxActive3 ? "active" : ""}
-                                                    value={checkboxActive3 ? "agree" : ""} 
-                                                    onChange={() => setCheckboxActive3(!checkboxActive3)}  
-                                                    id="marketing_agree"
-                                                    name="마케팅동의"
-                                                    label="(선택) 기부콩 마케팅 알림 수신에 동의합니다."
-                                                />
+                                                {
+                                                    agreeList.map((item) => {
+                                                        return( 
+                                                        <CheckBox 
+                                                            key={item.id}
+                                                            type={item.type} 
+                                                            value={item.value} 
+                                                            htmlId={item.htmlId}
+                                                            checked={item.checked}
+                                                            name={item.name}
+                                                            label={item.label}
+                                                            onChange={() => handleCheckBoxChange(item)} 
+                                                        />
+                                                        )
+                                                    })
+                                                }
                                                 <TermsList>
                                                     <li>기부콩에서 제공하는 이벤트/혜택 등 다양한 정보를 휴대전화(네이버 앱 알림 또는 문자), 이메일로 받아보실 수 있습니다.</li>
                                                 </TermsList>
                                                 <Terms>
-                                                이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관이용약관
+                                                    {agreeTerms.terms}
                                                 </Terms>
                                             </TermsWrap>
                                             <ButtonBox>
-                                                <Button bg="#fff" color="#f56400" border="#f56400">이전</Button>
-                                                <Button bg="#f56400" color="#fff">다음</Button>
+                                                <Button bg="#fff" color="#f56400" border="#f56400" onClick={() => handlePrev(Number(item.id) + 1)}>이전</Button>
+                                                <Button bg="#f56400" color="#fff" onClick={() => handleNext(Number(item.id)+ 1)}>다음</Button>
                                             </ButtonBox>
 
                                         </>  
                                     case 3:
                                         return<>
-                                        <Title bottomBorder title="결제수단"> 
+                                        <Title flex={"1 0 70%"} bottomBorder title="결제수단"> 
                                             <RadioWrap>
                                                 <Radio
                                                     className={radioActive2 === 1 ? "active" : ""}
@@ -266,7 +635,7 @@ const DetailPage = () =>  {
                                                 />
                                             </RadioWrap>
                                         </Title>
-                                        <Title bottomBorder title="카드구분"> 
+                                        <Title flex={"1 0 70%"} bottomBorder title={`${radioActive2 === 1 ?"카드" : "계좌"}구분`}> 
                                             <RadioWrap>
                                                 <Radio
                                                     className={radioActive3 === 1 ? "active" : ""}
@@ -288,19 +657,113 @@ const DetailPage = () =>  {
                                                 />
                                             </RadioWrap>
                                         </Title>
-                                        <Title flex={1} bottomBorder title="카드주명"> 
-                                            <InputBox><input type="text" placeholder="" value="" onChange={() => console.log('테스트')}/></InputBox>
+                                        {
+                                            radioActive2 === 1 ?
+                                            <> 
+                                            <Title flex={1} bottomBorder title="카드주명"> 
+                                                <InputBox><input type="text" placeholder="" value="" onChange={() => console.log('테스트')}/></InputBox>
+                                            </Title>
+                                            {
+                                                radioActive3 === 1 ?
+                                                
+                                            <Title bottomBorder flex={1} title="생년월일">
+                                                <InputBox><input type="text" placeholder="YYMMDD" value="" onChange={() => console.log('테스트')}/></InputBox>
+                                            </Title>
+                                            :
+                                            
+                                            <Title flex={"1 0 70%"} bottomBorder title="사업자등록번호">
+                                                <InputBox flexdirection="column">
+                                                    <div className="account">
+                                                        <input type="text" placeholder="'-'제외하고 입력" value="" onChange={() => console.log('테스트')}/>
+                                                        <Button bg="#fff" color="#f56400" border="#f56400" width="160">사업자번호확인</Button>
+                                                    </div> 
+                                                </InputBox>
+                                            </Title>
+                                            }
+                                            <Title flex={"1 0 70%"} bottomBorder title="카드사/유효기간"> 
+                                                <SelectWrap>
+                                                    <Select
+                                                        selectOptions={CardOptions1} 
+                                                    />
+                                                    <Select
+                                                        selectOptions={CardOptions2} 
+                                                    />
+                                                    <Select
+                                                        selectOptions={CardOptions3} 
+                                                    />
+                                                </SelectWrap>
+                                            </Title>
+                                            <Title flex={"1 0 70%"} bottomBorder title="카드번호"> 
+                                                <CardBox>
+                                                    <InputBox><input type="text" placeholder="0000" value=""  onChange={() => console.log('테스트')}/></InputBox>
+                                                    <InputBox><input type="text" placeholder="0000" value=""  onChange={() => console.log('테스트')}/></InputBox>
+                                                    <InputBox><input type="text" placeholder="0000" value=""  onChange={() => console.log('테스트')}/></InputBox>
+                                                    <InputBox><input type="text" placeholder="0000" value=""  onChange={() => console.log('테스트')}/></InputBox>
+                                                </CardBox>
+                                            </Title> 
+                                            </>
+                                            :
+                                            <>
+                                            <Title flex={1} bottomBorder title="예금주명"> 
+                                                <InputBox><input type="text" placeholder="" value="" onChange={() => console.log('테스트')}/></InputBox>
+                                            </Title>
+                                            {
+                                                radioActive3 === 1 ?
+                                                
+                                            <Title bottomBorder flex={1} title="생년월일">
+                                                <InputBox><input type="text" placeholder="YYMMDD" value="" onChange={() => console.log('테스트')}/></InputBox>
+                                            </Title>
+                                            :
+                                            
+                                            <Title flex={"1 0 70%"} bottomBorder title="사업자등록번호">
+                                                <InputBox flexdirection="column">
+                                                    <div className="account">
+                                                        <input type="text" placeholder="'-'제외하고 입력" value="" onChange={() => console.log('테스트')}/>
+                                                        <Button bg="#fff" color="#f56400" border="#f56400" width="160">사업자번호확인</Button>
+                                                    </div> 
+                                                </InputBox>
+                                            </Title>
+                                            }
+                                            <Title flex={"1 0 70%"} bottomBorder title="은행명">
+                                                <SelectWrap>
+                                                    <Select
+                                                        selectOptions={AccountOptions} 
+                                                    />  
+                                                </SelectWrap>
+                                            </Title>
+                                            <Title flex={"1 0 70%"} bottomBorder title="계좌번호"> 
+                                                <InputBox flexdirection="column">
+                                                    <div className="account">
+                                                        <input type="text" placeholder="'-'제외하고 입력" value="" onChange={() => console.log('테스트')}/>
+                                                        <Button bg="#fff" color="#f56400" border="#f56400" width="160">계좌인증</Button>
+                                                    </div>
+                                                    <span> - 휴대전화번호 계좌번호는 사용하실 수 없습니다.</span>
+                                                </InputBox>
+                                            </Title> 
+                                            <Title flex={"1 0 70%"} bottomBorder title="이체일"> 
+                                            <RadioWrap>
+                                                <Radio
+                                                    className={radioActive4 === 1 ? "active" : ""}
+                                                    type="round" 
+                                                    label="매월15일"
+                                                    id="fifthenfive"
+                                                    value="1"
+                                                    name="Transfer_date"   
+                                                    onChange={() => setRadioActive4(1)}
+                                                />
+                                                <Radio
+                                                    className={radioActive4 === 2 ? "active" : ""}
+                                                    type="round" 
+                                                    label="매월25일"
+                                                    id="twentyfive"
+                                                    value="2" 
+                                                    name="Transfer_date"     
+                                                    onChange={() => setRadioActive4(2)}
+                                                />
+                                            </RadioWrap>
                                         </Title>
-                                        <Title bottomBorder title="카드사/유효기간"> 
-                                        </Title>
-                                        <Title bottomBorder title="카드번호"> 
-                                            <CardBox>
-                                                <InputBox><input type="text" placeholder="0000" value=""  onChange={() => console.log('테스트')}/></InputBox>
-                                                <InputBox><input type="text" placeholder="0000" value=""  onChange={() => console.log('테스트')}/></InputBox>
-                                                <InputBox><input type="text" placeholder="0000" value=""  onChange={() => console.log('테스트')}/></InputBox>
-                                                <InputBox><input type="text" placeholder="0000" value=""  onChange={() => console.log('테스트')}/></InputBox>
-                                            </CardBox>
-                                        </Title> 
+                                            </>
+                                            }
                                         <ButtonBox>
                                             <Button bg="#f56400" color="#fff">후원하기</Button>
                                         </ButtonBox>
@@ -521,12 +984,66 @@ const RadioWrap = styled.div`
             margin-left: 30px;
        }
     }
-`
+` 
+const ButtonBox = styled.div`
+    display: flex;
+    gap:10px;
+    width: 100%;
+    margin-top: 50px;
+    text-align: center; 
+    justify-content: center;
+    button {
+        width: 200px;
+        height: 50px; 
+        font-size: 16px;
+        border-radius: 0;
+    }
+` 
+const InputBox = styled.div<{flexdirection?: string; alignitem?: string}>`
+    display: flex; 
+    width: inherit;
+    position: relative;
+    align-items: ${(props) => props.alignitem}; 
+    flex-direction: ${(props) => props.flexdirection}; 
+    gap: 10px;
+    input { 
+        width: 100%; 
+        height: 45px;
+        line-height: 1;
+        padding:10px; 
+        font-size: 16px;
+        border-bottom: 1px solid #f1f1f1;
+        &:focus {
+            outline:0;
+            border-bottom: 1px solid #f56400;
+        }
+    }  
+    .account {
+        display: flex; 
+        gap: 10px;
+    } 
+    span { 
+        color: #a1a1a1;
+    }
+    @media ${media.tablet}{  
+        button {
+            font-size: 14px;
+        } 
+        input { 
+            font-size: 12px;
+        }
+        span {
+            font-size:12px;
+        }
+    }
+`   
+
 // 후원분야
 const Percent = styled.div` 
     font-family: 'NanumSquareNeo-Variable';
     font-weight: 900;
     color:#00ab33;
+    margin-bottom: 15px;
     font-size: 32px;
     @media ${media.tablet}{   
         font-size: 24px;
@@ -534,6 +1051,7 @@ const Percent = styled.div`
 `               
 const DonationPeriod = styled.div` 
     font-size: 16px;
+    white-space: pre;
     color: #999999;
     margin-top: 10px;
 `    
@@ -554,7 +1072,7 @@ const DonationDDay = styled.div`
 const DonationCurrent = styled.div`
     font-family: 'NanumSquareNeo-Variable';
     font-weight: 900;
-    margin-top: 10px;
+    margin-top: 30px;
     font-size: 32px;
     letter-spacing: -1px;
     white-space: pre;
@@ -565,25 +1083,15 @@ const DonationCurrent = styled.div`
 const DonationAmout = styled.div`
     font-family: 'NanumSquareNeo-Variable';
     margin-top: 10px;
-`
-const InputBox = styled.div`
-    display: flex; 
-    width: inherit;
-    position: relative;
-    input { 
-        width: 100%;
-        padding:10px;
-        margin-right: 10px;
-        border-bottom: 1px solid #f1f1f1;
-        &:focus {
-            outline:0
-        }
-    } 
-`     
+    white-space: pre;
+`  
+
+// 후원납입
 const CardBox = styled.div`
     display: flex;
     input {
         margin-right: 30px;
+        text-align: center;
     } 
     & div:last-of-type {
         input {
@@ -596,6 +1104,8 @@ const CardBox = styled.div`
             content:'-'; 
             right: 10px;
             color: #cfcfcf;
+            top:50%;
+            transform: translateY(-50%);
         }
     }
     @media ${media.tablet}{  
@@ -615,19 +1125,31 @@ const AmountButtonBox = styled.div`
         margin-right: 5px;
     }
 ` 
-const ButtonBox = styled.div`
+const PaymentDateBox = styled.div`
+    .date {
+        font-size: 18px;
+        white-space: pre; 
+        span {
+            font-size: 18px;
+            font-family: inherit;
+            font-weight: 900;
+            display: inline-block;
+            &:last-child {
+                font-weight: normal;
+                margin-left: 10px;
+            }
+        }
+        @media ${media.tablet}{   
+            font-size: 12px;
+            span {
+                font-size: 12px; 
+            }
+        }
+    }
+`
+const SelectWrap = styled.div`
     display: flex;
     gap:10px;
-    width: 100%;
-    margin-top: 50px;
-    text-align: center; 
-    justify-content: center;
-    button {
-        width: 200px;
-        height: 50px; 
-        font-size: 16px;
-        border-radius: 0;
-    }
 `
 
 // 후원자 정보
@@ -635,6 +1157,7 @@ const TermsWrap = styled.div`
     margin: 20px 0;
 `
 const Terms = styled.div`
+ white-space: pre-wrap;
     margin-top: 20px;
     height: 100px;
     border: 1px solid #f1f1f1;
