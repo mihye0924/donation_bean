@@ -39,8 +39,36 @@ export async function insertPayment(req, res) {
     if(result === "ok") {
         res.json({ ok: true });
     }else{
-        res.json({ ok: false });
+        res.json({ ok: false }); 
+    }  
+}
 
-    } 
-    
+export async function getDonation(req, res) {   
+    const { user_id, donation_no } = req.query; 
+    const result = await PaymentRepository.donationData(user_id, donation_no); 
+    if(result) { 
+        res.json({ ok: true, result });
+    }else{
+        res.json({ ok: false, result }); 
+    }  
+}
+export async function getUser(req, res) {   
+    const { user_id } = req.query; 
+    const result = await PaymentRepository.userData(user_id);  
+    if(result) { 
+        res.json({ ok: true, result });
+    }else{
+        res.json({ ok: false, result }); 
+    }  
+}
+
+export async function getPayment(req, res) {   
+    const { user_id, donation_no } = req.query; 
+    const result = await PaymentRepository.paymentData(user_id, donation_no);  
+    // console.log(result,"result")
+    if(result) { 
+        res.json({ ok: true, result });
+    }else{
+        res.json({ ok: false, result }); 
+    }  
 }

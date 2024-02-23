@@ -1,19 +1,13 @@
 import styled from "styled-components"
 
-export interface AccordionProps {
-  children?: JSX.Element | null;
-  id?: number; 
-  active: boolean;  
-  title: string; 
-  content?: string; 
+export interface AccordionProps { 
+  id?: number;
+  children?: JSX.Element | null; 
+  title?:string;
+  active: boolean;   
   icon?: boolean; 
   type?: string;
-  disabled?: boolean; 
-  percent?: number;
-  period?: string;
-  dday?: string;
-  current?: string;
-  amount?: string;
+  disabled?: boolean;  
   onClick?: () => void; 
 }
 

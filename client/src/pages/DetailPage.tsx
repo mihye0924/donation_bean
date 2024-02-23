@@ -3,7 +3,7 @@ import Button from "@/components/Button"
 import CheckBox, { CheckboxProps } from "@/components/CheckBox"
 import Radio from "@/components/Radio"
 import Title from "@/components/Title"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import styled from "styled-components"
 import AgreeTerms from "@/api/detail/AgreeTerms.json"
 import Progressbar from "@/components/Progressbar" 
@@ -13,98 +13,9 @@ import AccountName from "@/api/detail/AccountName.json"
 import CardCompany from "@/api/detail/CardCompany.json"
 import CardDay from "@/api/detail/CardDay.json"
 import CardYear from "@/api/detail/CardYear.json"
+import axios from "axios"
+import { DetailDonationDataProps, DetailUserDataProps } from "@/types/detail"
  
-const StepList = [
-    {
-        id: 0,
-        title: "후원내용",
-        content: '1월 29일 제주돌고래 긴급구조단이 종달이 꼬리에 걸린 낚싯줄 제거에 성공했습니다. 아직 종달이 몸과 입에 제거하지 못한 낚싯줄이 남아 있습니다',
-        type: "custom",
-        percent: 4,
-        period: '2024.02.14 ~ 2024.04.30',
-        dday: 'D-75',
-        current: '398,000',
-        amount: '9,000,000',
-        active: false, 
-        icon: false,
-        disabled: false,
-    },
-    {
-        id: 1,
-        title: "STEP1. 후원분야 선택",
-        active: true,
-        disabled: false,
-        icon: true
-    },
-    {
-        id: 2,
-        title: "STEP2. 후원자 정보",
-        active: false,
-        disabled: true,
-        icon: true
-    },
-    {
-        id: 3,
-        title: "STEP3. 후원금 납입",
-        active: false,
-        disabled: true,
-        icon: true
-    },
-    {
-        id: 4,
-        title: "STEP4. 신청완료",
-        active: false,
-        disabled: true,
-        icon: true
-    }
-] 
-const Info = [
-    {
-        id: 0,
-        title: "회원유형",
-        data: "개인"
-    },
-    {
-        id: 1,
-        title: "이름",
-        data: "조미혜"
-    },
-    {
-        id: 2,
-        title: "성별",
-        data: "여자"
-    },
-    {
-        id: 3,
-        title: "생년월일",
-        data: "1997-09-24"
-    },
-    {
-        id: 4,
-        title: "이메일",
-        data: "chomihye0924@daum.net"
-    }
-]
-const AgreeList = [
-    {
-        id: 0,
-        name: "이용약관",
-        htmlId: "all-agree",
-        type: "round",
-        value: 0,
-        label: "(필수) 기부콩 이용약관에 동의합니다.",
-        checked: false
-    },
-    {
-        id: 1,
-        name: "마케팅동의",
-        htmlId: "marketing_agree",
-        type: "round",
-        value: 1,
-        label: "(선택) 기부콩 마케팅 알림 수신에 동의합니다.",
-        checked: false
-    }
-]   
 const DetailPage = () =>  {   
     const [radioActive1, setRadioActive1] = useState<number>(1);  //후원방식
     const [radioActive2, setRadioActive2] = useState<number>(1);  //결제수단
@@ -127,10 +38,96 @@ const DetailPage = () =>  {
     const [secondaryDate, setSecondaryDate] = useState<string>()
     const [list, setList] = useState<AccordionProps[]>([])  
     const [agreeList, setAgreeList] = useState<CheckboxProps[]>([])
-    const [allAgree, setAllAgree] = useState<boolean>(false) 
+    const [allAgree, setAllAgree] = useState<boolean>(false)  
+    const [submitMutate, {data: paymentData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/detail/payment`);
+    const [donationQueryData, setDonationQueryData] = useState<DetailDonationDataProps>()
+    const [paymentAllQueryData, setPaymentAllQueryData] = useState<DetailPaymentAllDataProps>()
+    const [userQueryData, setUserQueryData] = useState<DetailUserDataProps>()
+    const priceNumber = Number(price.replace(",", "")); 
+    const user_id ="test1";
+    const donation_no = 1;
 
-     
-    const [submitMutate, {data: paymentData }] = useMutation(`http://localhost:8081/payment`);
+    // steplist 데이터 셋팅
+    const StepList = useMemo(() => {
+        return [
+            {
+                id: 0,
+                title: "후원내용",
+                type: "custom",
+                active: false, 
+                icon: false,
+                disabled: false,
+            },
+            {
+                id: 1,
+                title: "STEP1. 후원분야 선택",
+                active: true,
+                disabled: false,
+                icon: true
+            },
+            {
+                id: 2,
+                title: "STEP2. 후원자 정보",
+                active: false,
+                disabled: true,
+                icon: true
+            },
+            {
+                id: 3,
+                title: "STEP3. 후원금 납입",
+                active: false,
+                disabled: true,
+                icon: true
+            },
+            {
+                id: 4,
+                title: "STEP4. 신청완료",
+                active: false,
+                disabled: true,
+                icon: true
+            }
+        ] 
+    }, []) 
+
+    // info 데이터 셋팅
+    const Info = useMemo(() => {
+        return [ 
+            {
+                id: 1,
+                title: "이름",
+                data: userQueryData?.user_name
+            }, 
+            {
+                id: 2,
+                title: "이메일",
+                data: userQueryData?.user_email
+            }
+        ]
+    },[userQueryData?.user_email, userQueryData?.user_name])
+
+    // agree 데이터 셋팅
+    const AgreeList = useMemo(() => {
+        return [
+            {
+                id: 0,
+                name: "이용약관",
+                htmlId: "all-agree",
+                type: "round",
+                value: 0,
+                label: "(필수) 기부콩 이용약관에 동의합니다.",
+                checked: false
+            },
+            {
+                id: 1,
+                name: "마케팅동의",
+                htmlId: "marketing_agree",
+                type: "round",
+                value: 1,
+                label: "(선택) 기부콩 마케팅 알림 수신에 동의합니다.",
+                checked: false
+            }
+        ] 
+    },[])  
 
     // 초기화
     const inital = useCallback(() => { 
@@ -148,6 +145,28 @@ const DetailPage = () =>  {
         setAccountNumber("")
         setCompanyCode("")
     },[])
+    
+    // 사용자 데이터 가져오기
+    const userData = useCallback(() => {
+        axios
+        .get(`${import.meta.env.VITE_SERVER_URL}/detail/user?user_id=${user_id}`) 
+        .then((res) => setUserQueryData(res.data.result));
+    },[])
+
+    // 기부 데이터 가져오기
+    const donationData = useCallback(() => {
+        axios
+        .get(`${import.meta.env.VITE_SERVER_URL}/detail/donation?user_id=${user_id}&donation_no=${donation_no}`) 
+        .then((res) => setDonationQueryData(res.data.result));
+    },[])
+
+    // 전체 결재 데이터 가져오기
+    const paymentAllData = useCallback(() => {
+        axios
+        .get(`${import.meta.env.VITE_SERVER_URL}/detail/paymentAll?user_id=${user_id}&donation_no=${donation_no}`) 
+        .then((res) => {console.log(res.data.result), setPaymentAllQueryData(res.data.result)});
+    },[])
+ 
 
     // 둘째주 월요일 찾기
     function executeOnSecondMonday() {
@@ -157,24 +176,18 @@ const DetailPage = () =>  {
         const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         const date = firstDayOfMonth.getDate() + (8 - firstDayOfMonth.getDay() + 7) //둘째주 일 
         setSecondaryDate(`${year}.${month <10 ? "0"+month: month}.${date}`)
-    }
-
+    } 
+    
     // 다음
-    const handleNext = useCallback((index: number) => {  
-        let count:number = 0;  
+    const handleNext = useCallback((index: number) => {    
         const content = document.querySelector(`section > div:nth-child(${index + 1})`);  
         const location = (content as HTMLElement).offsetTop  
-        if( index === 3 ) {
-            agreeList.forEach((item) => { 
-                if(item.checked) {
-                    count++
-                } 
-            })
-            if(count < 1 ){
+        if( index === 3 ) {  
+            if(!agreeList[0].checked){
                     return alert("이용 약관 동의를 선택해주세요.")
             }
         }
-        StepList.map((item) => {
+        list.map((item) => {
             item.id === index ? item.disabled = false : false;
             item.id === index ? item.active = true : false;
         })
@@ -188,15 +201,10 @@ const DetailPage = () =>  {
     const handlePrev = useCallback((index: number) => {    
         const content = document.querySelector(`section > div:nth-child(${index - 1})`);  
         const location = (content as HTMLElement).offsetTop 
-        StepList.map((item) => {
-            item.id === index ? item.disabled = false : false;
-            item.id === index ? item.active = true : false;
-        })
-        setList([...list])    
         setTimeout(() => {
             window.scrollTo({top:location, behavior:'smooth'}); 
         }, 100);
-    },[list]);
+    },[]);
 
     // 약관동의-모두동의
     const handleAllAgree = useCallback(() => {
@@ -221,62 +229,13 @@ const DetailPage = () =>  {
         })
     },[agreeList])
  
-    // 유효성 검사
-    const Validation = useCallback(() => { 
-        console.log(radioActive2, radioActive3)
-        if(radioActive2 === 1) {
-            if(cardOwner === "") {
-                return alert("카드주명을 입력해주세요.")
-            }
-            if(radioActive3 == 1) {
-                if(ownerBirth === "") {
-                    return alert("생년월일을 입력해주세요.")
-                }
-            }else{
-                if(companyCode === "") {
-                    return alert("사업자등록번호를 입력해주세요.")
-                } 
-            }
-            if(cardName === "") {
-                return alert("카드사를 선택해주세요.")
-            }
-            if(cardExpiryYear === "" || cardExpiryMonth === "") {
-                return alert("유효기간을 선택해주세요.")
-            }
-            if(cardNumber1 ==="" || cardNumber2 === "" || cardNumber3 === "" || cardNumber4 === "") {
-                return alert("카드번호를 입력해주세요.")
-            } 
-        }else {
-            if(accountName === "") {
-                return alert("예금주명을 입력해주세요.")
-            }
-            if(radioActive3 == 1) {
-                if(ownerBirth === "") {
-                    return alert("생년월일을 입력해주세요.")
-                }
-            }else{
-                if(companyCode === "") {
-                    return alert("사업자등록번호를 입력해주세요.")
-                } 
-            }
-            if(accountCompany === "") {
-                return alert("은행명을 선택해주세요.")
-            }
-            if(accountNumber === "") {
-                return alert("계좌번호를 입력해주세요.")
-            } 
-        }
-    },[accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, ownerBirth, radioActive2, radioActive3])
-    
     // 후원하기
-    const onValid = useCallback((index: number) => {
-        Validation()  
-        const number = price.replace(",", ""); 
+    const onValid = useCallback((index: number) => {  
         const data = { 
-            user_id: "test1", //유저 아이디
-            donation_no: 1, //기부 번호
+             user_id: user_id, //유저 아이디
+            donation_no: donation_no, //기부 번호
             donation_support : radioActive1 === 1 ? "일시" : "정기", //후원방식
-            donation_current : Number(number), // 후원금액
+            donation_current : priceNumber, // 후원금액
             payment_division : radioActive3 === 1 ? "개인" : "법인", // 개인, 법인
             payment_method : radioActive2 === 1 ? "카드" : " 자동이체", // 카드, 자동이체 
             payment_card_name: cardOwner, // 카드 소유자명
@@ -290,18 +249,65 @@ const DetailPage = () =>  {
             payment_birth : ownerBirth, //생년월일
             payment_company_code : companyCode// 법인 사업자 
         } 
-        submitMutate(data) 
-        if(paymentData.ok) {
-            alert("후원이 완료되었습니다.")
-        }
-        handleNext(index)
-    },[Validation, accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, handleNext, ownerBirth, paymentData.ok, price, radioActive1, radioActive2, radioActive3, radioActive4, submitMutate])
+        submitMutate(data)  
+        setTimeout(() => {
+            if(paymentData?.ok) {
+                handleNext(index)
+                return alert("후원이 완료되었습니다.")
+            }  
+        }, 1500);
+    },[accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, handleNext, ownerBirth, paymentData, priceNumber, radioActive1, radioActive2, radioActive3, radioActive4, submitMutate])
+    
+    // 유효성 검사 후 제출
+    const handleSubmit = useCallback((index:number) => {    
+        if(radioActive2 === 1) { 
+            if(cardOwner === "") {
+                return alert("카드주명을 입력해주세요.") 
+            }
+            if(radioActive3 == 1 && ownerBirth === "") { 
+                return alert("생년월일을 입력해주세요.") 
+            }      
+            if(radioActive3 == 2 && companyCode === "") {  
+                return alert("사업자등록번호를 입력해주세요.")   
+            }
+            if(cardName === "") {
+                return alert("카드사를 선택해주세요.") 
+            }
+            if(cardExpiryYear === "" || cardExpiryMonth === "") {
+                return alert("유효기간을 선택해주세요.")
+                
+            }
+            if(cardNumber1 === "" || cardNumber2 === "" || cardNumber3 === "" || cardNumber4 === "") {
+                return alert("카드번호를 입력해주세요.") 
+            }    
+        }else{ 
+            if(accountName === "") {
+                return alert("예금주명을 입력해주세요.") 
+            }
+            if(radioActive3 == 1 && ownerBirth === "") { 
+                return alert("생년월일을 입력해주세요.")    
+            }   
+            if(radioActive3 == 2 && companyCode === "") {  
+                return alert("사업자등록번호를 입력해주세요.")   
+            }
+            if(accountCompany === "") {
+                return alert("은행명을 선택해주세요.")
+            }
+            if(accountNumber === "") {
+                return alert("계좌번호를 입력해주세요.")
+            }   
+        }   
+        onValid(index)
+    },[accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, onValid, ownerBirth, radioActive2, radioActive3])
     
     useEffect(() => {
-        executeOnSecondMonday() 
         setList(StepList)
-        setAgreeList(AgreeList)   
-    },[list, agreeList])
+        setAgreeList(AgreeList)
+        executeOnSecondMonday()  
+        donationData()  
+        userData()
+        paymentAllData()
+    },[AgreeList, StepList, allAgree, donationData, paymentAllData, userData])
       
     return(
         <Article>
@@ -309,38 +315,38 @@ const DetailPage = () =>  {
                 <ContentWrap> 
                     <aside>
                         <h1>후원신청</h1>
-                        <p>낚싯줄에 걸린 돌고래 '종달이'를 구해주세요</p>
+                        <p>{donationQueryData?.donation_name}</p>
                     </aside>
                     <section>
                         {
-                            list.map((item)=> {
+                            StepList.map((item)=> {
                                 return(
                                     <Accordion   
+                                        id={item.id}   
                                         key={item.id}
                                         title={item.title}
-                                        type={item.type} 
+                                        type={item.type}
                                         active={item.active}
                                         icon={item.icon}
-                                        onClick={() => {    
-                                             item.active = !item.active;
-                                             setList([...list])
-                                        }}
-                                        disabled={item.disabled}  
-                                    >
+                                        onClick={() => {
+                                            item.active = !item.active
+                                            setList([...list])
+                                        } }
+                                        disabled={item.disabled}                               >
                                     {(() => {
                                     switch (item.id) {
                                     case 0:
                                         return <Flex>
                                             <div>
                                                 <AccordionBody2>
-                                                    <Percent>{item.percent}%</Percent>
+                                                    <Percent>{`${Number(donationQueryData?.donation_goal)/90000}`}%</Percent>
                                                     <Progressbar
-                                                        percentage={Number(item.percent)}
+                                                        percentage={4}
                                                      />
-                                                    <DonationPeriod>{item.period} 까지</DonationPeriod>
-                                                    <DonationDDay>{item.dday}</DonationDDay>
-                                                    <DonationCurrent>{item.current}<span>원</span></DonationCurrent>
-                                                    <DonationAmout>목표 금액: <span>{item.amount}</span></DonationAmout>
+                                                    <DonationPeriod>{donationQueryData?.donation_period}까지</DonationPeriod>
+                                                    <DonationDDay>D-9999</DonationDDay>
+                                                    <DonationCurrent>380,000<span>원</span></DonationCurrent>
+                                                    <DonationAmout>목표 금액: <span>{donationQueryData?.donation_goal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</span></DonationAmout>
                                                 </AccordionBody2>
                                             </div>
                                             <div>
@@ -350,7 +356,7 @@ const DetailPage = () =>  {
                                                 </AccordionHeader>
                                                 }
                                                 <AccordionBody>  
-                                                    {item.content}
+                                                    {donationQueryData?.donation_content}
                                                 </AccordionBody>
                                             </div>
                                         </Flex>
@@ -411,7 +417,7 @@ const DetailPage = () =>  {
                                             radioActive1 === 2 &&
                                             <PaymentDateBox>
                                                 <Title flex={"1 0 70%"} title="정부기부 기간" bottomBorder>
-                                                    <p className="date">{StepList[0].period}</p>
+                                                    <p className="date">{donationQueryData?.donation_period}</p>
                                                 </Title>
                                                 <Title flex={"1 0 70%"} title="다음 결제일" bottomBorder>
                                                     <p className="date">
@@ -447,7 +453,7 @@ const DetailPage = () =>  {
                                                     onChange={handleAllAgree} 
                                                 />
                                                 {
-                                                    agreeList.map((item) => {
+                                                    AgreeList.map((item) => {
                                                         return( 
                                                         <CheckBox 
                                                             key={item.id}
@@ -703,7 +709,7 @@ const DetailPage = () =>  {
                                             </>
                                         }
                                         <ButtonBox>
-                                            <Button bg="#f56400" color="#fff" onClick={() => onValid(Number(item.id)+ 1)}>후원하기</Button>
+                                            <Button bg="#f56400" color="#fff" onClick={() => handleSubmit(Number(item.id)+ 1)}>후원하기</Button>
                                         </ButtonBox>
                                         </>  
                                     case 4:
