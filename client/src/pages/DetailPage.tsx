@@ -116,7 +116,7 @@ const DetailPage = () =>  {
     const [cardNumber3, setCardNumber3] = useState<string>("");  //카드 번호3
     const [cardNumber4, setCardNumber4] = useState<string>("");  //카드 번호4
     const [accountName, setAccountName] = useState<string>(""); //예금주명 
-    const [accountCompany, setAccountCompany] = useState<string>(""); //예금주명 
+    const [accountCompany, setAccountCompany] = useState<string>(""); //은행명
     const [accountNumber, setAccountNumber] = useState<string>(""); //계좌번호
     const [companyCode, setCompanyCode] = useState<string>("");  //사업자번호
     const [ownerBirth, setOwnerBrith] = useState<string>("");  //카드 생년월일 
@@ -132,6 +132,22 @@ const DetailPage = () =>  {
      
     const [submitMutate, {data: paymentData }] = useMutation(`http://localhost:8081/payment`);
 
+    // 초기화
+    const inital = useCallback(() => { 
+        setCardOwner("")
+        setOwnerBrith("")
+        setCardName("")
+        setCardExpiryYear("")
+        setCardExpiryMonth("")
+        setCardNumber1("")
+        setCardNumber2("")
+        setCardNumber3("")
+        setCardNumber4("")
+        setAccountName("")
+        setAccountCompany("")
+        setAccountNumber("")
+        setCompanyCode("")
+    },[])
 
     // 둘째주 월요일 찾기
     function executeOnSecondMonday() {
@@ -147,13 +163,7 @@ const DetailPage = () =>  {
     const handleNext = useCallback((index: number) => {  
         let count:number = 0;  
         const content = document.querySelector(`section > div:nth-child(${index + 1})`);  
-        const location = (content as HTMLElement).offsetTop 
-        StepList.map((item) => {
-            item.id === index ? item.disabled = false : false;
-            item.id === index ? item.active = true : false;
-        })
-        setList([...list])    
-        
+        const location = (content as HTMLElement).offsetTop  
         if( index === 3 ) {
             agreeList.forEach((item) => { 
                 if(item.checked) {
@@ -164,6 +174,11 @@ const DetailPage = () =>  {
                     return alert("이용 약관 동의를 선택해주세요.")
             }
         }
+        StepList.map((item) => {
+            item.id === index ? item.disabled = false : false;
+            item.id === index ? item.active = true : false;
+        })
+        setList([...list])    
         setTimeout(() => {
             window.scrollTo({top:location, behavior:'smooth'}); 
         }, 100); 
@@ -253,13 +268,15 @@ const DetailPage = () =>  {
         }
     },[accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, ownerBirth, radioActive2, radioActive3])
     
-      
-    const onValid = useCallback(() => {
-        Validation() 
-       
+    // 후원하기
+    const onValid = useCallback((index: number) => {
+        Validation()  
+        const number = price.replace(",", ""); 
         const data = { 
+            user_id: "test1", //유저 아이디
+            donation_no: 1, //기부 번호
             donation_support : radioActive1 === 1 ? "일시" : "정기", //후원방식
-            donation_current : price, // 후원금액
+            donation_current : Number(number), // 후원금액
             payment_division : radioActive3 === 1 ? "개인" : "법인", // 개인, 법인
             payment_method : radioActive2 === 1 ? "카드" : " 자동이체", // 카드, 자동이체 
             payment_card_name: cardOwner, // 카드 소유자명
@@ -270,17 +287,20 @@ const DetailPage = () =>  {
             payment_account_company: accountCompany, //은행명
             payment_account_transfer: radioActive4 === 0 ? "매월15일" : "매월25일", //은행 이체일 
             payment_account_num: accountNumber, //계좌번호
-            payment_card_birth : ownerBirth, //생년월일
+            payment_birth : ownerBirth, //생년월일
             payment_company_code : companyCode// 법인 사업자 
         } 
-        submitMutate(data)
-        console.log(data,"후원하기")
-    },[Validation, accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, ownerBirth, price, radioActive1, radioActive2, radioActive3, radioActive4, submitMutate])
-
+        submitMutate(data) 
+        if(paymentData.ok) {
+            alert("후원이 완료되었습니다.")
+        }
+        handleNext(index)
+    },[Validation, accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, handleNext, ownerBirth, paymentData.ok, price, radioActive1, radioActive2, radioActive3, radioActive4, submitMutate])
+    
     useEffect(() => {
         executeOnSecondMonday() 
         setList(StepList)
-        setAgreeList(AgreeList)  
+        setAgreeList(AgreeList)   
     },[list, agreeList])
       
     return(
@@ -452,8 +472,7 @@ const DetailPage = () =>  {
                                             <ButtonBox>
                                                 <Button bg="#fff" color="#f56400" border="#f56400" onClick={() => handlePrev(Number(item.id) + 1)}>이전</Button>
                                                 <Button bg="#f56400" color="#fff" onClick={() => handleNext(Number(item.id)+ 1)}>다음</Button>
-                                            </ButtonBox>
-
+                                            </ButtonBox> 
                                         </>  
                                     case 3:
                                         return<>
@@ -466,7 +485,7 @@ const DetailPage = () =>  {
                                                     id="card"
                                                     value="1"
                                                     name="payment_method"   
-                                                    onChange={() => setRadioActive2(1)}
+                                                    onChange={() => { setRadioActive2(1), inital() }}
                                                 />
                                                 <Radio
                                                     className={radioActive2 === 2 ? "active" : ""}
@@ -475,7 +494,7 @@ const DetailPage = () =>  {
                                                     id="payment"
                                                     value="2" 
                                                     name="payment_method"     
-                                                    onChange={() => setRadioActive2(2)}
+                                                    onChange={() => { setRadioActive2(2),inital() }}
                                                 />
                                             </RadioWrap>
                                         </Title>
@@ -488,7 +507,7 @@ const DetailPage = () =>  {
                                                     id="personal"
                                                     value="1"
                                                     name="payment_option"   
-                                                    onChange={() => setRadioActive3(1)}
+                                                    onChange={() => { setRadioActive3(1), inital() }}
                                                 />
                                                 <Radio
                                                     className={radioActive3 === 2 ? "active" : ""}
@@ -497,7 +516,7 @@ const DetailPage = () =>  {
                                                     id="company"
                                                     value="2" 
                                                     name="payment_option"     
-                                                    onChange={() => setRadioActive3(2)}
+                                                    onChange={() => { setRadioActive3(2), inital() }}
                                                 />
                                             </RadioWrap>
                                         </Title>
@@ -660,31 +679,31 @@ const DetailPage = () =>  {
                                                 </InputBox>
                                             </Title> 
                                             <Title flex={"1 0 70%"} bottomBorder title="이체일"> 
-                                            <RadioWrap>
-                                                <Radio
-                                                    className={radioActive4 === 1 ? "active" : ""}
-                                                    type="round" 
-                                                    label="매월15일"
-                                                    id="fifthenfive"
-                                                    value="1"
-                                                    name="Transfer_date"   
-                                                    onChange={() => setRadioActive4(1)}
-                                                />
-                                                <Radio
-                                                    className={radioActive4 === 2 ? "active" : ""}
-                                                    type="round" 
-                                                    label="매월25일"
-                                                    id="twentyfive"
-                                                    value="2" 
-                                                    name="Transfer_date"     
-                                                    onChange={() => setRadioActive4(2)}
-                                                />
-                                            </RadioWrap>
-                                        </Title>
+                                                <RadioWrap>
+                                                    <Radio
+                                                        className={radioActive4 === 1 ? "active" : ""}
+                                                        type="round" 
+                                                        label="매월15일"
+                                                        id="fifthenfive"
+                                                        value="1"
+                                                        name="Transfer_date"   
+                                                        onChange={() => setRadioActive4(1)}
+                                                    />
+                                                    <Radio
+                                                        className={radioActive4 === 2 ? "active" : ""}
+                                                        type="round" 
+                                                        label="매월25일"
+                                                        id="twentyfive"
+                                                        value="2" 
+                                                        name="Transfer_date"     
+                                                        onChange={() => setRadioActive4(2)}
+                                                    />
+                                                </RadioWrap>
+                                            </Title>
                                             </>
-                                            }
+                                        }
                                         <ButtonBox>
-                                            <Button bg="#f56400" color="#fff" onClick={onValid}>후원하기</Button>
+                                            <Button bg="#f56400" color="#fff" onClick={() => onValid(Number(item.id)+ 1)}>후원하기</Button>
                                         </ButtonBox>
                                         </>  
                                     case 4:
@@ -733,13 +752,11 @@ const DetailPage = () =>  {
                                     default:
                                         return null;
                                     }
-                                })()}
-
-                                    </Accordion> 
+                                })()} 
+                                </Accordion> 
                                 )
                             })
-                        }
-                       
+                        } 
                     </section>
                 </ContentWrap>
             </ArticleInner>  

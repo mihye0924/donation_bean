@@ -1,5 +1,6 @@
 import express, { urlencoded } from "express"; 
 import UserRouter from "./router/UserRouter.js"; 
+import PaymentRouter from "./router/PaymentRouter.js"; 
 import cors from "cors";
 import bodyParser from "body-parser";
 import path from 'path'; 

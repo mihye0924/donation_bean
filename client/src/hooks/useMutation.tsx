@@ -10,7 +10,7 @@ export default function useMutation(
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<undefined | any>();
   const [error, setError] = useState<undefined | any>(false);
-  function mutation(data: any) {
+  function mutation(data: any) { 
     setLoading(true);
     axios
       .post(url, data)
