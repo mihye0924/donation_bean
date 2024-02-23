@@ -11,7 +11,7 @@ interface SelectProps {
   isFixed?: boolean;
   isDisabled?: boolean;
   size?: number;
-  onChange: (e: any) => void;
+  onChange?: (e: Option) => void;
 }
 const customStyles = (props: SelectProps): StylesConfig<Option, false> => ({
   control: (provided) => ({
@@ -28,7 +28,7 @@ const Select = (props: SelectProps) => {
       <ReactSelect   
         options={props.selectOptions}
         closeMenuOnSelect={true}
-        onChange={(e:any) => props.onChange(e)}
+        onChange={props.onChange}
         defaultValue={props.selectOptions[0]}
         styles={customStyles(props)}
       /> 

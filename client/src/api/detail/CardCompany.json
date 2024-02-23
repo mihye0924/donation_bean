@@ -1,0 +1,66 @@
+[
+    {
+        "value": "0",
+        "label": "선택"
+    },
+    {
+        "value": "1",
+        "label": "BC카드"
+    },
+    {
+        "value": "2",
+        "label": "신한카드"
+    },
+    {
+        "value": "3",
+        "label": "KB국민카드"
+    },
+    {
+        "value": "4",
+        "label": "KEB하나카드"
+    },
+    {
+        "value": "5",
+        "label": "현대카드"
+    },
+    {
+        "value": "6",
+        "label": "롯데카드"
+    },
+    {
+        "value": "7",
+        "label": "NH카드"
+    },
+    {
+        "value": "8",
+        "label": "삼성카드"
+    },
+    {
+        "value": "9",
+        "label": "카카오카드"
+    },
+    {
+        "value": "10",
+        "label": "한미카드"
+    },
+    {
+        "value": "11",
+        "label": "수협카드"
+    },
+    {
+        "value": "12",
+        "label": "우리카드"
+    },
+    {
+        "value": "13",
+        "label": "제주카드"
+    },
+    {
+        "value": "14",
+        "label": "광주카드"
+    },
+    {
+        "value": "14",
+        "label": "전북카드"
+    }
+]

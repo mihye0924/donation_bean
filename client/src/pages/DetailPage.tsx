@@ -3,13 +3,17 @@ import Button from "@/components/Button"
 import CheckBox, { CheckboxProps } from "@/components/CheckBox"
 import Radio from "@/components/Radio"
 import Title from "@/components/Title"
-import { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import styled from "styled-components"
-import agreeTerms from "@/api/AgreeTerms.json"
+import AgreeTerms from "@/api/detail/AgreeTerms.json"
 import Progressbar from "@/components/Progressbar" 
 import Select from "@/components/Select" 
-
-
+import useMutation from "@/hooks/useMutation"
+import AccountName from "@/api/detail/AccountName.json"
+import CardCompany from "@/api/detail/CardCompany.json"
+import CardDay from "@/api/detail/CardDay.json"
+import CardYear from "@/api/detail/CardYear.json"
+ 
 const StepList = [
     {
         id: 0,
@@ -100,277 +104,34 @@ const AgreeList = [
         label: "(선택) 기부콩 마케팅 알림 수신에 동의합니다.",
         checked: false
     }
-]
-const CardOptions1 = [
-    {
-        value: "0",
-        label: "선택"
-    },
-    {
-        value: "1",
-        label: "BC카드"
-    },
-    {
-        value: "2",
-        label: "신한카드"
-    },
-    {
-        value: "3",
-        label: "KB국민카드"
-    },
-    {
-        value: "4",
-        label: "KEB하나카드"
-    },
-    {
-        value: "5",
-        label: "현대카드"
-    },
-    {
-        value: "6",
-        label: "롯데카드"
-    },
-    {
-        value: "7",
-        label: "NH카드"
-    },
-    {
-        value: "8",
-        label: "삼성카드"
-    },
-    {
-        value: "9",
-        label: "카카오카드"
-    },
-    {
-        value: "10",
-        label: "한미카드"
-    },
-    {
-        value: "11",
-        label: "수협카드"
-    },
-    {
-        value: "12",
-        label: "우리카드"
-    },
-    {
-        value: "13",
-        label: "제주카드"
-    },
-    {
-        value: "14",
-        label: "광주카드"
-    },
-    {
-        value: "14",
-        label: "전북카드"
-    }
-]
-const CardOptions2 = [
-    {
-        value: "0",
-        label: "월 선택"
-    },
-    {
-        value: "1",
-        label: "1월"
-    },
-    {
-        value: "2",
-        label: "2월"
-    },
-    {
-        value: "3",
-        label: "3월"
-    },
-    {
-        value: "4",
-        label: "4월"
-    },
-    {
-        value: "5",
-        label: "5월"
-    },
-    {
-        value: "6",
-        label: "6월"
-    },
-    {
-        value: "7",
-        label: "7월"
-    },
-    {
-        value: "8",
-        label: "8월"
-    },
-    {
-        value: "9",
-        label: "9월"
-    },
-    {
-        value: "10",
-        label: "10월"
-    },
-    {
-        value: "11",
-        label: "11월"
-    },
-    {
-        value: "12",
-        label: "12월"
-    }
-] 
-const CardOptions3 = [
-    {
-        value: "0",
-        label: "연도 선택"
-    },
-    {
-        value: "1",
-        label: "2024년도"
-    },
-    {
-        value: "2",
-        label: "2025년도"
-    },
-    {
-        value: "3",
-        label: "2026년도"
-    },
-    {
-        value: "4",
-        label: "2027년도"
-    },
-    {
-        value: "5",
-        label: "2028년도"
-    },
-    {
-        value: "6",
-        label: "2029년도"
-    },
-    {
-        value: "7",
-        label: "2030년도"
-    },
-    {
-        value: "8",
-        label: "2031년도"
-    },
-    {
-        value: "9",
-        label: "2032년도"
-    },
-    {
-        value: "10",
-        label: "2033년도"
-    },
-    {
-        value: "11",
-        label: "2034년도"
-    }
-] 
-const AccountOptions = [
-    {
-        value: "0",
-        label: "선택"
-    },
-    {
-        value: "1",
-        label: "산업은행"
-    },
-    {
-        value: "2",
-        label: "기업은행"
-    },
-    {
-        value: "2",
-        label: "KB국민은행"
-    },
-    {
-        value: "3",
-        label: "수협"
-    },
-    {
-        value: "4",
-        label: "NH농협은행"
-    },
-    {
-        value: "5",
-        label: "지역(단위)농협"
-    },
-    {
-        value: "6",
-        label: "우리은행"
-    },
-    {
-        value: "7",
-        label: "스탠다드차타드은행"
-    },
-    {
-        value: "8",
-        label: "KEB하나은행"
-    },
-    {
-        value: "9",
-        label: "신한은행"
-    },
-    {
-        value: "10",
-        label: "한국씨티은행"
-    },
-    {
-        value: "11",
-        label: "대구은행"
-    },
-    {
-        value: "12",
-        label: "부산은행"
-    },
-    {
-        value: "13",
-        label: "광주은행"
-    },
-    {
-        value: "14",
-        label: "제주은행"
-    },
-    {
-        value: "15",
-        label: "전북은행"
-    },
-    {
-        value: "16",
-        label: "경남은행"
-    },
-    {
-        value: "17",
-        label: "새매을금고"
-    },
-    {
-        value: "18",
-        label: "신협"
-    },
-    {
-        value: "19",
-        label: "케이뱅크"
-    },
-    {
-        value: "20",
-        label: "카카오뱅크"
-    },
-]
+]   
 const DetailPage = () =>  {   
     const [radioActive1, setRadioActive1] = useState<number>(1);  //후원방식
     const [radioActive2, setRadioActive2] = useState<number>(1);  //결제수단
     const [radioActive3, setRadioActive3] = useState<number>(1);  //카드구분
     const [radioActive4, setRadioActive4] = useState<number>(1);  //이체일
+    const [cardOwner, setCardOwner] = useState<string>("");  //카드 소유자명 
+    const [cardNumber1, setCardNumber1] = useState<string>("");  //카드 번호1
+    const [cardNumber2, setCardNumber2] = useState<string>("");  //카드 번호2
+    const [cardNumber3, setCardNumber3] = useState<string>("");  //카드 번호3
+    const [cardNumber4, setCardNumber4] = useState<string>("");  //카드 번호4
+    const [accountName, setAccountName] = useState<string>(""); //예금주명 
+    const [accountCompany, setAccountCompany] = useState<string>(""); //예금주명 
+    const [accountNumber, setAccountNumber] = useState<string>(""); //계좌번호
+    const [companyCode, setCompanyCode] = useState<string>("");  //사업자번호
+    const [ownerBirth, setOwnerBrith] = useState<string>("");  //카드 생년월일 
+    const [cardName, setCardName] = useState<string>("");  // 카드명
+    const [cardExpiryYear, setCardExpiryYear] = useState<string>("");  //카드 년
+    const [cardExpiryMonth, setCardExpiryMonth] = useState<string>("");  //카드 월 
     const [price, setPrice] = useState('20,000') 
     const [secondaryDate, setSecondaryDate] = useState<string>()
     const [list, setList] = useState<AccordionProps[]>([])  
     const [agreeList, setAgreeList] = useState<CheckboxProps[]>([])
     const [allAgree, setAllAgree] = useState<boolean>(false) 
+
+     
+    const [submitMutate, {data: paymentData }] = useMutation(`http://localhost:8081/payment`);
+
 
     // 둘째주 월요일 찾기
     function executeOnSecondMonday() {
@@ -383,7 +144,8 @@ const DetailPage = () =>  {
     }
 
     // 다음
-    const handleNext = useCallback((index: number) => {    
+    const handleNext = useCallback((index: number) => {  
+        let count:number = 0;  
         const content = document.querySelector(`section > div:nth-child(${index + 1})`);  
         const location = (content as HTMLElement).offsetTop 
         StepList.map((item) => {
@@ -391,10 +153,21 @@ const DetailPage = () =>  {
             item.id === index ? item.active = true : false;
         })
         setList([...list])    
+        
+        if( index === 3 ) {
+            agreeList.forEach((item) => { 
+                if(item.checked) {
+                    count++
+                } 
+            })
+            if(count < 1 ){
+                    return alert("이용 약관 동의를 선택해주세요.")
+            }
+        }
         setTimeout(() => {
             window.scrollTo({top:location, behavior:'smooth'}); 
-        }, 100);
-    },[list]);
+        }, 100); 
+    },[agreeList, list]);
 
     // 이전
     const handlePrev = useCallback((index: number) => {    
@@ -432,11 +205,82 @@ const DetailPage = () =>  {
             count < 2 ? setAllAgree(false) : setAllAgree(true)
         })
     },[agreeList])
+ 
+    // 유효성 검사
+    const Validation = useCallback(() => { 
+        console.log(radioActive2, radioActive3)
+        if(radioActive2 === 1) {
+            if(cardOwner === "") {
+                return alert("카드주명을 입력해주세요.")
+            }
+            if(radioActive3 == 1) {
+                if(ownerBirth === "") {
+                    return alert("생년월일을 입력해주세요.")
+                }
+            }else{
+                if(companyCode === "") {
+                    return alert("사업자등록번호를 입력해주세요.")
+                } 
+            }
+            if(cardName === "") {
+                return alert("카드사를 선택해주세요.")
+            }
+            if(cardExpiryYear === "" || cardExpiryMonth === "") {
+                return alert("유효기간을 선택해주세요.")
+            }
+            if(cardNumber1 ==="" || cardNumber2 === "" || cardNumber3 === "" || cardNumber4 === "") {
+                return alert("카드번호를 입력해주세요.")
+            } 
+        }else {
+            if(accountName === "") {
+                return alert("예금주명을 입력해주세요.")
+            }
+            if(radioActive3 == 1) {
+                if(ownerBirth === "") {
+                    return alert("생년월일을 입력해주세요.")
+                }
+            }else{
+                if(companyCode === "") {
+                    return alert("사업자등록번호를 입력해주세요.")
+                } 
+            }
+            if(accountCompany === "") {
+                return alert("은행명을 선택해주세요.")
+            }
+            if(accountNumber === "") {
+                return alert("계좌번호를 입력해주세요.")
+            } 
+        }
+    },[accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, ownerBirth, radioActive2, radioActive3])
+    
+      
+    const onValid = useCallback(() => {
+        Validation() 
+       
+        const data = { 
+            donation_support : radioActive1 === 1 ? "일시" : "정기", //후원방식
+            donation_current : price, // 후원금액
+            payment_division : radioActive3 === 1 ? "개인" : "법인", // 개인, 법인
+            payment_method : radioActive2 === 1 ? "카드" : " 자동이체", // 카드, 자동이체 
+            payment_card_name: cardOwner, // 카드 소유자명
+            payment_card_company : cardName, //카드사
+            payment_card_expiry: `${cardExpiryYear}/${cardExpiryMonth}`, //카드유효기간
+            payment_card_num: `${cardNumber1}-${cardNumber2}-${cardNumber3}-${cardNumber4}`, //카드번호 
+            payment_account_name: accountName,// 예금주명
+            payment_account_company: accountCompany, //은행명
+            payment_account_transfer: radioActive4 === 0 ? "매월15일" : "매월25일", //은행 이체일 
+            payment_account_num: accountNumber, //계좌번호
+            payment_card_birth : ownerBirth, //생년월일
+            payment_company_code : companyCode// 법인 사업자 
+        } 
+        submitMutate(data)
+        console.log(data,"후원하기")
+    },[Validation, accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, ownerBirth, price, radioActive1, radioActive2, radioActive3, radioActive4, submitMutate])
 
     useEffect(() => {
-    executeOnSecondMonday() 
-    setList(StepList)
-    setAgreeList(AgreeList)
+        executeOnSecondMonday() 
+        setList(StepList)
+        setAgreeList(AgreeList)  
     },[list, agreeList])
       
     return(
@@ -602,7 +446,7 @@ const DetailPage = () =>  {
                                                     <li>기부콩에서 제공하는 이벤트/혜택 등 다양한 정보를 휴대전화(네이버 앱 알림 또는 문자), 이메일로 받아보실 수 있습니다.</li>
                                                 </TermsList>
                                                 <Terms>
-                                                    {agreeTerms.terms}
+                                                    {AgreeTerms.terms}
                                                 </Terms>
                                             </TermsWrap>
                                             <ButtonBox>
@@ -661,64 +505,133 @@ const DetailPage = () =>  {
                                             radioActive2 === 1 ?
                                             <> 
                                             <Title flex={1} bottomBorder title="카드주명"> 
-                                                <InputBox><input type="text" placeholder="" value="" onChange={() => console.log('테스트')}/></InputBox>
-                                            </Title>
-                                            {
-                                                radioActive3 === 1 ?
-                                                
-                                            <Title bottomBorder flex={1} title="생년월일">
-                                                <InputBox><input type="text" placeholder="YYMMDD" value="" onChange={() => console.log('테스트')}/></InputBox>
-                                            </Title>
-                                            :
-                                            
-                                            <Title flex={"1 0 70%"} bottomBorder title="사업자등록번호">
-                                                <InputBox flexdirection="column">
-                                                    <div className="account">
-                                                        <input type="text" placeholder="'-'제외하고 입력" value="" onChange={() => console.log('테스트')}/>
-                                                        <Button bg="#fff" color="#f56400" border="#f56400" width="160">사업자번호확인</Button>
-                                                    </div> 
+                                                <InputBox>
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="" 
+                                                        value={cardOwner}  
+                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCardOwner(e.target.value)}
+                                                    />
                                                 </InputBox>
                                             </Title>
+                                            {
+                                                radioActive3 === 1 ? 
+                                                <Title bottomBorder flex={1} title="생년월일">
+                                                    <InputBox>
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder="YYMMDD" 
+                                                            maxLength={6}
+                                                            value={ownerBirth}
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOwnerBrith(e.target.value)}
+                                                        />
+                                                    </InputBox>
+                                                </Title>
+                                                : 
+                                                <Title flex={"1 0 70%"} bottomBorder title="사업자등록번호">
+                                                    <InputBox flexdirection="column">
+                                                        <div className="account">
+                                                            <input 
+                                                                type="text" 
+                                                                placeholder="'-'제외하고 입력" 
+                                                                value={companyCode} 
+                                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyCode(e.target.value)}
+                                                            />
+                                                            <Button bg="#fff" color="#f56400" border="#f56400" width="160">사업자번호확인</Button>
+                                                        </div> 
+                                                    </InputBox>
+                                                </Title>
                                             }
                                             <Title flex={"1 0 70%"} bottomBorder title="카드사/유효기간"> 
                                                 <SelectWrap>
                                                     <Select
-                                                        selectOptions={CardOptions1} 
+                                                        selectOptions={CardCompany} 
+                                                        onChange={(e) => { setCardName(e.label) }} 
                                                     />
                                                     <Select
-                                                        selectOptions={CardOptions2} 
+                                                        selectOptions={CardDay} 
+                                                        onChange={(e) => { setCardExpiryMonth(e.label) }} 
                                                     />
                                                     <Select
-                                                        selectOptions={CardOptions3} 
+                                                        selectOptions={CardYear} 
+                                                        onChange={(e) => { setCardExpiryYear(e.label) }} 
                                                     />
                                                 </SelectWrap>
                                             </Title>
                                             <Title flex={"1 0 70%"} bottomBorder title="카드번호"> 
                                                 <CardBox>
-                                                    <InputBox><input type="text" placeholder="0000" value=""  onChange={() => console.log('테스트')}/></InputBox>
-                                                    <InputBox><input type="text" placeholder="0000" value=""  onChange={() => console.log('테스트')}/></InputBox>
-                                                    <InputBox><input type="text" placeholder="0000" value=""  onChange={() => console.log('테스트')}/></InputBox>
-                                                    <InputBox><input type="text" placeholder="0000" value=""  onChange={() => console.log('테스트')}/></InputBox>
+                                                    <InputBox>
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder="0000" 
+                                                            value={cardNumber1}  
+                                                            maxLength={4}
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCardNumber1(e.target.value)}
+                                                        />
+                                                    </InputBox>
+                                                    <InputBox>
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder="0000" 
+                                                            value={cardNumber2}   
+                                                            maxLength={4}
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCardNumber2(e.target.value)}
+                                                        />
+                                                    </InputBox>
+                                                    <InputBox>
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder="0000" 
+                                                            value={cardNumber3} 
+                                                            maxLength={4}
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCardNumber3(e.target.value)}
+                                                        />
+                                                    </InputBox>
+                                                    <InputBox>
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder="0000" 
+                                                            value={cardNumber4} 
+                                                            maxLength={4}
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCardNumber4(e.target.value)}
+                                                        />
+                                                    </InputBox>
                                                 </CardBox>
                                             </Title> 
                                             </>
                                             :
                                             <>
                                             <Title flex={1} bottomBorder title="예금주명"> 
-                                                <InputBox><input type="text" placeholder="" value="" onChange={() => console.log('테스트')}/></InputBox>
+                                                <InputBox>
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="" 
+                                                        value={accountName} 
+                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAccountName(e.target.value)}/>
+                                                    </InputBox>
                                             </Title>
                                             {
                                                 radioActive3 === 1 ?
-                                                
-                                            <Title bottomBorder flex={1} title="생년월일">
-                                                <InputBox><input type="text" placeholder="YYMMDD" value="" onChange={() => console.log('테스트')}/></InputBox>
+                                                <Title bottomBorder flex={1} title="생년월일">
+                                                <InputBox>
+                                                    <input 
+                                                        type="text" 
+                                                        placeholder="YYMMDD" 
+                                                        value={ownerBirth}
+                                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOwnerBrith(e.target.value)}
+                                                    />
+                                                </InputBox>
                                             </Title>
-                                            :
-                                            
+                                            : 
                                             <Title flex={"1 0 70%"} bottomBorder title="사업자등록번호">
                                                 <InputBox flexdirection="column">
                                                     <div className="account">
-                                                        <input type="text" placeholder="'-'제외하고 입력" value="" onChange={() => console.log('테스트')}/>
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder="'-'제외하고 입력" 
+                                                            value={companyCode} 
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCompanyCode(e.target.value)}
+                                                        />
                                                         <Button bg="#fff" color="#f56400" border="#f56400" width="160">사업자번호확인</Button>
                                                     </div> 
                                                 </InputBox>
@@ -727,14 +640,20 @@ const DetailPage = () =>  {
                                             <Title flex={"1 0 70%"} bottomBorder title="은행명">
                                                 <SelectWrap>
                                                     <Select
-                                                        selectOptions={AccountOptions} 
+                                                        selectOptions={AccountName} 
+                                                        onChange={(e) => { setAccountCompany(e.label) }} 
                                                     />  
                                                 </SelectWrap>
                                             </Title>
                                             <Title flex={"1 0 70%"} bottomBorder title="계좌번호"> 
                                                 <InputBox flexdirection="column">
                                                     <div className="account">
-                                                        <input type="text" placeholder="'-'제외하고 입력" value="" onChange={() => console.log('테스트')}/>
+                                                        <input 
+                                                            type="text" 
+                                                            placeholder="'-'제외하고 입력" 
+                                                            value={accountNumber} 
+                                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setAccountNumber(e.target.value)}
+                                                        />
                                                         <Button bg="#fff" color="#f56400" border="#f56400" width="160">계좌인증</Button>
                                                     </div>
                                                     <span> - 휴대전화번호 계좌번호는 사용하실 수 없습니다.</span>
@@ -765,7 +684,7 @@ const DetailPage = () =>  {
                                             </>
                                             }
                                         <ButtonBox>
-                                            <Button bg="#f56400" color="#fff">후원하기</Button>
+                                            <Button bg="#f56400" color="#fff" onClick={onValid}>후원하기</Button>
                                         </ButtonBox>
                                         </>  
                                     case 4:
