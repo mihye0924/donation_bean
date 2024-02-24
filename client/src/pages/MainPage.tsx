@@ -1,7 +1,7 @@
 import CardList from "@/components/CardLise"
 import Radio from "@/components/Radio"
 import Select from "@/components/Select"
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import styled from "styled-components"
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation } from 'swiper/modules';
@@ -148,6 +148,38 @@ const SlideList = [
     {
         id: 3,
         img: '/images/slideBanner4.png'
+    },
+    {
+        id: 4,
+        img: '/images/slideBanner1.png'
+    },
+    {
+        id: 5,
+        img: '/images/slideBanner2.png'
+    },
+    {
+        id: 6,
+        img: '/images/slideBanner3.png'
+    },
+    {
+        id: 7,
+        img: '/images/slideBanner4.png'
+    },
+    {
+        id: 8,
+        img: '/images/slideBanner1.png'
+    },
+    {
+        id: 9,
+        img: '/images/slideBanner2.png'
+    },
+    {
+        id: 10,
+        img: '/images/slideBanner3.png'
+    },
+    {
+        id: 11,
+        img: '/images/slideBanner4.png'
     }
 ]
 const MainPage = () =>  {
@@ -158,23 +190,25 @@ const MainPage = () =>  {
     // Swiper slide progress
     const progressProgress = useRef<any>(null);
     const onAutoplayTimeLeft = (s:any, time:any, progress:any) => {
-        progressProgress.current.style.setProperty('--progress', 1 - progress);
+        progressProgress.current.style.setProperty('--progress', progress);
     };
-    // slide 정지 기능
+    // slide Pause
     const [swiperPause, setSwiperPause] = useState<any>(); 
     const [pauseNum, setPauseNum] = useState<number>(0); 
+    const [swiperButton, setSwiperButton] = useState("icon-pause")
     const handleSlidePause = () => {
         if(pauseNum === 0) {
             setPauseNum(1)
+            setSwiperButton("icon-start")
             swiperPause.autoplay.stop();
         } else {
             setPauseNum(0)
+            setSwiperButton("icon-pause")
             swiperPause.autoplay.start();
         }
     }
     return(
         <MainInner>
-            {/* 슬라이드 확정시 변경 */}{swiperIndex}
             <SwiperWrap>
                 <Swiper
                     spaceBetween={30}
@@ -193,19 +227,26 @@ const MainPage = () =>  {
                         {
                             SlideList.map((item) => {
                                 return (
-                                    <SwiperSlide key={item.id}><img src={item.img} alt="배너" />${swiperIndex}</SwiperSlide>
+                                    <SwiperSlide key={item.id}><img src={item.img} alt="배너" />{String(swiperIndex).padStart(2, "0")}</SwiperSlide>
                                 )
                             })
                         }  
                     <div className="autoplay-progress" slot="container-end">
-                        <span>{swiperIndex}</span>
-                        <div ref={progressProgress} />
-                        <span>{SlideList.length}</span>
-                        <button onClick={handleSlidePause}>정지</button>
+                        <span className="autoplay-progress-num left">{String(swiperIndex).padStart(2, "0")}</span>
+                        <div className="autoplay-progress-bar">
+                            <div ref={progressProgress} />
+                        </div>
+                        <span className="autoplay-progress-num right">{String(SlideList.length).padStart(2, "0")}</span>
+                        <button onClick={handleSlidePause}><i className={swiperButton}/></button>
                     </div>
                 </Swiper>
             </SwiperWrap>
             <SelectWrap>
+                <Select 
+                    selectOptions={selectOptions}
+                    size={300}
+                    onChange={(e) => console.log(e)}
+                />
                 <Select 
                     selectOptions={selectOptions}
                     size={300}
@@ -304,28 +345,68 @@ const SwiperWrap = styled.div`
         }
         .autoplay-progress {
             position: absolute;
-            right: 16px;
-            bottom: 16px;
+            left: 110px;
+            bottom: 50px;
+            width: 70px;
             z-index: 10;
-            width: 48px;
-            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: var(--swiper-theme-color);
+            color: #f56400;
+            &-num {
+                font: {
+                    size: 20px;
+                }
+                &.left {
+                    position: absolute;
+                    left: -22px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                }
+                &.right {
+                    position: absolute;
+                    right: -22px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                }
+            }
+            &-bar{
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 70px;
+                height:2px;
+                background-color: #ddd;
+                div {
+                    --progress: 0;
+                    z-index: 10;
+                    width: calc(100% * (1 - var(--progress)));
+                    height: 2px;
+                    background-color: #f56400;
+                  }
+            }
+            button {
+                position: absolute;
+                right: -50px;
+                width: 20px;
+                height: 20px;
+                i{
+                    display: inline-block;
+                    width: 100%;
+                    height: 100%;
+                }
+                .icon {
+                    &-pause {
+                        background: url('/images/icon-pause.svg') no-repeat center/ contain;
+                    }
+                    &-start {
+                        background: url('/images/icon-start.svg') no-repeat center/ contain;
+                    }
+                }
+            }
           }
           
-          .autoplay-progress div {
-            --progress: 0;
-            position: absolute;
-            left: 0;
-            top: 0px;
-            z-index: 10;
-            width: calc(100% * (1 - var(--progress)));
-            height: 2px;
-            background-color: var(--swiper-theme-color);
-          }
     }
 `
 const SelectWrap = styled.div`
