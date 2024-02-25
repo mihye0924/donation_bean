@@ -51,7 +51,6 @@ mobile: `(max-width: ${sizes.mobile})`,
 
 const SelectItem = styled.div`
   display: inline-block; 
-  width: 100%; 
   &>div {
     &>div { 
       font-weight: normal;

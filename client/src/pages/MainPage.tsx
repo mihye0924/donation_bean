@@ -9,34 +9,70 @@ import 'swiper/css';
 // Radio
 const RadioList = [
     {   
-        label: '전체1',
+        label: '전체',
         id: 'option1',
         value: 'option1',
-        imgUrl: 'img'
+        imgUrl: 'been'
     },
     {
-        label: '전체1',
+        label: '다문화',
         id: 'option2',
         value: 'option2',
-        imgUrl: 'img'
+        imgUrl: 'multiculturalism'
     },
     {
-        label: '전체1',
+        label: '동물',
         id: 'option3',
         value: 'option3',
-        imgUrl: 'img'
+        imgUrl: 'animal'
     },
     {
-        label: '전체1',
+        label: '아동*청소년',
         id: 'option4',
         value: 'option4',
-        imgUrl: 'img'
+        imgUrl: 'kids'
     },
     {
-        label: '전체1',
+        label: '시민사회',
         id: 'option5',
         value: 'option5',
-        imgUrl: 'img'
+        imgUrl: 'civilsociety'
+    },
+    {   
+        label: '장애인',
+        id: 'option6',
+        value: 'option6',
+        imgUrl: 'disabledperson'
+    },
+    {
+        label: '어르신',
+        id: 'option7',
+        value: 'option7',
+        imgUrl: 'elders'
+    },
+    {
+        label: '가족*여성',
+        id: 'option8',
+        value: 'option8',
+        imgUrl: 'woman'
+    },
+    {
+        label: '기타',
+        id: 'option9',
+        value: 'option9',
+        imgUrl: 'etc'
+    },
+    {
+        label: '환경',
+        id: 'option10',
+        value: 'option10',
+        imgUrl: 'environment'
+    },
+    {
+        label: '지구촌',
+        id: 'option11',
+        value: 'option11',
+        imgUrl: 'earth'
     }
 ]
 // Card
@@ -48,7 +84,7 @@ const CardItemList = [
         imgUrl:"./" ,
         title:"sdadasdasd\nasdsa",
         agency:"sadsads",
-        day:1231,
+        day: 123,
         price:2313,
         percentage: 50
     },
@@ -122,15 +158,36 @@ const CardItemList = [
 // Select
 const selectOptions = [
     {
-        value: "123",
-        label: "123"
+        value: "전체",
+        label: "전체"
     },
     {
-        value: "12",
-        label: "13"
+        value: "진행중",
+        label: "진행중"
+    },
+    {
+        value: "종료",
+        label: "종료"
     }
 ]
-
+const selectOptions2 = [
+    {
+        value: "최신 순",
+        label: "최신 순"
+    },
+    {
+        value: "참여금액 순",
+        label: "참여금액 순"
+    },
+    {
+        value: "참여율 순",
+        label: "참여율 순"
+    },
+    {
+        value: "종료 임박 순",
+        label: "종료 임박 순"
+    }
+]
 // Slide
 const SlideList = [
     {
@@ -244,12 +301,12 @@ const MainPage = () =>  {
             <SelectWrap>
                 <Select 
                     selectOptions={selectOptions}
-                    size={300}
+                    size={120}
                     onChange={(e) => console.log(e)}
                 />
                 <Select 
-                    selectOptions={selectOptions}
-                    size={300}
+                    selectOptions={selectOptions2}
+                    size={120}
                     onChange={(e) => console.log(e)}
                 />
             </SelectWrap>
@@ -410,11 +467,14 @@ const SwiperWrap = styled.div`
     }
 `
 const SelectWrap = styled.div`
-
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
 `
 
 const RadioWrap = styled.div`
-    margin: 60px auto 20px;
+    margin: 20px auto 20px;
     radio.active {
         border-color: blue;
     }
@@ -429,6 +489,6 @@ const CardWrap = styled.ul`
     flex-wrap: wrap;
     gap: 20px;
     li {
-        flex: 0 1 calc((100% / 4) - 20px)
+        flex: 0 1 calc((100% / 4) - 15px)
     }
 `
