@@ -18,7 +18,7 @@ export async function insertPayment(req, res) {
         payment_birth, 
         payment_company_code } = req.body; 
 
-    let result = await PaymentRepository.paymentInfo(
+    const result = await PaymentRepository.paymentInfo(
         user_id, 
         donation_no, 
         donation_support, 
@@ -36,7 +36,7 @@ export async function insertPayment(req, res) {
         payment_birth, 
         payment_company_code
     );
-    if(result === "ok") {
+    if(result === "ok") { 
         res.json({ ok: true });
     }else{
         res.json({ ok: false }); 

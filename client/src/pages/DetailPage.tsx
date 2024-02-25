@@ -14,7 +14,7 @@ import CardCompany from "@/api/detail/CardCompany.json"
 import CardDay from "@/api/detail/CardDay.json"
 import CardYear from "@/api/detail/CardYear.json"
 import axios from "axios"
-import { DetailDonationDataProps, DetailUserDataProps } from "@/types/detail"
+import { DetailDonationDataProps, DetailPaymentAllDataProps, DetailUserDataProps } from "@/types/detail"
  
 const DetailPage = () =>  {   
     const [radioActive1, setRadioActive1] = useState<number>(1);  //후원방식
@@ -41,8 +41,9 @@ const DetailPage = () =>  {
     const [allAgree, setAllAgree] = useState<boolean>(false)  
     const [submitMutate, {data: paymentData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/detail/payment`);
     const [donationQueryData, setDonationQueryData] = useState<DetailDonationDataProps>()
-    const [paymentAllQueryData, setPaymentAllQueryData] = useState<DetailPaymentAllDataProps>()
-    const [userQueryData, setUserQueryData] = useState<DetailUserDataProps>()
+    const [paymentAllQueryData, setPaymentAllQueryData] = useState<DetailPaymentAllDataProps[]>()
+    const [userQueryData, setUserQueryData] = useState<DetailUserDataProps>() 
+    const [paymentFinally, setPaymentFinally] = useState<DetailPaymentAllDataProps>()
     const priceNumber = Number(price.replace(",", "")); 
     const user_id ="test1";
     const donation_no = 1;
@@ -164,7 +165,9 @@ const DetailPage = () =>  {
     const paymentAllData = useCallback(() => {
         axios
         .get(`${import.meta.env.VITE_SERVER_URL}/detail/paymentAll?user_id=${user_id}&donation_no=${donation_no}`) 
-        .then((res) => {console.log(res.data.result), setPaymentAllQueryData(res.data.result)});
+        .then((res) => { 
+            setPaymentAllQueryData(res.data.result)
+        });
     },[])
  
 
@@ -232,12 +235,12 @@ const DetailPage = () =>  {
     // 후원하기
     const onValid = useCallback((index: number) => {  
         const data = { 
-             user_id: user_id, //유저 아이디
+            user_id: user_id, //유저 아이디
             donation_no: donation_no, //기부 번호
             donation_support : radioActive1 === 1 ? "일시" : "정기", //후원방식
             donation_current : priceNumber, // 후원금액
             payment_division : radioActive3 === 1 ? "개인" : "법인", // 개인, 법인
-            payment_method : radioActive2 === 1 ? "카드" : " 자동이체", // 카드, 자동이체 
+            payment_method : radioActive2 === 1 ? "카드" : "자동이체", // 카드, 자동이체 
             payment_card_name: cardOwner, // 카드 소유자명
             payment_card_company : cardName, //카드사
             payment_card_expiry: `${cardExpiryYear}/${cardExpiryMonth}`, //카드유효기간
@@ -250,14 +253,16 @@ const DetailPage = () =>  {
             payment_company_code : companyCode// 법인 사업자 
         } 
         submitMutate(data)  
-        setTimeout(() => {
-            if(paymentData?.ok) {
-                handleNext(index)
-                return alert("후원이 완료되었습니다.")
-            }  
-        }, 1500);
-    },[accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, handleNext, ownerBirth, paymentData, priceNumber, radioActive1, radioActive2, radioActive3, radioActive4, submitMutate])
-    
+        setPaymentFinally(data) 
+        handleNext(index)
+    },[accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, handleNext, ownerBirth, priceNumber, radioActive1, radioActive2, radioActive3, radioActive4, submitMutate])
+     
+    useEffect(() => { 
+        if(paymentData && paymentData.ok) { 
+            return alert("후원이 완료되었습니다.")
+        }  
+    },[paymentData])
+
     // 유효성 검사 후 제출
     const handleSubmit = useCallback((index:number) => {    
         if(radioActive2 === 1) { 
@@ -716,7 +721,7 @@ const DetailPage = () =>  {
                                         return<>
                                         <ImgBox>
                                             <img src="/images/donation-complete.png" alt="후원완료"/>
-                                            <p>조미혜 님, 후원신청이 완료되었습니다.</p>
+                                            <p>{userQueryData?.user_name} 님, 후원신청이 완료되었습니다.</p>
                                             <p>감사합니다.</p>
                                         </ImgBox>
                                         <Table>
@@ -726,27 +731,34 @@ const DetailPage = () =>  {
                                             <tbody>
                                                 <tr>
                                                     <th scope="row">후원방식</th>
-                                                    <td>정기후원</td> 
+                                                    <td>{paymentFinally?.donation_support}후원</td> 
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">후원분야</th>
-                                                    <td>국내사업후원(30,000원)</td> 
+                                                    <td>{donationQueryData?.donation_category}({String(paymentFinally?.donation_current).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원)</td> 
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">후원금액</th>
-                                                    <td className="orange">30,000원</td> 
+                                                    <td className="orange">{String(paymentFinally?.donation_current).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</td> 
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">납입방법</th>
-                                                    <td>신용카드/매월15일</td> 
+                                                    <td>{paymentFinally?.payment_method === "카드" 
+                                                    ? "신용카드" 
+                                                    : `자동이체 / ${paymentFinally?.payment_account_transfer}`}</td> 
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">납입정보</th>
                                                     <td>
-                                                        <p>KB국민카드 4579443290439****</p>
+                                                        <p>{paymentFinally?.payment_method === "카드" 
+                                                        ? `${paymentFinally?.payment_card_company} / ${paymentFinally?.payment_card_num}`
+                                                        : `${paymentFinally?.payment_account_company} / ${paymentFinally?.payment_account_num}`}</p>
                                                         <ul>
                                                             <li>이번달 후원금은 신청한 일자에 출금됩니다.</li>
-                                                            <li>다음달부터는 매월 15일에 출금되며, 미승인 시 25일에 재출금이 진행됩니다.</li>
+                                                            {
+                                                                paymentFinally?.payment_method === "자동이체" &&
+                                                                <li>다음달부터는 매월 {paymentFinally?.payment_account_transfer}에 출금됩니다.</li>
+                                                            }
                                                         </ul>    
                                                     </td> 
                                                 </tr>
@@ -1170,7 +1182,7 @@ const Table = styled.table`
     }
     tbody {
         display: inline-block;
-        /* padding: 0 100px; */
+        width: 100%;
         border-top: 2px solid #2d2d2d;
         border-bottom: 1px solid #d5d5d5;
         th {
