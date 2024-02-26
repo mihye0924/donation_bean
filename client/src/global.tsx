@@ -77,4 +77,10 @@ input,textarea  {
     border: 0;
     margin: 0;
 }
+button {
+  outline: none;
+  border: none;
+  background: inherit;
+  padding: 0;
+}
 `;
