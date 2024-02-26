@@ -1,5 +1,6 @@
 import LoadingSpinner from "@/components/LoadingSpinner";
 import useMutation from "@/hooks/useMutation";
+import { getUser } from "@/util/userinfo";
 import { jwtDecode } from "jwt-decode";
 import { useCallback, useEffect, useState } from "react";
 import { Cookies } from "react-cookie";
@@ -49,6 +50,14 @@ const LoginPage = () => {
   const onValid = useCallback((formData: IFrom) => {
     loginMutate(formData);
   }, []);
+
+  const user = getUser();
+
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
 
   return (
     <HeaderPadding>

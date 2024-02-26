@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 
 export async function getId(req, res) {
   const { id } = req.query;
-  console.log(id);
+
   if (!id) return res.json({ join: "중복체크전" });
   const result = await UserRepository.getId(id);
   if (result.cnt === 1) {
@@ -54,4 +54,11 @@ export async function login(req, res) {
     result.message = "존재하지 않는 아이디입니다.";
     res.json({ ok: false, result });
   } //아이디 없을때
+}
+
+export async function getUserInfo(req, res) {
+  const { id } = req.query;
+  const result = await UserRepository.getUserInfo(id);
+  console.log(result);
+  res.json({ ok: true, userinfo: result });
 }

@@ -1,6 +1,5 @@
 import useMutation from "@/hooks/useMutation";
 import { getUser } from "@/util/userinfo";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -27,14 +26,6 @@ const SignInPage = () => {
   const [queryData, setQueryData] = useState<IResponse>();
   const [singInMutation, { loading: mutationLoading, data: mutationData }] =
     useMutation(`http://localhost:8081/user/signin`);
-  /*  const queryClient = useQueryClient();
-  const { data: queryData, isLoading } = useQuery<IResponse>({
-    queryKey: ["idExist"],
-    queryFn: () =>
-      axios
-        .get(`http://localhost:8081/user/signin?id=${watch("user_id")}`)
-        .then((res) => res.data),
-  }); */
 
   const onIdExistClick = useCallback(() => {
     axios
@@ -75,14 +66,14 @@ const SignInPage = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/login");
+      navigate("/");
     }
   }, [user, navigate]);
   useEffect(() => {
     setIdExist(true);
   }, [watch("user_id")]);
 
-  const onValid = (data: IFormData) => {
+  const onValid = useCallback((data: IFormData) => {
     if (idExist === true) return alert("중복 확인을 해주세요");
     const {
       user_id,
@@ -107,7 +98,7 @@ const SignInPage = () => {
       user_email: emailPrefix + "@" + emailDomain,
     });
     reset();
-  };
+  }, []);
 
   return (
     <HeaderPadding>

@@ -26,6 +26,10 @@ export const removeUser = () => {
   sessionStorage.removeItem("info");
 };
 
+/* export const useUser = () => {
+
+}; */
+
 /* 
 /// 회원정보 조회, 로그아웃 방법
 
