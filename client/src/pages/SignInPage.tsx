@@ -25,11 +25,11 @@ const SignInPage = () => {
   const [idExist, setIdExist] = useState(true);
   const [queryData, setQueryData] = useState<IResponse>();
   const [singInMutation, { loading: mutationLoading, data: mutationData }] =
-    useMutation(`http://localhost:8081/user/signin`);
+    useMutation(`${import.meta.env.VITE_SERVER_URL}/user/signin`);
 
   const onIdExistClick = useCallback(() => {
     axios
-      .get(`http://localhost:8081/user/signin?id=${watch("user_id")}`)
+      .get(`${import.meta.env.VITE_SERVER_URL}/user/signin?id=${watch("user_id")}`)
       .then((res) => setQueryData(res.data));
   }, []);
 
@@ -73,8 +73,9 @@ const SignInPage = () => {
     setIdExist(true);
   }, [watch("user_id")]);
 
-  const onValid = useCallback((data: IFormData) => {
-    if (idExist === true) return alert("중복 확인을 해주세요");
+  const onValid = useCallback((data: IFormData) => {  if (idExist === true) {
+    return alert("중복 확인을 해주세요");
+  } else {
     const {
       user_id,
       user_pw,
@@ -98,6 +99,7 @@ const SignInPage = () => {
       user_email: emailPrefix + "@" + emailDomain,
     });
     reset();
+  }
   }, []);
 
   return (

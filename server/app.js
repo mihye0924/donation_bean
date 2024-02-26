@@ -15,7 +15,7 @@ app.use(cors({
 }));  
 app.use(bodyParser.json({ limit:'100mb' }));
 app.use(express.static(path.join(__dirname, '/public')));  
-app.use("/", UserRouter); 
+app.use("/user", UserRouter); 
 app.use("/detail", PaymentRouter); 
 
 app.listen(8081, () => {
