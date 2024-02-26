@@ -71,6 +71,10 @@ const RadioItem = styled.label`
     height: 42px;
     padding: 0 10px;
     white-space: nowrap;
+    @media ${media.tablet} {
+      height: 38px;
+      padding: 0 15px;
+    }
     i {
       display: inline-block;
       vertical-align:middle;

@@ -370,6 +370,9 @@ const MainInner = styled.div`
     width: 100%;
     margin: 0 auto;
     padding-top: 147px;
+    @media ${media.mobile}{
+        padding-top: 112px;
+    }
 `
 const SwiperWrap = styled.div`
     height: 500px;
@@ -380,24 +383,6 @@ const SwiperWrap = styled.div`
             img {
                 width: 100%;
                 height: 100%;
-            }
-        }
-        @media ${media.tablet}{  
-            .swiper-slide {
-                height: 307px;
-                img {
-                    width: 100%;
-                    height: 100%;
-                }
-            }
-        }
-        @media ${media.mobile}{  
-            .swiper-slide {
-                height: 150px;
-                img {
-                    width: 100%;
-                    height: 100%;
-                }
             }
         }
         .autoplay-progress {
@@ -463,8 +448,27 @@ const SwiperWrap = styled.div`
                 }
             }
           }
-          
-    }
+        }
+        @media ${media.tablet}{  
+          height: 307px;
+          .swiper-slide {
+              height: 307px;
+              img {
+                  width: 100%;
+                  height: 100%;
+              }
+          }
+      }
+      @media ${media.mobile}{  
+          height: 150px;
+          .swiper-slide {
+              height: 150px;
+              img {
+                  width: 100%;
+                  height: 100%;
+              }
+          }
+      }
 `
 const SelectWrap = styled.div`
     margin-top: 20px;
@@ -475,13 +479,14 @@ const SelectWrap = styled.div`
 
 const RadioWrap = styled.div`
     margin: 20px auto 20px;
-    radio.active {
-        border-color: blue;
-    }
-    form {
-        display: flex;
-        gap: 8px;
-    }
+    overflow: scroll;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+        form {
+                display: flex;
+                gap: 8px;
+        }
 `
 
 const CardWrap = styled.ul`
@@ -489,6 +494,16 @@ const CardWrap = styled.ul`
     flex-wrap: wrap;
     gap: 20px;
     li {
-        flex: 0 1 calc((100% / 4) - 15px)
+        flex: 0 1 calc((100% / 4) - 15px);
+    }
+    @media ${media.tablet}{
+        li {
+            flex: 0 1 calc((100% / 2) - 10px);
+        }
+    }
+    @media ${media.mobile}{
+        li {
+            flex: 0 1 100%;
+        }
     }
 `
