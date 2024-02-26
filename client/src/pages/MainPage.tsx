@@ -1,11 +1,13 @@
-import CardList from "@/components/CardLise"
+// import CardList from "@/components/CardLise"
 import Radio from "@/components/Radio"
 import Select from "@/components/Select"
-import { useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import styled from "styled-components"
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation } from 'swiper/modules';
 import 'swiper/css';
+import axios from "axios"
+import { DetailDonationDataProps  } from "@/types/detail"
 // Radio
 const RadioList = [
     {   
@@ -73,86 +75,6 @@ const RadioList = [
         id: 'option11',
         value: 'option11',
         imgUrl: 'earth'
-    }
-]
-// Card
-const CardItemList = [
-    {
-        id: 0,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day: 123,
-        price:2313,
-        percentage: 50
-    },
-    {
-        id: 1,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day:1231,
-        price:2313,
-        percentage: 50
-    },
-    {
-        id: 2,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day:1231,
-        price:2313,
-        percentage: 50
-    },
-    {
-        id: 3,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day:1231,
-        price:2313,
-        percentage: 50
-    },
-    {
-        id: 4,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day:1231,
-        price:2313,
-        percentage: 50
-    },
-    {
-        id: 5,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day:1231,
-        price:2313,
-        percentage: 50
-    },
-    {
-        id: 6,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day:1231,
-        price:2313,
-        percentage: 50
     }
 ]
 // Select
@@ -253,6 +175,7 @@ const MainPage = () =>  {
     const [swiperPause, setSwiperPause] = useState<any>(); 
     const [pauseNum, setPauseNum] = useState<number>(0); 
     const [swiperButton, setSwiperButton] = useState("icon-pause")
+    const user_id = "test1"
     const handleSlidePause = () => {
         if(pauseNum === 0) {
             setPauseNum(1)
@@ -264,6 +187,13 @@ const MainPage = () =>  {
             swiperPause.autoplay.start();
         }
     }
+    // donations data
+    const [donationQueryData, setDonationQueryData] = useState<DetailDonationDataProps>()
+    useEffect(() => {
+        axios
+        .get(`http://localhost:8081/main/donation?user_id=${user_id}`) 
+        .then((res) => setDonationQueryData(res.data.result));
+    }, [])
     return(
         <MainInner>
             <SwiperWrap>
@@ -332,23 +262,23 @@ const MainPage = () =>  {
                 </form>
             </RadioWrap>
             <CardWrap>
-                {
-                    CardItemList.map((item) => {
+                {/* {
+                    donationQueryData.map((item) => {
                         return (
                             <CardList 
-                                key={item.id}
-                                to={item.to}
-                                imgSrc={item.imgSrc} 
-                                imgUrl={item.imgUrl} 
-                                title={item.title}
-                                agency={item.agency}
-                                day={item.day}
-                                price={item.price}
-                                percentage={item.percentage}
+                                key={item.donation_no}
+                                to={item.donation_no}
+                                imgSrc={item.donation_name} 
+                                imgUrl={item.donation_image} 
+                                title={item.donation_name}
+                                agency={item.donation_company}
+                                day={item.donation_period}
+                                price={item.donation_goal}
+                                percentage={item.donation_status}
                             />
                         )
                     })
-                }
+                } */}
             </CardWrap>
         </MainInner>
     )

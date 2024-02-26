@@ -1,6 +1,7 @@
 
 
-export interface DetailDonationDataProps { 
+export interface DetailDonationDataProps {
+    map(arg0: (item: any) => import("react/jsx-runtime").JSX.Element): import("react").ReactNode; 
     donation_no: number;
     user_id: string;
     donation_name: string; 
