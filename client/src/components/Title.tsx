@@ -4,8 +4,7 @@ interface TitleProps {
     title: string; 
     bottomBorder?: boolean;
     children?: JSX.Element | string;
-    flex?: number;
-    flexdirection?: string;
+    flex?: number | string; 
 
 }
 
@@ -14,8 +13,7 @@ const Title = (props: TitleProps) => {
     <TitleWrap className={props.bottomBorder ? "bottom_border" : ""}>   
         <p>{props.title} </p>
         <Content
-          flex={props.flex}  
-          flexdirection={props.flexdirection}  
+          flex={props.flex}    
         >
           {props.children}
         </Content>
@@ -42,29 +40,31 @@ const TitleWrap = styled.div`
   font-family: 'NanumSquareNeo-Variable';
   font-size: 20px;
   font-weight: 900;
+  align-items: center;
   p {
-    width: 210px; 
+    width: 155px; 
   }
   span {
     font-family: initial;
     font-weight: normal;
     font-size: 16px;
   }
-  &.bottom_border { 
+  &.bottom_border {  
+    gap: 15px;
     border-bottom: 1px solid #f1f1f1;
     padding-top: 15px;
     padding-bottom: 15px;
   } 
   @media ${media.tablet}{ 
     flex-wrap: wrap;
+    gap: 10px;
        p {
         width: 100px;
         font-size: 14px;
        }
     }
 `
-const Content = styled.div<{flex?: number; flexdirection?: string;}>` 
-  flex: ${(props) => props.flex}; 
-  flex-direction: ${(props) => props.flexdirection}; 
+const Content = styled.div<{flex?: number | string;}>` 
+  flex: ${(props) => props.flex};  
   /* display: flex; */
 `

@@ -1,5 +1,6 @@
 import express, { urlencoded } from "express"; 
-import userRouter from "./router/UserRouter.js";
+import UserRouter from "./router/UserRouter.js"; 
+import PaymentRouter from "./router/PaymentRouter.js"; 
 import cors from "cors";
 import bodyParser from "body-parser";
 import path from 'path'; 
@@ -14,7 +15,8 @@ app.use(cors({
 }));  
 app.use(bodyParser.json({ limit:'100mb' }));
 app.use(express.static(path.join(__dirname, '/public')));  
-app.use("/", userRouter); 
+app.use("/", UserRouter); 
+app.use("/detail", PaymentRouter); 
 
 app.listen(8081, () => {
   console.log(`http://localhost:8081 서버실행중`);

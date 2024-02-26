@@ -5,6 +5,7 @@ interface ButtonProps {
     bg?: string;
     color?: string; 
     border?: string;
+    width?: string;
     onClick?: () => void;
 
 }
@@ -13,6 +14,7 @@ const Button = (props: ButtonProps) => {
     <ButtonWrap   
         bg={props.bg}
         border={props.border}
+        width={props.width}
         color={props.color}
         onClick={props.onClick}
     >
@@ -29,8 +31,10 @@ const ButtonWrap = styled.button<ButtonProps>`
     background-color: ${(props) => props.bg};
     color: ${(props) => props.color};
     border: 1px solid ${(props) => props.border};
+    width: ${(props) => props.width+"px"};
     padding: 5px 10px;
-    /* border: 0; */
+    font-size: 16px; 
     border-radius: 5px;
     font-family: 'NanumSquareNeo-Variable'; 
+    white-space: pre;
 `

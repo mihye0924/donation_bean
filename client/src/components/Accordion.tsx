@@ -1,18 +1,20 @@
 import styled from "styled-components"
 
-interface AccordionProps {
-  children: JSX.Element | null;
-  title: string;
-  onClick?: () => void; 
-  active?: boolean;
-  toggle?: boolean; 
+export interface AccordionProps { 
+  id?: number;
+  children?: JSX.Element | null; 
+  title?:string;
+  active: boolean;   
+  icon?: boolean; 
   type?: string;
+  disabled?: boolean;  
+  onClick?: () => void; 
 }
 
-const Accordion = (props: AccordionProps) => { 
+const Accordion = (props:AccordionProps) => {
   return ( 
     <AccordionWrap 
-      className={`${props.active ? '' : 'active'} ${props.type ? 'row': ''}`}
+      className={`${props.active ? '' : 'active'} ${props.type ? 'row': ''}`}   
       > 
       {
           props.type === "custom" ?
@@ -25,8 +27,11 @@ const Accordion = (props: AccordionProps) => {
               <AccordionHeader>
               <h1>{props.title}</h1>
               {
-                props.toggle &&
-                <button onClick={props.onClick}></button>
+                props.icon &&
+                <button 
+                  disabled={props.disabled} 
+                  onClick={props.onClick} 
+                />
               }
             </AccordionHeader>
             }
@@ -100,8 +105,7 @@ const AccordionHeader =  styled.div`
     }
 `
 const AccordionBody = styled.div`
-  background-color: #fff;
-  overflow: hidden;
+  background-color: #fff; 
   border-radius: 0 0 15px 15px;
   border-top: 1px solid #f1f1f1;
   height:  auto;

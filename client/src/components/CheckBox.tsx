@@ -1,13 +1,14 @@
 import styled from "styled-components";
 
-interface CheckboxProps{
+export interface CheckboxProps{
+    id?: number;
     type?: string;
     label: string;
-    id: string;
+    htmlId: string;
     value: string | number;
-    name: string;
-    className?: string;
-    onChange: () => void;
+    name: string; 
+    checked: boolean;
+    onChange?: () => void;
 }
 const CheckBox = (props: CheckboxProps) => {
   return (
@@ -17,15 +18,16 @@ const CheckBox = (props: CheckboxProps) => {
           switch(props.type) {
             case "round":
               return (
-                <InputItem className={props.className} >
+                <InputItem className={props.checked ? "active" : ""} > 
                   <input 
-                    type="checkbox"
-                    id={props.id}
+                    type="checkbox" 
+                    id={props.htmlId}
                     name={props.name}
                     value={props.value}
+                    checked={props.checked}
                     onChange={props.onChange}
                   /> 
-                   <label htmlFor={props.id}>{props.label}</label>
+                   <label htmlFor={props.htmlId}>{props.label}</label>
                 </InputItem>
               )
           }
