@@ -15,6 +15,7 @@ import CardDay from "@/api/detail/CardDay.json"
 import CardYear from "@/api/detail/CardYear.json"
 import axios from "axios"
 import { DetailDonationDataProps, DetailPaymentAllDataProps, DetailUserDataProps } from "@/types/detail"
+import { useLocation } from "react-router-dom"
  
 const DetailPage = () =>  {   
     const [radioActive1, setRadioActive1] = useState<number>(1);  //후원방식
@@ -41,12 +42,14 @@ const DetailPage = () =>  {
     const [allAgree, setAllAgree] = useState<boolean>(false)  
     const [submitMutate, {data: paymentData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/detail/payment`);
     const [donationQueryData, setDonationQueryData] = useState<DetailDonationDataProps>()
-    const [paymentAllQueryData, setPaymentAllQueryData] = useState<DetailPaymentAllDataProps[]>()
+    const [paymentTotalData, setPaymentTotalData] = useState<number>()
     const [userQueryData, setUserQueryData] = useState<DetailUserDataProps>() 
     const [paymentFinally, setPaymentFinally] = useState<DetailPaymentAllDataProps>()
     const priceNumber = Number(price.replace(",", "")); 
+    const router = useLocation()
     const user_id ="test1";
-    const donation_no = 1;
+    const path = Number(router.pathname.split("/")[2]); 
+    const donation_no = path;
 
     // steplist 데이터 셋팅
     const StepList = useMemo(() => {
@@ -159,17 +162,33 @@ const DetailPage = () =>  {
         axios
         .get(`${import.meta.env.VITE_SERVER_URL}/detail/donation?user_id=${user_id}&donation_no=${donation_no}`) 
         .then((res) => setDonationQueryData(res.data.result));
-    },[])
+    },[donation_no])
 
-    // 전체 결재 데이터 가져오기
+    // 전체 결제 데이터 가져오기
     const paymentAllData = useCallback(() => {
         axios
         .get(`${import.meta.env.VITE_SERVER_URL}/detail/paymentAll?user_id=${user_id}&donation_no=${donation_no}`) 
-        .then((res) => { 
-            setPaymentAllQueryData(res.data.result)
-        });
-    },[])
- 
+        .then((res) => {    
+            const arr: number[] = []
+            res.data.result.forEach((item: DetailPaymentAllDataProps) => {
+            arr.push(item.donation_current) 
+            const returnVal = arr.reduce((prev, curr) => {
+                return prev + curr 
+                },0) 
+                setPaymentTotalData(Number(returnVal))
+            }) 
+        }); 
+    },[donation_no])
+  
+    // 디데이 계산
+    const dDay = useMemo(() => { 
+        const targetData = new Date(String(donationQueryData?.donation_period.split("~ ")[1]))
+        const currentDate = new Date();
+        const timeDiff = targetData.getTime() - currentDate.getTime();
+        const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+        return daysRemaining
+    },[donationQueryData?.donation_period])
 
     // 둘째주 월요일 찾기
     function executeOnSecondMonday() {
@@ -255,13 +274,14 @@ const DetailPage = () =>  {
         submitMutate(data)  
         setPaymentFinally(data) 
         handleNext(index)
-    },[accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, handleNext, ownerBirth, priceNumber, radioActive1, radioActive2, radioActive3, radioActive4, submitMutate])
+    },[accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, donation_no, handleNext, ownerBirth, priceNumber, radioActive1, radioActive2, radioActive3, radioActive4, submitMutate])
      
     useEffect(() => { 
         if(paymentData && paymentData.ok) { 
+            paymentAllData()
             return alert("후원이 완료되었습니다.")
         }  
-    },[paymentData])
+    },[paymentAllData, paymentData])
 
     // 유효성 검사 후 제출
     const handleSubmit = useCallback((index:number) => {    
@@ -305,14 +325,14 @@ const DetailPage = () =>  {
         onValid(index)
     },[accountCompany, accountName, accountNumber, cardExpiryMonth, cardExpiryYear, cardName, cardNumber1, cardNumber2, cardNumber3, cardNumber4, cardOwner, companyCode, onValid, ownerBirth, radioActive2, radioActive3])
     
-    useEffect(() => {
+    useEffect(() => { 
         setList(StepList)
         setAgreeList(AgreeList)
         executeOnSecondMonday()  
         donationData()  
         userData()
         paymentAllData()
-    },[AgreeList, StepList, allAgree, donationData, paymentAllData, userData])
+    },[AgreeList, StepList, allAgree, donationData, donationQueryData?.donation_period, paymentAllData, userData])
       
     return(
         <Article>
@@ -344,14 +364,14 @@ const DetailPage = () =>  {
                                         return <Flex>
                                             <div>
                                                 <AccordionBody2>
-                                                    <Percent>{`${Number(donationQueryData?.donation_goal)/90000}`}%</Percent>
+                                                    <Percent>{`${paymentTotalData ? Math.floor((Number(paymentTotalData)/Number(donationQueryData?.donation_goal)) * 100) : 0}`}%</Percent>
                                                     <Progressbar
                                                         percentage={4}
                                                      />
                                                     <DonationPeriod>{donationQueryData?.donation_period}까지</DonationPeriod>
-                                                    <DonationDDay>D-9999</DonationDDay>
-                                                    <DonationCurrent>380,000<span>원</span></DonationCurrent>
-                                                    <DonationAmout>목표 금액: <span>{donationQueryData?.donation_goal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</span></DonationAmout>
+                                                    <DonationDDay>D-{dDay}</DonationDDay>
+                                                    <DonationCurrent>{paymentTotalData ? String(paymentTotalData).replace(/\B(?=(\d{3})+(?!\d))/g, ","): 0}<span>원</span></DonationCurrent>
+                                                    <DonationAmout>목표 금액: <span>{donationQueryData?.donation_goal ? donationQueryData?.donation_goal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","): 0}</span></DonationAmout>
                                                 </AccordionBody2>
                                             </div>
                                             <div>
