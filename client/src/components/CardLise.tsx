@@ -4,12 +4,12 @@ import Progressbar from "./Progressbar";
 
 
 interface CardProps {
-    to: string;
+    to: number | any;
     imgSrc: string;
     imgUrl: string;
     title: string;
     agency: string;
-    day: number;
+    day: number | string;
     price: number;
     percentage: number;
 }

@@ -1,13 +1,14 @@
 // import CardList from "@/components/CardLise"
 import Radio from "@/components/Radio"
 import Select from "@/components/Select"
-import { useEffect, useMemo, useRef, useState } from "react"
+import { Key, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import styled from "styled-components"
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import axios from "axios"
 import { DetailDonationDataProps  } from "@/types/detail"
+import CardList from "@/components/CardLise";
 // Radio
 const RadioList = [
     {   
@@ -163,7 +164,7 @@ const SlideList = [
 ]
 const MainPage = () =>  {
     // Radio Index
-    const [radioActive, setRadioActive] = useState<number>();
+    const [radioActive, setRadioActive] = useState<number>(0);
     // Swiper slide Index
     const [swiperIndex, setSwiperIndex] = useState<number>(1); 
     // Swiper slide progress
@@ -188,12 +189,39 @@ const MainPage = () =>  {
         }
     }
     // donations data
-    const [donationQueryData, setDonationQueryData] = useState<DetailDonationDataProps>()
+    const [donationQueryData, setDonationQueryData] = useState<any>([])
+    interface DetailDonationDataProps {
+        donation_category: any; donation_no: Key | null | undefined; donation_name: string; donation_image: string; donation_company: string; donation_period: string | number; donation_goal: number; donation_status: number; 
+}
     useEffect(() => {
         axios
         .get(`http://localhost:8081/main/donation?user_id=${user_id}`) 
-        .then((res) => setDonationQueryData(res.data.result));
+        .then((res) => {
+            res.data.result.forEach((item: DetailDonationDataProps, index:number) => {
+                // 날짜 구하기
+                const targetData = new Date(String(res.data.result[index].donation_period.split("~ ")[1]))
+                const currentDate = new Date();
+                const timeDiff = targetData.getTime() - currentDate.getTime();
+                const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                item.donation_period = daysRemaining;
+                setDonationQueryData(res.data.result)
+            })
+        })
     }, [])
+        // 라디오 카테고리 구분
+        const [donationData, setDonationData] = useState<any>(donationQueryData)  
+        const handleRadioChange = useCallback((e:any, i:number) => {
+            // 라디오 active 
+            setRadioActive(i)
+            donationQueryData.forEach((item: any) => {
+                if(item.donation_category === e.label) {
+                    const newData = donationQueryData.filter((item: { donation_category: any; }) => item.donation_category === e.label)
+                    setDonationData(newData)
+                } else if (e.label === "전체") {
+                    setDonationData(donationQueryData)
+                }
+            })
+        }, [donationQueryData])
     return(
         <MainInner>
             <SwiperWrap>
@@ -254,7 +282,7 @@ const MainPage = () =>  {
                                     imgUrl={item.imgUrl}  
                                     type="image"
                                     name="기부리스트" 
-                                    onChange={() => setRadioActive(index)}
+                                    onChange={() => handleRadioChange(item, index)}
                                 />
                             )
                         })
@@ -262,23 +290,22 @@ const MainPage = () =>  {
                 </form>
             </RadioWrap>
             <CardWrap>
-                {/* {
-                    donationQueryData.map((item) => {
-                        return (
-                            <CardList 
-                                key={item.donation_no}
-                                to={item.donation_no}
-                                imgSrc={item.donation_name} 
-                                imgUrl={item.donation_image} 
-                                title={item.donation_name}
-                                agency={item.donation_company}
-                                day={item.donation_period}
-                                price={item.donation_goal}
-                                percentage={item.donation_status}
-                            />
-                        )
-                    })
-                } */}
+
+                {
+                    donationData.map((item: DetailDonationDataProps) => (
+                        <CardList
+                            key={item.donation_no}
+                            to={`/detail/${item.donation_no}`}
+                            imgSrc={item.donation_name} 
+                            imgUrl={item.donation_image} 
+                            title={item.donation_name}
+                            agency={item.donation_company}
+                            day={item.donation_period}
+                            price={item.donation_goal}
+                            percentage={item.donation_status}
+                        />
+                    ))
+                }
             </CardWrap>
         </MainInner>
     )
