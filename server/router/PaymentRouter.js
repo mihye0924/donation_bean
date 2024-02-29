@@ -3,8 +3,8 @@ import { insertPayment, getDonation, getUser, getPayment } from "../controller/P
 
 const router = express.Router();
 
-router.post(`/payment`, insertPayment); 
-router.get(`/paymentAll`, getPayment); 
+router.post(`/`, insertPayment); 
+router.get(`/all`, getPayment); 
 router.get(`/donation`, getDonation); 
 router.get(`/user`, getUser); 
 

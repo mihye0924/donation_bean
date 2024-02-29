@@ -1,10 +1,11 @@
 // import CardList from "@/components/CardLise"
 import Radio from "@/components/Radio"
 import Select from "@/components/Select"
-import { Key, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { Key, useCallback, useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation } from 'swiper/modules';
+import  CategoryList from "@/api/main/Category.json"
 import 'swiper/css';
 import axios from "axios"
 import { DetailDonationDataProps  } from "@/types/detail"
@@ -282,7 +283,7 @@ const MainPage = () =>  {
             <RadioWrap>
                 <form>
                 {
-                        RadioList.map((item, index) => {
+                        CategoryList.map((item, index) => {
                             return (
                                 <Radio 
                                     key={item.id}

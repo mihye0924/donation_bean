@@ -25,7 +25,7 @@ const LoginPage = () => {
   }, []);
   const { handleSubmit, register } = useForm<IFrom>();
   const [loginMutate, { loading: LoginLoading, data: LoginData }] = useMutation(
-    `http://localhost:8081/user/login`
+    `${import.meta.env.VITE_SERVER_URL}/user/login`
   );
 
   useEffect(() => {
@@ -33,7 +33,7 @@ const LoginPage = () => {
       alert(LoginData?.result?.message);
     }
     if (LoginData && LoginData.ok === true) {
-      let cookie = new Cookies();
+      const cookie = new Cookies();
       cookie.set("auth_donation", LoginData?.result?.token);
       const userId = jwtDecode(LoginData.result.token);
       if (session) {

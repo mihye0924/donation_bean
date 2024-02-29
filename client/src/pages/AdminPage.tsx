@@ -5,8 +5,7 @@ import { FaRegHeart } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { getUser } from "@/util/userinfo";
-import { Link, Outlet, useMatch, useNavigate } from "react-router-dom";
-import { useEffect } from "react";
+import { Link, Outlet, useMatch, useNavigate } from "react-router-dom"; 
 
 interface Response {
   ok: boolean;
@@ -21,7 +20,7 @@ interface Response {
   };
 }
 
-const MyPage = () => {
+const AdminPage = () => {
   const user = getUser();
   const { data } = useQuery<Response>({
     queryKey: ["user"],
@@ -31,9 +30,8 @@ const MyPage = () => {
         .then((res) => res.data),
   });
 
-  const indexMatch = useMatch("/mypage");
-  const infoMatch = useMatch("/mypage/info");
-  const favMatch = useMatch("/mypage/fav");
+  const indexMatch = useMatch("/admin");
+  const infoMatch = useMatch("/admin/account"); 
   const navigate = useNavigate();
   // useEffect(() => {
   //   if (!user) {
@@ -52,37 +50,26 @@ const MyPage = () => {
           <ul>
             <li>
               <Link
-                to={`/mypage`}
+                to={`/admin`}
                 style={{ color: indexMatch ? "#f56400" : "" }}
               >
                 <span>
                   <BsClipboard2Heart />
                 </span>
-                <span>나의 후원</span>
+                <span>기부목록</span>
               </Link>
             </li>
             <li>
               <Link
-                to="/mypage/info"
+                to="/admin/account"
                 style={{ color: infoMatch ? "#f56400" : "" }}
               >
                 <span>
                   <FaRegUser />
                 </span>
-                <span>나의 정보</span>
+                <span>회원목록</span>
               </Link>
-            </li>
-            <li>
-              <Link
-                to="/mypage/fav"
-                style={{ color: favMatch ? "#f56400" : "" }}
-              >
-                <span>
-                  <FaRegHeart />
-                </span>
-                <span>관심 후원</span>
-              </Link>
-            </li>
+            </li> 
           </ul>
         </SidBar>
         <Main>
@@ -93,39 +80,49 @@ const MyPage = () => {
   );
 };
 
-export default MyPage;
+export default AdminPage;
 
 const sizes = {
   tablet: "768px",
-  desktop: "1024px",
+  desktop: "1200px",
+  mobile: "375px",
 };
 
 const media = {
   tablet: `(min-width: ${sizes.tablet})`,
   desktop: `(min-width: ${sizes.desktop})`,
+  mobile: `(min-width: ${sizes.mobile})`,
 };
 
-const HeaderPadding = styled.div`
-  padding-top: 200px;
-  padding-bottom: 50px;
+const HeaderPadding = styled.div` 
+  padding: 200px 20px 50px 20px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
 `;
 
 const Center = styled.div`
   margin: 0 auto;
-  width: 85%;
+  /* width: 85%; */
   display: flex;
   flex-direction: column;
   @media ${media.tablet} {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
   }
 `;
 
 const SidBar = styled.div`
   width: 100%;
+  border-bottom: 1px solid #f1f1f1;
   li {
     padding: 16px 0px 16px 20px;
     border-bottom: 1px solid #ececec;
+    font-family: 'NanumSquareNeo-Variable';
+    @media ${media.mobile} { 
+      &:last-child { border-bottom:0; }
+    }
     span {
       font-weight: bolder;
       &:first-child {
@@ -134,7 +131,8 @@ const SidBar = styled.div`
     }
   }
 `;
-const UserNameBox = styled.div`
+const UserNameBox = styled.div` 
+  font-family: 'NanumSquareNeo-Variable';
   background: #f56400;
   padding: 30px 15px 20px 15px;
   color: white;
