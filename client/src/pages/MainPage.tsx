@@ -9,6 +9,7 @@ import 'swiper/css';
 import axios from "axios"
 import { DetailDonationDataProps  } from "@/types/detail"
 import CardList from "@/components/CardLise";
+import Button from "@/components/Button";
 // Radio
 const RadioList = [
     {   
@@ -323,6 +324,9 @@ const MainPage = () =>  {
                     )
                 }
             </CardWrap>
+            <Button border="#ddd" size="medium">
+                더보기
+            </Button>
         </MainInner>
     )
 }
