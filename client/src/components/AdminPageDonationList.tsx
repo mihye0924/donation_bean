@@ -33,26 +33,26 @@ const AdminPageDonationList = () => {
     <AdminPageWrap>
       <h1>기부목록</h1> 
       <ButtonBox> 
-        <Button onClick={() => {setTitle("등록"), popupState(!popup)}}>등록</Button>
-        <Button>삭제</Button>
-        <Button>수정</Button>
+        <Button width="80" onClick={() => {setTitle("등록"), popupState(!popup)}}>등록</Button>
+        <Button width="80">삭제</Button>
+        <Button width="80">수정</Button>
       </ButtonBox>
       <CardWrap> 
-            {
-                donationList.map((item: DetailDonationDataProps) => (
-                    <CardList
-                        key={item.donation_no}
-                        to={`/payment/${item.donation_no}`}
-                        imgSrc={item.donation_name} 
-                        imgUrl={item.donation_image} 
-                        title={item.donation_name}
-                        agency={item.donation_company}
-                        day={item.donation_period}
-                        price={item.donation_goal}
-                        percentage={item.donation_status}
-                    />
-                ))
-            }
+          {
+            donationList.map((item: DetailDonationDataProps) => (
+                <CardList
+                    key={item.donation_no}
+                    to={`/payment/${item.donation_no}`}
+                    imgSrc={item.donation_name} 
+                    imgUrl={item.donation_image} 
+                    title={item.donation_name}
+                    agency={item.donation_company}
+                    day={item.donation_period}
+                    price={item.donation_goal}
+                    percentage={item.donation_status}
+                />
+            ))
+          }
         </CardWrap>
     </AdminPageWrap>
   )
@@ -76,7 +76,14 @@ const AdminPageWrap = styled.div`
   font-family: 'NanumSquareNeo-Variable';
   font-size: 40px;
   font-weight: 900;
-}
+  @media ${media.desktop}{ 
+    margin-top: 20px;
+    font-size: 30px;  
+  }
+  @media ${media.tablet}{  
+    display: none;
+  } 
+  }
 `
 const ButtonBox = styled.div`
   margin-top: 50px; 
@@ -95,6 +102,13 @@ const ButtonBox = styled.div`
       background-color: transparent;
     }
   } 
+  @media ${media.desktop}{  
+    button {
+    width: 65px;
+    padding: 5px 13px;
+    font-size: 14px; 
+    }
+  }
 `
 
 

@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import Button from "@/components/Button"
-import Select, { Option } from "@/components/Select"
+import Select from "@/components/Select"
 import  { useState, useMemo, useCallback, ChangeEvent, useEffect } from "react";
 import CategoryList from "@/api/main/Category.json" 
 import useMutation from "@/hooks/useMutation"
@@ -97,12 +97,12 @@ const AdminPopupCreate = () => {
                     onChange={handleUpLoadProfile}
                 />   
         </Input>
-        <Image>
-            {
-                saveImage &&
+        {
+            saveImage &&
+            <Image>
                 <img src={URL.createObjectURL(saveImage)} alt="기부이미지" />
-            } 
-        </Image>
+            </Image> 
+        } 
         <Input>
             <label htmlFor="donation_content">기부내용</label>
             <textarea 
@@ -147,7 +147,8 @@ const AdminPopupCreate = () => {
             <SelectWrap> 
                 <Select
                     selectOptions={CategoryList} 
-                    onChange={(e) => setDonationCategory(e.label)} 
+                    value={CategoryList[0]}
+                    onChange={(e) => setDonationCategory(e?.label as string)} 
                 />
             </SelectWrap>
         </Input>
@@ -156,12 +157,13 @@ const AdminPopupCreate = () => {
             <SelectWrap> 
                 <Select
                     selectOptions={StatusList} 
-                    onChange={(e) =>  setDonationStatus(e.label) } 
+                    value={StatusList[0]}
+                    onChange={(e) =>  setDonationStatus(e?.label as string) } 
                 />
             </SelectWrap> 
         </Input>
         <ButtonBox>
-            <Button onClick={handleSubmit}>등록하기</Button>
+            <Button width="80" onClick={handleSubmit}>등록하기</Button>
         </ButtonBox>
     </PopupWrap>
   )

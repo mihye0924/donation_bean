@@ -8,6 +8,7 @@ export interface CheckboxProps{
     value: string | number;
     name: string; 
     checked: boolean;
+    icon?: boolean;
     onChange?: () => void;
 }
 const CheckBox = (props: CheckboxProps) => {
@@ -26,12 +27,17 @@ const CheckBox = (props: CheckboxProps) => {
                     value={props.value}
                     checked={props.checked}
                     onChange={props.onChange}
-                  /> 
-                  <div className="icon"></div> 
-                  { 
-                    props.label &&
-                    <label htmlFor={props.htmlId}>{props.label}</label>
-                  }
+                  />  
+                  <label htmlFor={props.htmlId}>
+                    {
+                      props.icon &&
+                      <i className="icon" />
+                    }
+                    {
+                      props.label &&
+                      <span>{props.label}</span>
+                    }
+                  </label>
                 </InputItem>
               )
               case "square":
@@ -45,11 +51,16 @@ const CheckBox = (props: CheckboxProps) => {
                       checked={props.checked}
                       onChange={props.onChange}
                     /> 
-                    <div className="icon"></div> 
-                    { 
-                      props.label &&
-                      <label htmlFor={props.htmlId}>{props.label}</label>
-                    }
+                    <label htmlFor={props.htmlId}>
+                      {
+                        props.icon &&
+                        <i className="icon" />
+                      }
+                      {
+                        props.label &&
+                        <span>{props.label}</span>
+                      }
+                    </label> 
                   </InputItem>
                 )
           }
@@ -62,8 +73,6 @@ const CheckBox = (props: CheckboxProps) => {
 export default CheckBox
 
 const InputItem = styled.div` 
-    position: relative;  
-    display: flex;
     input{ 
         position: absolute;
         width: 1px;
@@ -75,13 +84,15 @@ const InputItem = styled.div`
         border: 0; 
     }
     label {
-      cursor: pointer;
-      margin-left: 15px;
-    }
-    .icon { 
-      position: relative;
-      width: 25px;
-      height: 25px;
+      cursor: pointer;  
+      display: flex; 
+      .icon {
+        position: relative;
+        display: inline-block;
+        margin-right: 10px;
+        width: 25px;
+        height:25px;
+        border-radius: 50%;
       &::before{ 
         position: absolute;
         content: '';
@@ -91,58 +102,50 @@ const InputItem = styled.div`
         background-color: #fff;
         top: 56%;
         transform: translateY(-50%) rotate(-40deg);
-        left: 9px;
+        left: 8px;
         border-radius: 5px;
       }
-      &::after{ 
+      &::after{  
         position: absolute;
         content: '';
         z-index: 1;
         display: inline-block;
         width: 2px;
-        height: 12px;
+        height: 11px;
         background-color: #fff;
-        top: 50%;
+        top: 53%;
         transform: translateY(-50%) rotate(40deg);
-        left: 15px;
+        left: 14px;
         border-radius: 5px;
       } 
+      }
+      span {
+        flex: 1;
+      }
     } 
     &.active{ 
-      &::before{
+      .icon {
         background-color: #f56400 !important;
         z-index: 1;
       } 
     }
     &.round { 
       padding: 10px 0;
-      &::before {
-        position: absolute; 
-        content: ''; 
-        width: 25px;
-        height: 25px;
-        left: 0; 
+      .icon {   
         background-color: #bdbdbd;
-        border-radius: 50%;
       } 
     } 
-    &.square { 
-      .icon {
+    &.square {  
+      .icon { 
+        margin-right: 0; 
+        border: 1px solid #f56400; 
+        border-radius: 5px;
         &::before{  
           background-color: #f56400 !important; 
         }
         &::after{  
           background-color: #f56400  !important;  
         } 
-      }
-      &::before {
-        position: absolute; 
-        content: ''; 
-        width: 25px;
-        height: 25px;
-        left: 0;  
-        border: 1px solid #f56400; 
-        border-radius: 5px;
       } 
       &.active{ 
         .icon {  

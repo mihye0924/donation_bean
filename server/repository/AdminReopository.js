@@ -32,3 +32,16 @@ export async function getUserList() {
     .execute(sql)
     .then((row) => row[0]);
 }
+
+export async function deleteUser(user_no) {
+    const sql = `delete from user where user_no = ?`;
+    return db
+    .execute(sql,[user_no])
+    .then((row) => "ok");
+}
+export async function updateUser(user_no, user_enum) {
+    const sql = `update user set user_enum = ? where user_no = ?`;
+    return db
+    .execute(sql,[user_enum, user_no])
+    .then((row) => "ok");
+}
