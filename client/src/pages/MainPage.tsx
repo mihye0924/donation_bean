@@ -191,9 +191,11 @@ const MainPage = () =>  {
     }
     // donations data
     const [donationQueryData, setDonationQueryData] = useState<any>([])
+    // 라디오 카테고리 구분
+    const [donationData, setDonationData] = useState<any>([])  
     interface DetailDonationDataProps {
         donation_category: any; donation_no: Key | null | undefined; donation_name: string; donation_image: string; donation_company: string; donation_period: string | number; donation_goal: number; donation_status: number; 
-}
+    }
     useEffect(() => {
         axios
         .get(`http://localhost:8081/main/donation?user_id=${user_id}`) 
@@ -206,11 +208,11 @@ const MainPage = () =>  {
                 const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
                 item.donation_period = daysRemaining;
                 setDonationQueryData(res.data.result)
+                setDonationData(res.data.result)
             })
         })
     }, [])
         // 라디오 카테고리 구분
-        const [donationData, setDonationData] = useState<any>(donationQueryData)  
         const handleRadioChange = useCallback((e:any, i:number) => {
             // 라디오 active 
             setRadioActive(i)
@@ -223,8 +225,14 @@ const MainPage = () =>  {
                 }
             })
         }, [donationQueryData])
-        // 카드리스트 limit
+        useEffect(() => {
+
+        },[donationData])
+        // 카드리스트 limit 증가
         const [limit, setLimit] = useState<number>(12)
+        const handleLimitToggle = () => {
+            donationData.length > limit && setLimit(limit + 12)
+        }
     return(
         <MainInner>
             <SwiperWrap>
@@ -295,41 +303,25 @@ const MainPage = () =>  {
             <CardWrap>
 
                 {   
-                    radioActive === 0 ? (
-                        donationQueryData.map((item: DetailDonationDataProps, index: number) => (
-                            index < limit && <CardList
-                                key={item.donation_no}
-                                to={`/detail/${item.donation_no}`}
-                                imgSrc={item.donation_name} 
-                                imgUrl={item.donation_image} 
-                                title={item.donation_name}
-                                agency={item.donation_company}
-                                day={item.donation_period}
-                                price={item.donation_goal}
-                                percentage={item.donation_status}
-                            />
-                        ))
-                    ) : (
-                        donationData.map((item: DetailDonationDataProps, index: number) => (
-                            index < limit && <CardList
-                                key={item.donation_no}
-                                to={`/detail/${item.donation_no}`}
-                                imgSrc={item.donation_name} 
-                                imgUrl={item.donation_image} 
-                                title={item.donation_name}
-                                agency={item.donation_company}
-                                day={item.donation_period}
-                                price={item.donation_goal}
-                                percentage={item.donation_status}
-                            />
-                        ))
-                    )
+                    donationData.map((item: DetailDonationDataProps, index: number) => (
+                        index < limit && <CardList
+                            key={item.donation_no}
+                            to={`/detail/${item.donation_no}`}
+                            imgSrc={item.donation_name} 
+                            imgUrl={item.donation_image} 
+                            title={item.donation_name}
+                            agency={item.donation_company}
+                            day={item.donation_period}
+                            price={item.donation_goal}
+                            percentage={item.donation_status}
+                        />
+                    ))
                 }
             </CardWrap>
             {
-                limit <= 12 ?
+                limit <= donationData.length ?
                     <ButtonWrap>
-                        <Button border="#ddd" size="medium" onClick={()=> {donationQueryData.length && donationData.length < limit ? setLimit(limit + 12) : setLimit(limit)}}>
+                        <Button border="#ddd" size="medium" onClick={handleLimitToggle}>
                             더보기
                         </Button>
                     </ButtonWrap>
