@@ -223,6 +223,8 @@ const MainPage = () =>  {
                 }
             })
         }, [donationQueryData])
+        // 카드리스트 limit
+        const [limit, setLimit] = useState<number>(12)
     return(
         <MainInner>
             <SwiperWrap>
@@ -292,10 +294,10 @@ const MainPage = () =>  {
             </RadioWrap>
             <CardWrap>
 
-                {
+                {   
                     radioActive === 0 ? (
-                        donationQueryData.map((item: DetailDonationDataProps) => (
-                            <CardList
+                        donationQueryData.map((item: DetailDonationDataProps, index: number) => (
+                            index < limit && <CardList
                                 key={item.donation_no}
                                 to={`/detail/${item.donation_no}`}
                                 imgSrc={item.donation_name} 
@@ -308,8 +310,8 @@ const MainPage = () =>  {
                             />
                         ))
                     ) : (
-                        donationData.map((item: DetailDonationDataProps) => (
-                            <CardList
+                        donationData.map((item: DetailDonationDataProps, index: number) => (
+                            index < limit && <CardList
                                 key={item.donation_no}
                                 to={`/detail/${item.donation_no}`}
                                 imgSrc={item.donation_name} 
@@ -324,9 +326,15 @@ const MainPage = () =>  {
                     )
                 }
             </CardWrap>
-            <Button border="#ddd" size="medium">
-                더보기
-            </Button>
+            {
+                limit <= 12 ?
+                    <ButtonWrap>
+                        <Button border="#ddd" size="medium" onClick={()=> {donationQueryData.length && donationData.length < limit ? setLimit(limit + 12) : setLimit(limit)}}>
+                            더보기
+                        </Button>
+                    </ButtonWrap>
+                    : null
+            }
         </MainInner>
     )
 }
@@ -483,4 +491,7 @@ const CardWrap = styled.ul`
             flex: 0 1 100%;
         }
     }
+`
+const ButtonWrap = styled.div`
+    margin-top:24px;
 `
