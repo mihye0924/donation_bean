@@ -94,9 +94,8 @@ const media = {
   mobile: `(min-width: ${sizes.mobile})`,
 };
 
-const HeaderPadding = styled.div`
-  padding-top: 200px;
-  padding-bottom: 50px;
+const HeaderPadding = styled.div` 
+  padding: 200px 20px 50px 20px;
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
@@ -116,6 +115,7 @@ const Center = styled.div`
 
 const SidBar = styled.div`
   width: 100%;
+  border-bottom: 1px solid #f1f1f1;
   li {
     padding: 16px 0px 16px 20px;
     border-bottom: 1px solid #ececec;

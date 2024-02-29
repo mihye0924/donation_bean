@@ -1,8 +1,23 @@
 import styled from "styled-components"
 import Button from "./Button"
 import CheckBox from "./CheckBox"
+import { useCallback, useEffect,useState } from "react"
+import axios from "axios"
 
 const AdminPageAccountList = () => {
+  const [userList, setUserList] = useState([])
+  const user_id = "test1"
+
+  const getUserData = useCallback(() => {
+    axios
+      .get(`${import.meta.env.VITE_SERVER_URL}/user/list?user_id=${user_id}`)
+      .then((res) => console.log(res.data))
+  },[])
+
+  useEffect(() => {
+    getUserData()
+  },[getUserData])
+
   return (
     <AdminPageWrap>
       <h1>회원목록</h1>
@@ -48,6 +63,9 @@ const AdminPageAccountList = () => {
           </tr>
         </tbody>
       </Table>
+      <MoreButton>
+        <Button>더보기</Button>
+      </MoreButton>
     </AdminPageWrap>
   )
 }
@@ -64,13 +82,28 @@ const AdminPageWrap = styled.div`
 `
 const ButtonBox = styled.div`
   margin-top: 50px; 
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+  button {
+    background-color: #f56400;
+    color: #fff;
+    padding: 8px 20px;
+    border: 0;
+    margin-left: 10px;  
+    &:nth-of-type(2) {
+      color: #f56400;
+      border: 1px solid #f56400;
+      background-color: transparent;
+    }
+  } 
 `
 const Table = styled.table`
   border: 1px solid #707070;
   width: 100%;
   caption {
     display: none;
-  }
+  } 
   th, tr, td {
     vertical-align: middle;
     border: 1px solid #707070;
@@ -78,5 +111,18 @@ const Table = styled.table`
   th, td {
     padding: 10px;
     text-align: center;
+  }
+`
+
+const MoreButton = styled.div`
+  margin-top: 50px;
+  text-align: center;
+  button {
+    border: 1px solid #f56400;
+    padding: 8px 10px;
+    border-radius: 0;
+    color: #f56400;
+    width: 200px;
+    height: 45px;
   }
 `

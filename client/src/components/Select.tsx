@@ -1,7 +1,7 @@
 import styled from "styled-components";
-import ReactSelect, { StylesConfig } from 'react-select'
+import ReactSelect, {StylesConfig } from 'react-select'
 
-interface Option {
+export interface Option {
   value: string;
   label: string;
 }
@@ -24,10 +24,10 @@ const customStyles = (props: SelectProps): StylesConfig<Option, false> => ({
 });
 const Select = (props: SelectProps) => { 
   return (
-    <SelectItem>
-      <ReactSelect   
+    <SelectItem className="select">
+      <ReactSelect  
         options={props.selectOptions}
-        closeMenuOnSelect={true}
+        closeMenuOnSelect={true} 
         onChange={props.onChange}
         defaultValue={props.selectOptions[0]}
         styles={customStyles(props)}

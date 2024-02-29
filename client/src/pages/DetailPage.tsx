@@ -40,7 +40,7 @@ const DetailPage = () =>  {
     const [list, setList] = useState<AccordionProps[]>([])  
     const [agreeList, setAgreeList] = useState<CheckboxProps[]>([])
     const [allAgree, setAllAgree] = useState<boolean>(false)  
-    const [submitMutate, {data: paymentData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/detail/payment`);
+    const [submitMutate, {data: paymentData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/payment`);
     const [donationQueryData, setDonationQueryData] = useState<DetailDonationDataProps>()
     const [paymentTotalData, setPaymentTotalData] = useState<number>()
     const [userQueryData, setUserQueryData] = useState<DetailUserDataProps>() 
@@ -153,21 +153,21 @@ const DetailPage = () =>  {
     // 사용자 데이터 가져오기
     const userData = useCallback(() => {
         axios
-        .get(`${import.meta.env.VITE_SERVER_URL}/detail/user?user_id=${user_id}`) 
+        .get(`${import.meta.env.VITE_SERVER_URL}/payment/user?user_id=${user_id}`) 
         .then((res) => setUserQueryData(res.data.result));
     },[])
 
     // 기부 데이터 가져오기
     const donationData = useCallback(() => {
         axios
-        .get(`${import.meta.env.VITE_SERVER_URL}/detail/donation?user_id=${user_id}&donation_no=${donation_no}`) 
+        .get(`${import.meta.env.VITE_SERVER_URL}/payment/donation?user_id=${user_id}&donation_no=${donation_no}`) 
         .then((res) => setDonationQueryData(res.data.result));
     },[donation_no])
 
     // 전체 결제 데이터 가져오기
     const paymentAllData = useCallback(() => {
         axios
-        .get(`${import.meta.env.VITE_SERVER_URL}/detail/paymentAll?user_id=${user_id}&donation_no=${donation_no}`) 
+        .get(`${import.meta.env.VITE_SERVER_URL}/payment/all?user_id=${user_id}&donation_no=${donation_no}`) 
         .then((res) => {    
             const arr: number[] = []
             res.data.result.forEach((item: DetailPaymentAllDataProps) => {
