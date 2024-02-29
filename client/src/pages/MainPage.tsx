@@ -11,75 +11,6 @@ import axios from "axios"
 import { DetailDonationDataProps  } from "@/types/detail"
 import CardList from "@/components/CardLise";
 import Button from "@/components/Button";
-// Radio
-const RadioList = [
-    {   
-        label: '전체',
-        id: 'option1',
-        value: 'option1',
-        imgUrl: 'been'
-    },
-    {
-        label: '다문화',
-        id: 'option2',
-        value: 'option2',
-        imgUrl: 'multiculturalism'
-    },
-    {
-        label: '동물',
-        id: 'option3',
-        value: 'option3',
-        imgUrl: 'animal'
-    },
-    {
-        label: '아동*청소년',
-        id: 'option4',
-        value: 'option4',
-        imgUrl: 'kids'
-    },
-    {
-        label: '시민사회',
-        id: 'option5',
-        value: 'option5',
-        imgUrl: 'civilsociety'
-    },
-    {   
-        label: '장애인',
-        id: 'option6',
-        value: 'option6',
-        imgUrl: 'disabledperson'
-    },
-    {
-        label: '어르신',
-        id: 'option7',
-        value: 'option7',
-        imgUrl: 'elders'
-    },
-    {
-        label: '가족*여성',
-        id: 'option8',
-        value: 'option8',
-        imgUrl: 'woman'
-    },
-    {
-        label: '기타',
-        id: 'option9',
-        value: 'option9',
-        imgUrl: 'etc'
-    },
-    {
-        label: '환경',
-        id: 'option10',
-        value: 'option10',
-        imgUrl: 'environment'
-    },
-    {
-        label: '지구촌',
-        id: 'option11',
-        value: 'option11',
-        imgUrl: 'earth'
-    }
-]
 // Select
 const selectOptions = [
     {
@@ -194,9 +125,6 @@ const MainPage = () =>  {
     const [donationQueryData, setDonationQueryData] = useState<any>([])
     // 라디오 카테고리 구분
     const [donationData, setDonationData] = useState<any>([])  
-    interface DetailDonationDataProps {
-        donation_category: any; donation_no: Key | null | undefined; donation_name: string; donation_image: string; donation_company: string; donation_period: string | number; donation_goal: number; donation_status: number; 
-    }
     useEffect(() => {
         axios
         .get(`http://localhost:8081/main/donation?user_id=${user_id}`) 
@@ -219,21 +147,48 @@ const MainPage = () =>  {
             setRadioActive(i)
             donationQueryData.forEach((item: any) => {
                 if(item.donation_category === e.label) {
-                    const newData = donationQueryData.filter((item: { donation_category: any; }) => item.donation_category === e.label)
+                    const newData = donationQueryData.filter((item: { donation_category: DetailDonationDataProps; }) => item.donation_category === e.label)
                     setDonationData(newData)
                 } else if (e.label === "전체") {
                     setDonationData(donationQueryData)
                 }
             })
         }, [donationQueryData])
-        useEffect(() => {
-
-        },[donationData])
         // 카드리스트 limit 증가
         const [limit, setLimit] = useState<number>(12)
         const handleLimitToggle = () => {
             donationData.length > limit && setLimit(limit + 12)
         }
+        // 최신순
+        const handleSelectEvnet = useCallback((e:any) => {
+            if(e.value === "최신 순"){
+                donationQueryData.forEach((item: DetailDonationDataProps, index:number) => {
+                    // 날짜 구하기
+                    const targetData = new Date(String(donationQueryData[index].donation_period.split("~ ")[1]))
+                    const currentDate = new Date();
+                    const timeDiff = targetData.getTime() - currentDate.getTime();
+                    const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                    console.log(targetData ,currentDate, timeDiff, daysRemaining) 
+                })
+            } else if(e.value === "참여금액 순"){
+                console.log("참여금액 순")
+                setDonationData(
+                    donationQueryData.sort((a:DetailDonationDataProps,b:DetailDonationDataProps) => (b.donation_goal - a.donation_goal))
+                )
+            } else if(e.value === "참여율 순"){
+                console.log("참여율 순")
+                setDonationData(
+                    donationQueryData.sort((a:DetailDonationDataProps,b:DetailDonationDataProps) => (b.donation_status - a.donation_status))
+                )
+            } else if(e.value === "종료 임박 순"){
+                donationQueryData.sort((a:any,b:any) => (a.donation_period - b.donation_period))
+                console.log("종료임박 순", donationQueryData)
+            }
+        }, [donationQueryData])
+
+        useEffect(() => {
+            
+        },[donationData, donationQueryData])
     return(
         <MainInner>
             <SwiperWrap>
@@ -277,7 +232,7 @@ const MainPage = () =>  {
                 <Select 
                     selectOptions={selectOptions2}
                     size={120}
-                    onChange={(e) => console.log(e)}
+                    onChange={(e) => handleSelectEvnet(e)}
                 />
             </SelectWrap>
             <RadioWrap>

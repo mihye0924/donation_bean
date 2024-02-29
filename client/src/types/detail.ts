@@ -1,14 +1,14 @@
 
 
 export interface DetailDonationDataProps {
-    donation_no: number;
+    donation_no: number | null | undefined;
     user_id: string;
     donation_name: string; 
     donation_image: string;
     donation_content: string;
     donation_company: string;
     donation_goal: number;
-    donation_period: string;
+    donation_period: string | number;
     donation_category: string;
     donation_createAt: Date;
     donation_status: number;
