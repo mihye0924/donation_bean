@@ -35,7 +35,7 @@ export async function insertUser(req, res) {
 
 export async function login(req, res) {
   const { id, pass } = req.body;
-  console.log(id, pass);
+
   const result = await UserRepository.login(id);
   result.message = "";
   if (result.cnt === 1) {
@@ -59,6 +59,45 @@ export async function login(req, res) {
 export async function getUserInfo(req, res) {
   const { id } = req.query;
   const result = await UserRepository.getUserInfo(id);
-  console.log(result);
   res.json({ ok: true, userinfo: result });
+}
+
+export async function updateUser(req, res) {
+  const {
+    user_nick,
+    user_name,
+    user_phone,
+    user_pw,
+    emailPrefix,
+    emailDomain,
+    user_id,
+    user_avatar,
+  } = req.body;
+
+  const user_email = emailPrefix + "@" + emailDomain;
+  const hashPass = bcryptjs.hashSync(user_pw, 8);
+  const result = await UserRepository.updateUser(
+    user_email,
+    user_phone,
+    hashPass,
+    user_name,
+    user_nick,
+    user_avatar,
+    user_id
+  );
+  if (result === "ok") {
+    res.json({ ok: true });
+  } else {
+    res.json({ ok: false });
+  }
+}
+
+export async function getFevList(req, res) {
+  const { id } = req.query;
+  const result = await UserRepository.getFevList(id);
+  if (result) {
+    res.json({ ok: true, favList: result });
+  } else {
+    res.json({ ok: false });
+  }
 }

@@ -16,7 +16,6 @@ interface IFrom {
 const LoginPage = () => {
   const [svgCheck, setSvgCheck] = useState(false);
   const [session, setSession] = useState(true);
-  console.log(session);
 
   const navigate = useNavigate();
   const onSVGClick = useCallback(() => {

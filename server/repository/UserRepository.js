@@ -27,3 +27,31 @@ export async function getUserInfo(id) {
   const sql = `select  user_name, user_avatar,user_id,user_email,user_nick,user_phone,DATEDIFF(NOW(), user_createAt) as user_createAt from user where user_id = ? `;
   return db.execute(sql, [id]).then((row) => row[0][0]);
 }
+
+export async function updateUser(
+  user_email,
+  user_phone,
+  user_pw,
+  user_name,
+  user_nick,
+  user_avatar,
+  user_id
+) {
+  const sql = `update user  set user_email=? ,user_phone=?, user_pw=?,  user_name=?, user_nick=?, user_avatar=? where user_id = ?`;
+  return db
+    .execute(sql, [
+      user_email,
+      user_phone,
+      user_pw,
+      user_name,
+      user_nick,
+      user_avatar,
+      user_id,
+    ])
+    .then((row) => "ok");
+}
+
+export async function getFevList(id) {
+  const sql = `select  * from donation inner join fav on donation.donation_no = fav.donation_no where fav.user_id  = ?`;
+  return db.execute(sql, [id]).then((row) => row[0][0]);
+}

@@ -47,7 +47,12 @@ const MyPage = () => {
           <UserNameBox>
             <p>{data?.userinfo?.user_nick}님,</p>
             <p>반갑습니다</p>
-            <span>기부콩과 만난지 {data?.userinfo?.user_createAt}일째</span>
+            <span>
+              기부콩과 만난지{" "}
+              {data?.userinfo?.user_createAt &&
+                data?.userinfo?.user_createAt + 1}
+              일째
+            </span>
           </UserNameBox>
           <ul>
             <li>

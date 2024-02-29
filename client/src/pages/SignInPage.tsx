@@ -30,20 +30,12 @@ const SignInPage = () => {
   const onIdExistClick = useCallback(() => {
     axios
       .get(`http://localhost:8081/user/signin?id=${watch("user_id")}`)
-      .then((res) => setQueryData(res.data));
+      .then((res) => {
+        return setQueryData(res.data);
+      })
+      .catch((err) => console.log(err));
   }, []);
 
-  useEffect(() => {
-    if (queryData && queryData.join) {
-      setIdExist(false);
-      return alert("사용 가능한 아이디입니다.");
-    }
-    if (queryData && !queryData.join) {
-      setIdExist(true);
-      return alert("이미 존재하는 아이디입니다.");
-    }
-  }, [queryData]);
-  console.log(queryData);
   const { register, handleSubmit, setValue, setFocus, reset, watch } =
     useForm<IFormData>();
 
@@ -73,32 +65,47 @@ const SignInPage = () => {
     setIdExist(true);
   }, [watch("user_id")]);
 
-  const onValid = useCallback((data: IFormData) => {
-    if (idExist === true) return alert("중복 확인을 해주세요");
-    const {
-      user_id,
-      user_pw,
-      user_pw_check,
-      user_phone,
-      emailPrefix,
-      emailDomain,
-      user_name,
-    } = data;
+  const onValid = (data: IFormData) => {
+    if (!idExist) {
+      const {
+        user_id,
+        user_pw,
+        user_pw_check,
+        user_phone,
+        emailPrefix,
+        emailDomain,
+        user_name,
+      } = data;
 
-    if (user_pw !== user_pw_check) {
-      alert("비밀번호가 일치하지 않습니다.");
-      return setFocus("user_pw_check");
+      if (user_pw !== user_pw_check) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return setFocus("user_pw_check");
+      }
+
+      singInMutation({
+        user_id,
+        user_pw,
+        user_phone,
+        user_name,
+        user_email: emailPrefix + "@" + emailDomain,
+      });
+      reset();
+    } else if (idExist) {
+      alert("중복 확인을 해주세요");
     }
+  };
 
-    singInMutation({
-      user_id,
-      user_pw,
-      user_phone,
-      user_name,
-      user_email: emailPrefix + "@" + emailDomain,
-    });
-    reset();
-  }, []);
+  useEffect(() => {
+    if (queryData && queryData.join) {
+      setIdExist(false);
+
+      return alert("사용 가능한 아이디입니다.");
+    }
+    if (queryData && !queryData.join) {
+      setIdExist(true);
+      return alert("이미 존재하는 아이디입니다.");
+    }
+  }, [queryData]);
 
   return (
     <HeaderPadding>
@@ -205,14 +212,28 @@ const SignInPage = () => {
                 <input
                   {...register("emailDomain", { required: true })}
                   type="text"
-                  value={currentSelect === "" ? undefined : currentSelect}
+                  value={currentSelect === "" ? "" : currentSelect}
                 />
-                <select onChange={onSelectChange} name="domain">
-                  <option value="">직접입력</option>
-                  <option value="gmail.com">gmail.com</option>
-                  <option value="naver.com">naver.com</option>
-                  <option value="daum.net">daum.net</option>
-                  <option value="nate.com">nate.com</option>
+                <select
+                  onChange={onSelectChange}
+                  value={currentSelect || ""}
+                  name="domain"
+                >
+                  <option key={""} value="">
+                    직접입력
+                  </option>
+                  <option key={"gmail.com"} value="gmail.com">
+                    gmail.com
+                  </option>
+                  <option key={"naver.com"} value="naver.com">
+                    naver.com
+                  </option>
+                  <option key={"daum.net"} value="daum.net">
+                    daum.net
+                  </option>
+                  <option key={"nate.com"} value="nate.com">
+                    nate.com
+                  </option>
                 </select>
               </EmailCheck>
               <Constraint>이메일 주소를 입력해 주세요</Constraint>

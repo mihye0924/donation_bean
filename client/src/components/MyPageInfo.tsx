@@ -2,6 +2,11 @@ import { getUser } from "@/util/userinfo";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import styled from "styled-components";
+import LoadingSpinner from "./LoadingSpinner";
+import { useForm } from "react-hook-form";
+import useMutation from "@/hooks/useMutation";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 interface Response {
   ok: boolean;
   userinfo: {
@@ -14,22 +19,125 @@ interface Response {
     user_createAt: number;
   };
 }
+interface IFormData {
+  user_avatar: FileList;
+  user_id: string;
+  user_pw: string;
+  user_pw_check: string;
+  user_phone: string;
+  emailPrefix: string;
+  emailDomain: string;
+  user_name: string;
+  user_nick: string;
+}
 const MyPageInfo = () => {
   const user = getUser();
+  const navigate = useNavigate();
   const { data } = useQuery<Response>({
-    queryKey: ["user"],
+    queryKey: ["mypageinfo"],
     queryFn: () =>
       axios
         .get(`http://localhost:8081/user/me?id=${user?.id}`)
         .then((res) => res.data),
   });
+  const [avatarPreview, setAvatarPreview] = useState("");
+  const { handleSubmit, register, watch, setFocus } = useForm<IFormData>({
+    defaultValues: {
+      user_nick: data?.userinfo?.user_nick,
+      user_name: data?.userinfo?.user_name,
+      emailPrefix: data?.userinfo?.user_email.split("@")[0],
+      emailDomain: data?.userinfo?.user_email.split("@")[1],
+      user_phone: data?.userinfo?.user_phone,
+    },
+  });
+  const avatarChange = watch("user_avatar");
+
+  useEffect(() => {
+    if (avatarChange && avatarChange.length > 0) {
+      const file = avatarChange[0];
+      setAvatarPreview(URL.createObjectURL(file));
+    }
+  }, [avatarChange]);
+
+  const [editMutation, { data: editMuationData }] = useMutation(
+    `http://localhost:8081/user/edit`
+  );
+  const onValid = async (ValidData: IFormData) => {
+    const {
+      user_nick,
+      user_name,
+      user_pw,
+      user_phone,
+      emailPrefix,
+      emailDomain,
+      user_pw_check,
+    } = ValidData;
+    if (user_pw !== user_pw_check) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return setFocus("user_pw_check");
+    }
+    if (avatarChange && avatarChange.length > 0) {
+      const file = avatarChange[0];
+      const form = new FormData();
+      form.append("file", file);
+      const response = await axios.post(
+        `http://localhost:8081/user/uploads?id=${user?.id}`,
+        form
+      );
+      console.log(response);
+    }
+    editMutation({
+      user_avatar: user.id + "." + avatarChange[0].name.split(".")[1],
+      user_id: user.id,
+      user_nick,
+      user_name,
+      user_pw,
+      user_phone,
+      emailPrefix,
+      emailDomain,
+    });
+  };
+
+  useEffect(() => {
+    if (editMuationData && editMuationData.ok) {
+      alert("회원정보 변경이 성공했습니다.");
+      navigate("/mypage");
+    }
+  }, [editMuationData, navigate]);
+
   return (
     <>
-      {!data && "로딩중"}
+      {!data && (
+        <>
+          <LoadingSpinner size={10} />
+          "로딩중..."
+        </>
+      )}
       <Center>
         <Title>나의 정보</Title>
-        <Form>
+        <Form onSubmit={handleSubmit(onValid)}>
           <Notice>개인정보를 입력해 주세요</Notice>
+          <ImageBox>
+            {avatarPreview && <img src={avatarPreview} alt="" />}
+            {!avatarPreview && data?.userinfo?.user_avatar ? (
+              <img
+                src={`http://localhost:8081/uploads/${data?.userinfo?.user_avatar}`}
+                alt=""
+              />
+            ) : (
+              <div />
+            )}
+            <label htmlFor="photo">
+              사진 변경하기
+              <input
+                {...register("user_avatar")}
+                id="photo"
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+              />
+            </label>
+          </ImageBox>
           <FormBox>
             <Label>아이디</Label>
             <PassCheck>
@@ -46,12 +154,12 @@ const MyPageInfo = () => {
             <Label>닉네임</Label>
             <PassCheck>
               <input
+                {...register("user_nick", { maxLength: 8 })}
                 placeholder="닉네임"
                 type="text"
-                defaultValue={`${data?.userinfo?.user_nick}`}
               />
             </PassCheck>
-            <Constraint>닉네임을 입력해 주세요</Constraint>
+            <Constraint>8자 이내 닉네임을 입력해 주세요</Constraint>
           </FormBox>
           <FormBox>
             <Label>이름</Label>
@@ -59,7 +167,11 @@ const MyPageInfo = () => {
               <input
                 placeholder="이름"
                 type="text"
-                defaultValue={`${data?.userinfo?.user_name}`}
+                {...register("user_name", {
+                  required: true,
+                  minLength: 2,
+                  maxLength: 4,
+                })}
               />
             </PassCheck>
             <Constraint>이름을 입력해 주세요</Constraint>
@@ -68,7 +180,19 @@ const MyPageInfo = () => {
           <FormBox>
             <Label>비밀번호</Label>
             <PassCheck>
-              <input placeholder="비밀번호" type="password" />
+              <input
+                {...register("user_pw", {
+                  required: true,
+                  pattern: {
+                    value:
+                      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+-=\[\]{}|;:'",.<>\/?]).{8,}$/,
+                    message:
+                      "영문, 대소문자, 숫자, 특수기호 조합 ~ 8자리 이상 입력하세요",
+                  },
+                })}
+                placeholder="비밀번호"
+                type="password"
+              />
             </PassCheck>
             <Constraint>
               영문, 대소문자, 숫자, 특수기호 조합 ~ 8자리 이상
@@ -77,7 +201,11 @@ const MyPageInfo = () => {
           <FormBox>
             <Label>비밀번호 확인</Label>
             <PassCheck>
-              <input placeholder="비밀번호 확인" type="password" />
+              <input
+                {...register("user_pw_check")}
+                placeholder="비밀번호 확인"
+                type="password"
+              />
             </PassCheck>
             <Constraint>
               영문, 대소문자, 숫자, 특수기호 조합 ~ 8자리 이상
@@ -87,9 +215,13 @@ const MyPageInfo = () => {
             <Label>전화번호</Label>
             <PassCheck>
               <input
+                {...register("user_phone", {
+                  required: true,
+                  minLength: 11,
+                  maxLength: 11,
+                })}
                 placeholder="전화번호"
                 type="tel"
-                defaultValue={`${data?.userinfo?.user_phone}`}
               />
             </PassCheck>
             <Constraint>'-' 기호 없이 전화번호 11자리 입력해 주세요</Constraint>
@@ -98,12 +230,15 @@ const MyPageInfo = () => {
             <Label>이메일</Label>
             <EmailCheck>
               <input
-                name="emailPrefix"
                 placeholder="이메일 주소"
-                defaultValue={`${data?.userinfo?.user_email.split("@")[0]}`}
+                {...register("emailPrefix", { required: true })}
               />
               <span>@</span>
-              <input type="text" />
+              <input
+                type="text"
+                {...register("emailDomain", { required: true })}
+                defaultValue={`${data?.userinfo?.user_email.split("@")[1]}`}
+              />
               <select name="domain">
                 <option value="">직접입력</option>
                 <option value="gmail.com">gmail.com</option>
@@ -282,5 +417,26 @@ const ButtonArea = styled.div`
     &:last-child {
       background: #f56400;
     }
+  }
+`;
+
+const ImageBox = styled.div`
+  display: flex;
+  align-items: center;
+  label {
+    border: none;
+    background: #f56400;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  img {
+    width: 75px;
+    height: 75px;
+    border: 1px solid black;
+    border-radius: 100%;
+    margin-right: 10px;
   }
 `;
