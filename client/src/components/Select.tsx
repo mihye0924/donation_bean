@@ -1,8 +1,8 @@
 import styled from "styled-components";
-import ReactSelect, {StylesConfig } from 'react-select'
+import ReactSelect, { SingleValue, StylesConfig } from 'react-select'
 
 export interface Option {
-  value: string;
+  value?: string;
   label: string;
 }
 interface SelectProps {
@@ -10,8 +10,9 @@ interface SelectProps {
   color?: string;
   isFixed?: boolean;
   isDisabled?: boolean;
-  size?: number;
-  onChange?: (e: Option) => void;
+  size?: number; 
+  value?: Option;
+  onChange?: (e: SingleValue<Option>) => void;
 }
 const customStyles = (props: SelectProps): StylesConfig<Option, false> => ({
   control: (provided) => ({
@@ -22,14 +23,15 @@ const customStyles = (props: SelectProps): StylesConfig<Option, false> => ({
     display: 'none',
   }),
 });
-const Select = (props: SelectProps) => { 
+
+const Select = (props: SelectProps) => {   
   return (
     <SelectItem className="select">
       <ReactSelect  
         options={props.selectOptions}
         closeMenuOnSelect={true} 
         onChange={props.onChange}
-        defaultValue={props.selectOptions[0]}
+        defaultValue={props.value}
         styles={customStyles(props)}
       /> 
     </SelectItem>
@@ -52,15 +54,14 @@ mobile: `(max-width: ${sizes.mobile})`,
 const SelectItem = styled.div`
   display: inline-block; 
   &>div {
-    &>div { 
+    &>div {  
       font-weight: normal;
       font-size: 16px;
     }
   }
   @media ${media.tablet}{  
     &>div {
-      &>div { 
-        /* max-width: 100px; */
+      &>div {  
         font-size: 14px;
       }
     }

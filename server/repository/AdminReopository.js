@@ -26,3 +26,9 @@ export async function donation(
     ])
     .then((row) => "ok");
 }
+export async function getUserList() {
+    const sql = `select * from user`;
+    return db
+    .execute(sql)
+    .then((row) => row[0]);
+}

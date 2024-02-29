@@ -270,7 +270,7 @@ const DetailPage = () =>  {
             payment_account_num: accountNumber, //계좌번호
             payment_birth : ownerBirth, //생년월일
             payment_company_code : companyCode// 법인 사업자 
-        } 
+        }  
         submitMutate(data)  
         setPaymentFinally(data) 
         handleNext(index)
@@ -596,15 +596,18 @@ const DetailPage = () =>  {
                                                 <SelectWrap>
                                                     <Select
                                                         selectOptions={CardCompany} 
-                                                        onChange={(e) => { setCardName(e.label) }} 
+                                                        value={CardCompany[0]} 
+                                                        onChange={(e) => setCardName(e?.label as string)}  
                                                     />
                                                     <Select
                                                         selectOptions={CardDay} 
-                                                        onChange={(e) => { setCardExpiryMonth(e.label) }} 
+                                                        value={CardDay[0]} 
+                                                        onChange={(e) =>setCardExpiryMonth(e?.label as string)} 
                                                     />
                                                     <Select
                                                         selectOptions={CardYear} 
-                                                        onChange={(e) => { setCardExpiryYear(e.label) }} 
+                                                        value={CardYear[0]} 
+                                                        onChange={(e) =>setCardExpiryYear(e?.label as string)} 
                                                     />
                                                 </SelectWrap>
                                             </Title>
@@ -691,7 +694,8 @@ const DetailPage = () =>  {
                                                 <SelectWrap>
                                                     <Select
                                                         selectOptions={AccountName} 
-                                                        onChange={(e) => { setAccountCompany(e.label) }} 
+                                                        value={AccountName[0]} 
+                                                        onChange={(e) => setAccountCompany(e?.label as string)}
                                                     />  
                                                 </SelectWrap>
                                             </Title>
@@ -1124,6 +1128,9 @@ const PaymentDateBox = styled.div`
 const SelectWrap = styled.div`
     display: flex;
     gap:10px;
+    .select { 
+        min-width: 25%;
+    }
 `
 
 // 후원자 정보

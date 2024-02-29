@@ -13,25 +13,24 @@ export interface DetailDonationDataProps {
     donation_createAt: Date;
     donation_status: number;
 }
-export interface DetailPaymentAllDataProps { 
-    payment_no?:number;
+export interface DetailPaymentAllDataProps {  
     user_id: string;
     donation_no:number;
     donation_support: string;
-    donation_current:number;
+    donation_current: number;
     payment_division: string;
     payment_method: string;
-    payment_card_name: string;
-    payment_card_company: string;
-    payment_card_expiry: string;
-    payment_card_num: string;
-    payment_account_name: string;
-    payment_account_company: string;
-    payment_account_transfer: string;
-    payment_account_num: string; 
-    payment_birth: string;
-    payment_company_code: string;
-    payment_createAt?: string;
+    payment_card_name?: string;
+    payment_card_company?: string;
+    payment_card_expiry?: string;
+    payment_card_num?: string;
+    payment_account_name?: string;
+    payment_account_company?: string;
+    payment_account_transfer?: string;
+    payment_account_num?: string; 
+    payment_birth?: string;
+    payment_company_code?: string;
+    payment_createAt?: Date;
 }
 
 export interface DetailUserDataProps { 

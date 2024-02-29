@@ -1,5 +1,5 @@
 import express from "express";
-import { insertDonation, upLoadFile } from "../controller/AdminController.js"; 
+import { insertDonation, upLoadFile, getUserList } from "../controller/AdminController.js"; 
 
 import path from 'path';  
 import multer from 'multer';
@@ -21,5 +21,6 @@ const upload = multer({
 
 router.post(`/donation`, insertDonation); 
 router.post(`/upload`, upload.single('file'), upLoadFile); 
+router.get(`/user`, getUserList); 
 
 export default router;

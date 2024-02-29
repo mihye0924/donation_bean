@@ -37,3 +37,10 @@ export async function insertDonation(req, res) {
         res.json({ ok: false }); 
     }   
 }
+
+
+export async function getUserList(req, res) { 
+    const result = await AdminReopository.getUserList(); 
+    res.json({ ok: true, result: result });
+  }
+  

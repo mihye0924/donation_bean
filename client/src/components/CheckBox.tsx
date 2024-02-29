@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components"; 
 
 export interface CheckboxProps{
     id?: number;
@@ -18,7 +18,7 @@ const CheckBox = (props: CheckboxProps) => {
           switch(props.type) {
             case "round":
               return (
-                <InputItem className={`round ${props.checked ? "active" : ""}`} > 
+                <InputItem className={`round${props.checked ? " active" : ""}`} > 
                   <input 
                     type="checkbox" 
                     id={props.htmlId}
@@ -36,7 +36,7 @@ const CheckBox = (props: CheckboxProps) => {
               )
               case "square":
                 return (
-                  <InputItem className={`square ${props.checked ? "active" : ""}`} > 
+                  <InputItem className={`square${props.checked ? " active" : ""}`} > 
                     <input 
                       type="checkbox" 
                       id={props.htmlId}
@@ -63,7 +63,7 @@ export default CheckBox
 
 const InputItem = styled.div` 
     position: relative;  
-    padding: 15px 0;
+    display: flex;
     input{ 
         position: absolute;
         width: 1px;
@@ -74,97 +74,85 @@ const InputItem = styled.div`
         clip: rect(0, 0, 0, 0);
         border: 0; 
     }
-    &.round { 
-      &::before {
-        position: absolute; 
-        content: ''; 
-        width: 20px;
-        height: 20px;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%); 
-        background-color: #bdbdbd;
-        border-radius: 50%;
-      } 
-    }
-    .icon::before{
-      position: absolute; 
-      content: '';
-      width: 2px;
-      height: 7px;
-      z-index: 1;
-      background-color: #fff;
-      top: 51%;
-      transform: translateY(-50%) rotate(-40deg);
-      left: 6px;
-      border-radius: 5px;
-    }
-    .icon::after{
-      position: absolute;
-      content: '';
-      z-index: 1;
-      display:inline-block;
-      width: 2px;
-      height: 10px;
-      background-color: #fff;
-      top: 50%;
-      transform: translateY(-50%) rotate(40deg);
-      left: 11px;
-      border-radius: 5px;
-    } 
-    &.active{ 
-      &.round::before{
-        background-color: #f56400;
-        z-index: 1;
-      } 
-    }
     label {
       cursor: pointer;
-      margin-left: 30px;
+      margin-left: 15px;
     }
-    &.square {
-      width: 15px;
-      height: 15px; 
-      .icon::before{
-        position: absolute; 
+    .icon { 
+      position: relative;
+      width: 25px;
+      height: 25px;
+      &::before{ 
+        position: absolute;
         content: '';
         width: 2px;
-        height: 7px;
+        height: 9px;
         z-index: 1;
         background-color: #fff;
-        top: 51%;
+        top: 56%;
         transform: translateY(-50%) rotate(-40deg);
-        left: 7px;
+        left: 9px;
         border-radius: 5px;
       }
-      .icon::after{
+      &::after{ 
         position: absolute;
         content: '';
         z-index: 1;
-        display:inline-block;
+        display: inline-block;
         width: 2px;
-        height: 10px;
+        height: 12px;
         background-color: #fff;
         top: 50%;
         transform: translateY(-50%) rotate(40deg);
-        left: 12px;
+        left: 15px;
         border-radius: 5px;
       } 
+    } 
+    &.active{ 
+      &::before{
+        background-color: #f56400 !important;
+        z-index: 1;
+      } 
+    }
+    &.round { 
+      padding: 10px 0;
       &::before {
         position: absolute; 
         content: ''; 
-        width: 20px;
-        height: 20px;
-        left: 0;
-        top: 50%;
-        transform: translateY(-50%); 
+        width: 25px;
+        height: 25px;
+        left: 0; 
+        background-color: #bdbdbd;
+        border-radius: 50%;
+      } 
+    } 
+    &.square { 
+      .icon {
+        &::before{  
+          background-color: #f56400 !important; 
+        }
+        &::after{  
+          background-color: #f56400  !important;  
+        } 
+      }
+      &::before {
+        position: absolute; 
+        content: ''; 
+        width: 25px;
+        height: 25px;
+        left: 0;  
         border: 1px solid #f56400; 
         border-radius: 5px;
+      } 
+      &.active{ 
+        .icon {  
+          &::before{  
+            background-color: #fff !important;  
+          }
+          &::after{  
+            background-color: #fff !important;  
+          } 
+        } 
       }
-      &.active {
-        &::before {
-          background-color: #f56400;
-        }
-      }    
     }
 ` 

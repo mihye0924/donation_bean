@@ -1,17 +1,34 @@
 import styled from "styled-components"
 import Button from "./Button"
 import CheckBox from "./CheckBox"
-import { useCallback, useEffect,useState } from "react"
+import {  useCallback, useEffect, useMemo, useState } from "react"
 import axios from "axios"
+import { userTypes } from "@/types/user"
+import Select from "@/components/Select" 
 
 const AdminPageAccountList = () => {
-  const [userList, setUserList] = useState([])
-  const user_id = "test1"
+  const [userList, setUserList] = useState<userTypes[]>([]) 
+  const [authority, setAuthority] = useState<string>("")
+  const [check, setCheck] = useState<boolean>(false)
+  const [allAgree, setAllAgree] = useState<boolean>(false)
+
+  const authoriyList = useMemo(() => {
+    return [
+      {
+        value: "0",
+        label: "사용자"
+      },
+      {
+        value: "1",
+        label: "관리자"
+      },
+    ]
+  },[])
 
   const getUserData = useCallback(() => {
     axios
-      .get(`${import.meta.env.VITE_SERVER_URL}/user/list?user_id=${user_id}`)
-      .then((res) => console.log(res.data))
+      .get(`${import.meta.env.VITE_SERVER_URL}/admin/user`)
+      .then((res) => setUserList(res.data.result))
   },[])
 
   useEffect(() => {
@@ -36,31 +53,48 @@ const AdminPageAccountList = () => {
                   value={0} 
                   name="모두동의"
                   checked={false}
+                  onChange={() =>console.log('테스트')}
                 />
             </th>
             <th>번호</th>
-            <th>이름</th>
             <th>아이디</th>
+            <th>이름</th>
             <th>전화번호</th>
             <th>이메일</th>
             <th>권한</th>
           </tr>
-          <tr>
-            <td> 
-              <CheckBox  
-                type="square" 
-                value={0} 
-                name="체크"
-                checked={true}
-              />
-            </td>
-            <td>1</td>
-            <td>조미혜</td>
-            <td>mihye0924</td>
-            <td>01047755749</td>
-            <td>mihye0924@naver.com</td>
-            <td>0</td>
-          </tr>
+            {
+              userList.map((item) => {
+                return(
+                  <tr key={item.user_no}>
+                    <td> 
+                      <CheckBox  
+                        type="square" 
+                        value={0} 
+                        name="체크"
+                        checked={check}
+                        onChange={() =>setCheck(!check)}
+                      />
+                    </td>
+                    <td>{item.user_no}</td>
+                    <td>{item.user_id}</td>
+                    <td>{item.user_name}</td>
+                    <td>{item.user_phone}</td> 
+                    <td>{item.user_email}</td> 
+                    <td>
+                      <Select
+                        selectOptions={authoriyList} 
+                        value={{
+                          value: String(item.user_enum),
+                          label: item.user_enum === 0 ? "사용자" : "관리자"
+                        }}  
+                        onChange={(e) => {setAuthority(e?.label as string)} } 
+                      />
+                    </td>  
+                  </tr> 
+                )
+              })
+            }
         </tbody>
       </Table>
       <MoreButton>
@@ -111,7 +145,7 @@ const Table = styled.table`
   th, td {
     padding: 10px;
     text-align: center;
-  }
+  } 
 `
 
 const MoreButton = styled.div`
