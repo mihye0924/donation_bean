@@ -224,19 +224,35 @@ const MainPage = () =>  {
             <CardWrap>
 
                 {
-                    donationData.map((item: DetailDonationDataProps) => (
-                        <CardList
-                            key={item.donation_no}
-                            to={`/detail/${item.donation_no}`}
-                            imgSrc={item.donation_name} 
-                            imgUrl={item.donation_image} 
-                            title={item.donation_name}
-                            agency={item.donation_company}
-                            day={item.donation_period}
-                            price={item.donation_goal}
-                            percentage={item.donation_status}
-                        />
-                    ))
+                    radioActive === 0 ? (
+                        donationQueryData.map((item: DetailDonationDataProps) => (
+                            <CardList
+                                key={item.donation_no}
+                                to={`/detail/${item.donation_no}`}
+                                imgSrc={item.donation_name} 
+                                imgUrl={item.donation_image} 
+                                title={item.donation_name}
+                                agency={item.donation_company}
+                                day={item.donation_period}
+                                price={item.donation_goal}
+                                percentage={item.donation_status}
+                            />
+                        ))
+                    ) : (
+                        donationData.map((item: DetailDonationDataProps) => (
+                            <CardList
+                                key={item.donation_no}
+                                to={`/detail/${item.donation_no}`}
+                                imgSrc={item.donation_name} 
+                                imgUrl={item.donation_image} 
+                                title={item.donation_name}
+                                agency={item.donation_company}
+                                day={item.donation_period}
+                                price={item.donation_goal}
+                                percentage={item.donation_status}
+                            />
+                        ))
+                    )
                 }
             </CardWrap>
         </MainInner>
