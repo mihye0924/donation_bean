@@ -21,14 +21,14 @@ const CardList = (props: CardProps) => {
                 <img src={props.imgSrc} alt={props.imgUrl} />
             </ImageInner>
             <TextInner>
-                <TextTop>
+                <div>
                     <TopTitle>
                         <strong>{props.title}</strong>
                         <span>D-{props.day}</span>
                     </TopTitle>
-                    <span>{props.agency}</span>
-                </TextTop>
+                </div>
                 <TextBottom>
+                    <span>{props.agency}</span>
                     <Progressbar percentage={props.percentage} />
                     <div className="text-list">
                         <p className="percent">{props.percentage}%</p>
@@ -46,6 +46,10 @@ export default CardList
 const CardItem = styled.li`
     border: 1px solid #ddd;
     background-color: #fff;
+    a {
+        display: block;
+        height: 100%;
+    }
 `
 const ImageInner = styled.div`
     width: 100%;
@@ -56,19 +60,19 @@ const ImageInner = styled.div`
     }
 `
 const TextInner = styled.div`
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     padding: 18px;
-`
-const TextTop = styled.div`
-    margin-bottom: 24px;
-    span {
-        font-size: 14px;
-    }
+    height: calc(100% - 165px);
 `
 const TopTitle = styled.div`
     display: flex;
+    gap: 16px;
     align-items: baseline;
     justify-content: space-between;
-    margin-bottom: 6px;
+    margin-bottom: 12px;
+    white-space: nowrap;
     strong{
         white-space: pre-wrap;
         font-size: 18px;
@@ -78,14 +82,22 @@ const TopTitle = styled.div`
     }
 `
 const TextBottom = styled.div`
+    span {
+        display: inline-block;
+        margin-bottom: 12px;
+    }
     .text-list {
         margin-top: 6px;
         display: flex;
         justify-content: space-between;
         p {
+            display: inline-block;
             font-size: 18px;
             &.percent {
                 color: #00B2FF;
+            }
+            span {
+                margin: 0;
             }
         }
     }
