@@ -1,83 +1,15 @@
 // import CardList from "@/components/CardLise"
 import Radio from "@/components/Radio"
 import Select from "@/components/Select"
-import { Key, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { Key, useCallback, useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation } from 'swiper/modules';
+import  CategoryList from "@/api/main/Category.json"
 import 'swiper/css';
 import axios from "axios"
 import { DetailDonationDataProps  } from "@/types/detail"
-import CardList from "@/components/CardLise";
-// Radio
-const RadioList = [
-    {   
-        label: '전체',
-        id: 'option1',
-        value: 'option1',
-        imgUrl: 'been'
-    },
-    {
-        label: '다문화',
-        id: 'option2',
-        value: 'option2',
-        imgUrl: 'multiculturalism'
-    },
-    {
-        label: '동물',
-        id: 'option3',
-        value: 'option3',
-        imgUrl: 'animal'
-    },
-    {
-        label: '아동*청소년',
-        id: 'option4',
-        value: 'option4',
-        imgUrl: 'kids'
-    },
-    {
-        label: '시민사회',
-        id: 'option5',
-        value: 'option5',
-        imgUrl: 'civilsociety'
-    },
-    {   
-        label: '장애인',
-        id: 'option6',
-        value: 'option6',
-        imgUrl: 'disabledperson'
-    },
-    {
-        label: '어르신',
-        id: 'option7',
-        value: 'option7',
-        imgUrl: 'elders'
-    },
-    {
-        label: '가족*여성',
-        id: 'option8',
-        value: 'option8',
-        imgUrl: 'woman'
-    },
-    {
-        label: '기타',
-        id: 'option9',
-        value: 'option9',
-        imgUrl: 'etc'
-    },
-    {
-        label: '환경',
-        id: 'option10',
-        value: 'option10',
-        imgUrl: 'environment'
-    },
-    {
-        label: '지구촌',
-        id: 'option11',
-        value: 'option11',
-        imgUrl: 'earth'
-    }
-]
+import CardList from "@/components/CardLise"; 
 // Select
 const selectOptions = [
     {
@@ -271,7 +203,7 @@ const MainPage = () =>  {
             <RadioWrap>
                 <form>
                 {
-                        RadioList.map((item, index) => {
+                        CategoryList.map((item, index) => {
                             return (
                                 <Radio 
                                     key={item.id}
