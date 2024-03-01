@@ -108,7 +108,7 @@ const HeaderPadding = styled.div`
 `;
 
 const Center = styled.div` 
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   display: grid;
   gap: 20px;
   @media ${media.tablet} {
@@ -158,7 +158,7 @@ const UserNameBox = styled.div`
 `;
 
 const Main = styled.div`
-  grid-column: span 2;
+  grid-column: span 3;
   li {
     padding: 15px 10px;
     display: flex;

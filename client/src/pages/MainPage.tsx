@@ -1,118 +1,20 @@
 // import CardList from "@/components/CardLise"
 import Radio from "@/components/Radio"
-import Select from "@/components/Select"
-import { Key, useCallback, useEffect, useRef, useState } from "react"
+import Select, { Option } from "@/components/Select"
+import { useCallback, useEffect, useRef, useState } from "react"
 import styled from "styled-components"
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Autoplay, Navigation } from 'swiper/modules';
-import  CategoryList from "@/api/main/Category.json"
+import { Swiper, SwiperSlide } from 'swiper/react'; 
+
+import { Autoplay, Navigation } from 'swiper/modules'; 
 import 'swiper/css';
 import axios from "axios"
 import { DetailDonationDataProps  } from "@/types/detail"
 import CardList from "@/components/CardLise";
-import Button from "@/components/Button";
-// Radio
-const RadioList = [
-    {   
-        label: '전체',
-        id: 'option1',
-        value: 'option1',
-        imgUrl: 'been'
-    },
-    {
-        label: '다문화',
-        id: 'option2',
-        value: 'option2',
-        imgUrl: 'multiculturalism'
-    },
-    {
-        label: '동물',
-        id: 'option3',
-        value: 'option3',
-        imgUrl: 'animal'
-    },
-    {
-        label: '아동*청소년',
-        id: 'option4',
-        value: 'option4',
-        imgUrl: 'kids'
-    },
-    {
-        label: '시민사회',
-        id: 'option5',
-        value: 'option5',
-        imgUrl: 'civilsociety'
-    },
-    {   
-        label: '장애인',
-        id: 'option6',
-        value: 'option6',
-        imgUrl: 'disabledperson'
-    },
-    {
-        label: '어르신',
-        id: 'option7',
-        value: 'option7',
-        imgUrl: 'elders'
-    },
-    {
-        label: '가족*여성',
-        id: 'option8',
-        value: 'option8',
-        imgUrl: 'woman'
-    },
-    {
-        label: '기타',
-        id: 'option9',
-        value: 'option9',
-        imgUrl: 'etc'
-    },
-    {
-        label: '환경',
-        id: 'option10',
-        value: 'option10',
-        imgUrl: 'environment'
-    },
-    {
-        label: '지구촌',
-        id: 'option11',
-        value: 'option11',
-        imgUrl: 'earth'
-    }
-]
-// Select
-const selectOptions = [
-    {
-        value: "전체",
-        label: "전체"
-    },
-    {
-        value: "진행중",
-        label: "진행중"
-    },
-    {
-        value: "종료",
-        label: "종료"
-    }
-]
-const selectOptions2 = [
-    {
-        value: "최신 순",
-        label: "최신 순"
-    },
-    {
-        value: "참여금액 순",
-        label: "참여금액 순"
-    },
-    {
-        value: "참여율 순",
-        label: "참여율 순"
-    },
-    {
-        value: "종료 임박 순",
-        label: "종료 임박 순"
-    }
-]
+import Button from "@/components/Button"; 
+import Category from "@/api/main/Category.json"
+import Sort1 from "@/api/main/Sort1.json"
+import Sort2 from "@/api/main/Sort2.json" 
+
 // Slide
 const SlideList = [
     {
@@ -170,12 +72,13 @@ const MainPage = () =>  {
     // Swiper slide Index
     const [swiperIndex, setSwiperIndex] = useState<number>(1); 
     // Swiper slide progress
-    const progressProgress = useRef<any>(null);
-    const onAutoplayTimeLeft = (s:any, time:any, progress:any) => {
-        progressProgress.current.style.setProperty('--progress', progress);
-    };
+    const progressProgress = useRef<HTMLDivElement>(null);
+    const onAutoplayTimeLeft = (s: string, time: number, progress: string) => {
+    progressProgress.current?.style.setProperty('--progress', progress);
+    }; 
+
     // slide Pause
-    const [swiperPause, setSwiperPause] = useState<any>(); 
+    const [swiperPause, setSwiperPause] = useState<{autoplay : { stop: () => void, start: () => void}}>(); 
     const [pauseNum, setPauseNum] = useState<number>(0); 
     const [swiperButton, setSwiperButton] = useState("icon-pause")
     const user_id = "test1"
@@ -183,20 +86,19 @@ const MainPage = () =>  {
         if(pauseNum === 0) {
             setPauseNum(1)
             setSwiperButton("icon-start")
-            swiperPause.autoplay.stop();
+            swiperPause?.autoplay.stop();
         } else {
             setPauseNum(0)
             setSwiperButton("icon-pause")
-            swiperPause.autoplay.start();
+            swiperPause?.autoplay.start();
         }
     }
+
     // donations data
-    const [donationQueryData, setDonationQueryData] = useState<any>([])
+    const [donationQueryData, setDonationQueryData] = useState<DetailDonationDataProps[]>([])
     // 라디오 카테고리 구분
-    const [donationData, setDonationData] = useState<any>([])  
-    interface DetailDonationDataProps {
-        donation_category: any; donation_no: Key | null | undefined; donation_name: string; donation_image: string; donation_company: string; donation_period: string | number; donation_goal: number; donation_status: number; 
-    }
+    const [donationData, setDonationData] = useState<DetailDonationDataProps[]>([])   
+
     useEffect(() => {
         axios
         .get(`http://localhost:8081/main/donation?user_id=${user_id}`) 
@@ -207,33 +109,36 @@ const MainPage = () =>  {
                 const currentDate = new Date();
                 const timeDiff = targetData.getTime() - currentDate.getTime();
                 const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-                item.donation_period = daysRemaining;
+                item.donation_period = String(daysRemaining);
                 setDonationQueryData(res.data.result)
                 setDonationData(res.data.result)
             })
         })
     }, [])
-        // 라디오 카테고리 구분
-        const handleRadioChange = useCallback((e:any, i:number) => {
-            // 라디오 active 
-            setRadioActive(i)
-            donationQueryData.forEach((item: any) => {
-                if(item.donation_category === e.label) {
-                    const newData = donationQueryData.filter((item: { donation_category: any; }) => item.donation_category === e.label)
-                    setDonationData(newData)
-                } else if (e.label === "전체") {
-                    setDonationData(donationQueryData)
-                }
-            })
-        }, [donationQueryData])
-        useEffect(() => {
 
-        },[donationData])
-        // 카드리스트 limit 증가
-        const [limit, setLimit] = useState<number>(12)
-        const handleLimitToggle = () => {
-            donationData.length > limit && setLimit(limit + 12)
-        }
+    // 라디오 카테고리 구분
+    const handleRadioChange = useCallback((e:Option, i:number) => {
+        // 라디오 active 
+        setRadioActive(i)
+        donationQueryData.forEach((item: DetailDonationDataProps) => {
+            if(item.donation_category === e.label) {
+                const newData = donationQueryData.filter((item: { donation_category: string; }) => item.donation_category === e.label)
+                setDonationData(newData)
+            } else if (e.label === "전체") {
+                setDonationData(donationQueryData)
+            }
+        })
+    }, [donationQueryData])
+
+    useEffect(() => {
+
+    },[donationData])
+
+    // 카드리스트 limit 증가
+    const [limit, setLimit] = useState<number>(12)
+    const handleLimitToggle = () => {
+        donationData.length > limit && setLimit(limit + 12)
+    }
     return(
         <MainInner>
             <SwiperWrap>
@@ -246,9 +151,9 @@ const MainPage = () =>  {
                     }}
                     navigation={true}
                     modules={[Autoplay, Navigation]}
-                    onSlideChange={(e:any) => setSwiperIndex(e.realIndex + 1)}
-                    onSwiper={(e:any) => setSwiperPause(e)}
-                    onAutoplayTimeLeft={onAutoplayTimeLeft}
+                    onSlideChange={(e:{realIndex: number}) => setSwiperIndex(e.realIndex + 1)}
+                    onSwiper={(e) => setSwiperPause(e)}
+                    onAutoplayTimeLeft={() => onAutoplayTimeLeft}
                     className="mySwiper"
                 >
                         {
@@ -270,12 +175,14 @@ const MainPage = () =>  {
             </SwiperWrap>
             <SelectWrap>
                 <Select 
-                    selectOptions={selectOptions}
+                    selectOptions={Sort1}
+                    value={Sort1[0]}
                     size={120}
                     onChange={(e) => console.log(e)}
                 />
                 <Select 
-                    selectOptions={selectOptions2}
+                    selectOptions={Sort2}
+                    value={Sort2[0]}
                     size={120}
                     onChange={(e) => console.log(e)}
                 />
@@ -283,7 +190,7 @@ const MainPage = () =>  {
             <RadioWrap>
                 <form>
                 {
-                        CategoryList.map((item, index) => {
+                        Category.map((item, index) => {
                             return (
                                 <Radio 
                                     key={item.id}
@@ -306,15 +213,15 @@ const MainPage = () =>  {
                 {   
                     donationData.map((item: DetailDonationDataProps, index: number) => (
                         index < limit && <CardList
-                            key={item.donation_no}
-                            to={`/detail/${item.donation_no}`}
-                            imgSrc={item.donation_name} 
-                            imgUrl={item.donation_image} 
-                            title={item.donation_name}
-                            agency={item.donation_company}
-                            day={item.donation_period}
-                            price={item.donation_goal}
-                            percentage={item.donation_status}
+                        key={item.donation_no}
+                        to={`/detail/${item.donation_no}`}
+                        imgSrc={item.donation_name} 
+                        imgUrl={item.donation_image} 
+                        title={item.donation_name}
+                        agency={item.donation_company}
+                        day={item.donation_period}
+                        price={item.donation_goal}
+                        percentage={item.donation_status}
                         />
                     ))
                 }

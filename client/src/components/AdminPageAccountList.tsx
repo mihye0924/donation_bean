@@ -5,11 +5,16 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import axios from "axios"
 import { userTypes } from "@/types/user"
 import Select from "@/components/Select" 
+import Pagination from "@/components/Pagination"
 
 const AdminPageAccountList = () => {
   const [userList, setUserList] = useState<userTypes[]>([]) 
   const [authority, setAuthority] = useState<string>("") 
-  const [allAgree, setAllAgree] = useState<boolean>(false) 
+  const [allAgree, setAllAgree] = useState<boolean>(false)    
+  const [data, setData] = useState<userTypes[]>([])
+  const [limit] = useState<number>(10)
+  const [page, setPage] = useState<number>(1)
+  const offset = (page - 1) * limit //데이터 시작 번호
 
   const authoriyList = useMemo(() => {
     return [
@@ -38,7 +43,7 @@ const AdminPageAccountList = () => {
           })
         })
         setUserList(data)
-        // console.log(userList)
+        setData(data) 
       })
   },[])
 
@@ -94,6 +99,7 @@ const AdminPageAccountList = () => {
       }
     }) 
   },[authority, userList]);
+  
 
   useEffect(() => { 
     getUserData() 
@@ -141,8 +147,8 @@ const AdminPageAccountList = () => {
           </thead>
           <tbody>
               {
-                userList.length > 0 ?
-                userList.map((item) => {
+                userList.length > 0 ? 
+                userList.slice(offset, offset + limit).map((item) => {
                   return(  
                     <tr key={item.user_no}>
                       <td> 
@@ -183,10 +189,13 @@ const AdminPageAccountList = () => {
               }
           </tbody>
         </Table>
-      </TableWrap>
-      <MoreButton>
-        <Button onClick={() => alert('준비중')}>더보기</Button>
-      </MoreButton>
+      </TableWrap> 
+      <Pagination 
+        total={data.length}
+        limit={10}
+        page={page}
+        setPage={setPage} 
+      />
     </AdminPageWrap>
   )
 }
@@ -291,24 +300,4 @@ const Table = styled.table`
       }
     }
   }
-`
-
-const MoreButton = styled.div`
-  margin-top: 50px;
-  text-align: center;
-  button {
-    border: 1px solid #f56400;
-    padding: 8px 10px;
-    border-radius: 0;
-    color: #f56400;
-    width: 200px;
-    height: 45px;
-  }
-  @media ${media.tablet} { 
-    button {  
-      width: 150px;
-      height: 35px;
-      font-size: 14px;
-    }
-  } 
-`
+` 

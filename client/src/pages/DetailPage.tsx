@@ -335,7 +335,7 @@ const DetailPage = () =>  {
       
     return(
         <Article>
-            <ArticleInner image={'image01.jpg'}>
+            <ArticleInner image={donationQueryData?.donation_image}>
                 <ContentWrap> 
                     <aside>
                         <h1>후원신청</h1>
