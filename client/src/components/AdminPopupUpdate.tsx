@@ -1,13 +1,13 @@
 import styled from "styled-components"
 import Button from "@/components/Button"
 import Select from "@/components/Select"
-import  { useState, useMemo, useCallback, ChangeEvent, useEffect } from "react";
-import Category from "@/api/main/Category.json" 
-import useMutation from "@/hooks/useMutation"
+import  { useState, useMemo, useCallback, ChangeEvent } from "react";
+import Category from "@/api/main/Category.json"  
 import axios from "axios"
 import PopupStore from "@/store/popupStore";  
+import DonationStore from "@/store/donationStore"; 
 
-const AdminPopupCreate = () => {
+const AdminPopupUpdate = () => {
     const [donationName, setDonationName] = useState<string>("");
     const [donationContent, setDonationContent] = useState<string>("");
     const [donationCompany, setDonationCompany] = useState<string>("");
@@ -16,10 +16,10 @@ const AdminPopupCreate = () => {
     const [donationCategory, setDonationCategory] = useState<string>("");  
     const [saveImage, setSaveImage] = useState<File>(); 
     const [formData, setFormData] = useState<FormData>();
-    const [donationStatus, setDonationStatus] = useState<string>("");    
-    const [submitMutate, {data: donationData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/admin/donation`); 
-    const { popup, popupState } = PopupStore(); 
-    const user_id = "test1"
+    const [donationStatus, setDonationStatus] = useState<string>("");   
+    const { donation } = DonationStore()
+ 
+    const { popup, popupState } = PopupStore();  
     const StatusList = useMemo(() => {
         return [
             {
@@ -32,6 +32,7 @@ const AdminPopupCreate = () => {
             },
         ]
     }, [])
+ 
 
     // 이미지 업로드
     const handleUpLoadProfile = useCallback(async(e: ChangeEvent<HTMLInputElement>) => {
@@ -45,35 +46,39 @@ const AdminPopupCreate = () => {
 
     // 게시물 등록록
     const handleSubmit = useCallback(() => { 
-        axios({
+       axios({
             method:'post',
             url:`${import.meta.env.VITE_SERVER_URL}/admin/upload`, 
             headers: { 'Content-Type': 'multipart/form-data' },   
             data: formData
         }) 
         const data = {
-            user_id: user_id,
-            donation_name: donationName,
-            donation_image: saveImage?.name,
-            donation_content: donationContent,
-            donation_company: donationCompany,
-            donation_goal: Number(donationGoal),
-            donation_period: donationPeriod,
-            donation_category: donationCategory,
-            donation_status: donationStatus === "진행중" ? 0 : 1
-        }
-        submitMutate(data)
-    },[donationCategory, donationCompany, donationContent, donationGoal, donationName, donationPeriod, donationStatus, formData, saveImage?.name, submitMutate])
-     
-
-    useEffect(() => {
-    if(donationData && donationData.ok) {
-        popupState(!popup)
-        alert('등록되었습니다.')
-        window.location.reload()
-        return  
-    }
-    },[donationData, popup, popupState]) 
+            donation_name: donationName || donation.donation_name,
+            donation_image: saveImage?.name || donation.donation_image,
+            donation_content: donationContent || donation.donation_content,
+            donation_company: donationCompany || donation.donation_company,
+            donation_goal: Number(donationGoal || donation.donation_goal ),
+            donation_period: donationPeriod || donation.donation_period,
+            donation_category: donationCategory || donation.donation_category,
+            donation_status: donationStatus === "진행중" ? 0 : 1,
+            donation_no: donation.donation_no,
+        } 
+        axios({
+            method:'put',
+            url:`${import.meta.env.VITE_SERVER_URL}/admin/donation`,   
+            headers: { 'Content-Type': 'application/json' },
+            data: data
+        })
+        .then((res) => {
+            if(res.data.ok) { 
+            popupState(!popup)
+            alert('수정되었습니다.')
+            window.location.reload()
+            return  
+            }
+        })
+    },[donation.donation_category, donation.donation_company, donation.donation_content, donation.donation_goal, donation.donation_image, donation.donation_name, donation.donation_no, donation.donation_period, donationCategory, donationCompany, donationContent, donationGoal, donationName, donationPeriod, donationStatus, formData, popup, popupState, saveImage?.name])
+         
   return (
     <PopupWrap>
         <Input>
@@ -82,7 +87,7 @@ const AdminPopupCreate = () => {
                 type="text" 
                 id="donation_name" 
                 placeholder="기부명을 입력해주세요."
-                value={donationName}
+                value={donationName || donation.donation_name || ""}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => { setDonationName(e.target.value)}}
             />
         </Input>
@@ -95,9 +100,18 @@ const AdminPopupCreate = () => {
                 />   
         </Input>
         {
-            saveImage &&
+            saveImage ?
             <Image>
-                <img src={URL.createObjectURL(saveImage)} alt="기부이미지" />
+                <img src={
+                    URL.createObjectURL(saveImage)} 
+                    alt="기부이미지"
+                />
+            </Image> 
+            :
+            <Image>
+                <img src={`${import.meta.env.VITE_SERVER_URL}/uploads/donation/${donation.donation_image}`} 
+                    alt="기부이미지"
+                />
             </Image> 
         } 
         <Input>
@@ -105,7 +119,7 @@ const AdminPopupCreate = () => {
             <textarea 
                 id="donation_content" 
                 placeholder="내용을 입력해주세요"
-                value={donationContent}
+                value={donationContent || donation.donation_content}
                 onChange={(e: ChangeEvent<HTMLTextAreaElement>) => { setDonationContent(e.target.value)}}
             /> 
         </Input>
@@ -115,7 +129,7 @@ const AdminPopupCreate = () => {
                 type="text" 
                 id="donation_company" 
                 placeholder="기부처를 입력해주세요."
-                value={donationCompany}
+                value={donationCompany || donation.donation_company || ""}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => { setDonationCompany(e.target.value)}}
             />                 
         </Input>
@@ -125,7 +139,7 @@ const AdminPopupCreate = () => {
                 type="text" 
                 id="donation_goal" 
                 placeholder="900000"
-                value={donationGoal}
+                value={donationGoal || donation.donation_goal || ""}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => { setDonationGoal(e.target.value)}}
             /> 
         </Input>
@@ -135,7 +149,7 @@ const AdminPopupCreate = () => {
                 type="text" 
                 id="donation_period" 
                 placeholder="2024-01-01 ~ 2024.12.31"
-                value={donationPeriod}
+                value={donationPeriod || donation.donation_period || ""}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => { setDonationPeriod(e.target.value)}}
             /> 
         </Input>
@@ -144,7 +158,7 @@ const AdminPopupCreate = () => {
             <SelectWrap> 
                 <Select
                     selectOptions={Category} 
-                    value={Category[1]}
+                    value={Category[1] || donation.donation_category}
                     onChange={(e) => setDonationCategory(e?.label as string)} 
                 />
             </SelectWrap>
@@ -154,19 +168,19 @@ const AdminPopupCreate = () => {
             <SelectWrap> 
                 <Select
                     selectOptions={StatusList} 
-                    value={StatusList[0]}
+                    value={StatusList[0]  || donation.donation_status}
                     onChange={(e) =>  setDonationStatus(e?.label as string) } 
                 />
             </SelectWrap> 
         </Input>
         <ButtonBox>
-            <Button width="80" onClick={handleSubmit}>등록하기</Button>
+            <Button width="80" onClick={handleSubmit}>수정하기</Button>
         </ButtonBox>
     </PopupWrap>
   )
 }
 
-export default AdminPopupCreate
+export default AdminPopupUpdate
 
 const PopupWrap = styled.div`
     padding: 20px;

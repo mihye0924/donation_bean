@@ -1,5 +1,5 @@
 import express from "express";
-import { insertDonation, upLoadFile, getUserList, deleteUser, updateUser } from "../controller/AdminController.js"; 
+import { insertDonation, getDonation, updateDonation, upLoadFile, getUserList, deleteUser, updateUser, deleteDonation } from "../controller/AdminController.js"; 
 
 import path from 'path';  
 import multer from 'multer';
@@ -19,7 +19,10 @@ const upload = multer({
 }); 
 
 
+router.get(`/donation`, getDonation); 
 router.post(`/donation`, insertDonation); 
+router.put(`/donation`, updateDonation); 
+router.delete(`/donation`, deleteDonation); 
 router.post(`/upload`, upload.single('file'), upLoadFile); 
 router.get(`/user`, getUserList); 
 router.delete(`/user`, deleteUser); 

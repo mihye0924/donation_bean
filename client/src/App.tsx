@@ -5,6 +5,7 @@ import Popup from "@/components/Popup"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import PopupStore from "@/store/popupStore";
 import AdminPopupCreate from "./components/AdminPopupCreate";
+import AdminPopupUpdate from "./components/AdminPopupUpdate";
 function App() {
   const queryClient = new QueryClient();
   const { popup, title, popupState } = PopupStore(); 
@@ -24,6 +25,8 @@ function App() {
               switch (title) {
                 case "등록":
                   return <AdminPopupCreate /> 
+                case "수정":
+                  return <AdminPopupUpdate /> 
                 default:
                   break;
               }

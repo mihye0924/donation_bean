@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom"
 import styled from "styled-components"
-import Progressbar from "./Progressbar";
+import Progressbar from "@/components/Progressbar";
+import CheckBox from "@/components/CheckBox";
 
 
-interface CardProps {
-    to: number | any;
+
+interface CardProps { 
+    to: string;
     imgSrc: string;
     imgUrl: string;
     title: string;
@@ -12,10 +14,28 @@ interface CardProps {
     day: number | string;
     price: number;
     percentage: number;
+    check?: boolean;  
+    htmlId: string;
+    checked: boolean;
+    name: string;
+    value: string | number;
+    onChange?: () => void;
 }
 const CardList = (props: CardProps) => { 
   return (
     <CardItem>
+        {
+        props.check && 
+        <CheckBox 
+            icon
+            type="square"
+            htmlId={props.htmlId}
+            name={props.name}
+            value={props.value}            
+            checked={props.checked}
+            onChange={props.onChange} 
+            />
+        }
         <Link to={props.to}>
             <ImageInner>
                 <img src={`${import.meta.env.VITE_SERVER_URL}/uploads/donation/${props.imgUrl}`} alt={props.imgSrc} />
@@ -44,11 +64,30 @@ const CardList = (props: CardProps) => {
 export default CardList
 
 const CardItem = styled.li`
+    position: relative;
     border: 1px solid #ddd;
     background-color: #fff;
     a {
         display: block;
         height: 100%;
+    }
+    .square {
+        position: absolute;
+        top: 20px;
+        left: 20px; 
+        .icon {
+            background-color: #bdbdbd;
+            border: 0;
+            &::before{  
+            background-color: #fff !important; 
+            }
+            &::after{  
+            background-color: #fff  !important;  
+            } 
+        }
+        &.active{ 
+            background-color: #f56400; 
+        }
     }
 `
 const ImageInner = styled.div`

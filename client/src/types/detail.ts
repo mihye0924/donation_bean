@@ -1,7 +1,6 @@
-
-
+ 
 export interface DetailDonationDataProps {
-    donation_no: number | null | undefined;
+    donation_no: number;
     user_id: string;
     donation_name: string; 
     donation_image: string;
@@ -12,6 +11,8 @@ export interface DetailDonationDataProps {
     donation_category: string;
     donation_createAt: Date;
     donation_status: number;
+    checked: boolean;
+    htmlId: string;
 }
 export interface DetailPaymentAllDataProps {  
     user_id: string;
@@ -36,4 +37,11 @@ export interface DetailPaymentAllDataProps {
 export interface DetailUserDataProps { 
     user_name: string;
     user_email: string;
+}
+
+export interface CategoryTypes {
+    label : string;
+    id: string;
+    value:  string;
+    imgUrl: string; 
 }

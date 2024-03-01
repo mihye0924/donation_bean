@@ -1,10 +1,10 @@
 import styled from "styled-components"; 
 
 export interface CheckboxProps{
-    id?: number;
+    id?: number | string;
     type?: string;
     label?: string;
-    htmlId?: string;
+    htmlId: string;
     value: string | number;
     name: string; 
     checked: boolean;

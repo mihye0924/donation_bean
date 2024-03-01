@@ -9,14 +9,16 @@ import Category from "@/api/main/Category.json"
 import Sort1 from "@/api/main/Sort1.json"
 import Sort2 from "@/api/main/Sort2.json"
 import Select, { Option } from "./Select";
-import Radio from "./Radio";
+import Radio from "./Radio"; 
+import DonationStore from "@/store/donationStore";
 
 const AdminPageDonationList = () => {
   const [radioActive, setRadioActive] = useState<number>(0);
   const {popup, popupState, setTitle } = PopupStore(); 
   const [limit, setLimit] = useState<number>(12)
   const [donationQueryData, setDonationQueryData] = useState<DetailDonationDataProps[]>([]); 
-  const [donationData, setDonationData] = useState<DetailDonationDataProps[]>([])   
+  const [donationData, setDonationData] = useState<DetailDonationDataProps[]>([])  
+  const { setDonation } = DonationStore()
   const user_id = "test1"
 
   
@@ -31,11 +33,20 @@ const AdminPageDonationList = () => {
           const timeDiff = targetData.getTime() - currentDate.getTime();
           const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
           item.donation_period = String(daysRemaining);
-          setDonationQueryData(res.data.result)
-          setDonationData(res.data.result)
+          const data :DetailDonationDataProps[] =[]
+            res.data.result.map((item: DetailDonationDataProps) => {
+              data.push({
+                ...item,
+                checked:  false,
+                htmlId: String(item.donation_no)
+              })
+            })
+          setDonationQueryData(data)
+          setDonationData(data)
+          setDonation(data)
       })
       })
-  },[]) 
+  },[setDonation]) 
 
   // 라디오 카테고리 구분
   const handleRadioChange = useCallback((e:Option, i:number) => {
@@ -55,17 +66,96 @@ const AdminPageDonationList = () => {
   const handleLimitToggle = () => {
       donationData.length > limit && setLimit(limit + 12)
   }
+
+  // 카드리스트 체크
+  const handleCheckBoxChange = useCallback((item: DetailDonationDataProps) => { 
+    item.checked = !item.checked;
+    setDonationQueryData([...donationQueryData]);  
+  },[donationQueryData])
+
+  // 기부 컨텐츠 삭제
+  const donationDelete = useCallback(() => {
+    let count = 0;
+    donationData.forEach((item) => {
+      if(item.checked) {
+        count++
+      }
+    })   
+    if(count > 0) {  
+      donationData.forEach((item) => {
+        if(item.checked) {
+          axios
+          .delete(`${import.meta.env.VITE_SERVER_URL}/admin/donation?donation_no=${item.donation_no}`)
+          .then((res) => {
+            if(res.data.ok) {
+              window.location.reload()
+              return 
+            }
+          }) 
+        }
+      })  
+    }else{
+      alert('선택된 게시글이 없습니다.') 
+    }
+  },[donationData])
+
+  // 게시글 가져오기
+  const getDonationData = useCallback(() => {
+    donationData.forEach((item) => {
+      if(item.checked) {
+        axios
+        .get(`${import.meta.env.VITE_SERVER_URL}/admin/donation?donation_no=${item.donation_no}`)
+        .then((res) => { 
+          setDonation(res.data.result)
+        }) 
+      }
+    }) 
+  },[donationData, setDonation])
+  
+
+  // 게시글 수정 체크여부
+  const donationUpdate = useCallback(() => {
+    let count = 0;
+    donationData.forEach((item) => {
+      if(item.checked) {
+        count++
+      }
+    })  
+    if(count > 0) { 
+      setTitle("수정")
+      popupState(!popup)
+      getDonationData()
+    }else{
+      alert('선택된 게시글이 없습니다.') 
+    }
+  },[donationData, getDonationData, popup, popupState, setTitle])
+ 
   useEffect(() => {
     getDonationList()
   },[getDonationList])
+
   return (
     <AdminPageWrap>
       <h1>기부목록</h1> 
       <ButtonBox> 
         <Button width="80" onClick={() => {setTitle("등록"), popupState(!popup)}}>등록</Button>
-        <Button width="80">삭제</Button>
-        <Button width="80">수정</Button>
+        <Button width="80" onClick={donationDelete}>삭제</Button>
+        <Button width="80" onClick={donationUpdate}>수정</Button>
       </ButtonBox>
+      <SelectWrap>
+            <Select 
+                selectOptions={Sort1}
+                value={Sort1[0]}
+                size={120}
+                onChange={(e) => console.log(e)}
+            />
+            <Select 
+                selectOptions={Sort2}
+                value={Sort2[0]}
+                size={120}
+                onChange={(e) => console.log(e)}
+            />
+      </SelectWrap>
       <RadioWrap>
         <form>
         {
@@ -87,24 +177,11 @@ const AdminPageDonationList = () => {
           } 
         </form>
       </RadioWrap>
-      <SelectWrap>
-            <Select 
-                selectOptions={Sort1}
-                value={Sort1[0]}
-                size={120}
-                onChange={(e) => console.log(e)}
-            />
-            <Select 
-                selectOptions={Sort2}
-                value={Sort2[0]}
-                size={120}
-                onChange={(e) => console.log(e)}
-            />
-      </SelectWrap>
       <CardWrap> 
           {
             donationData.map((item: DetailDonationDataProps, index: number) => (
               index < limit && <CardList
+                    check
                     key={item.donation_no}
                     to={`/detail/${item.donation_no}`}
                     imgSrc={item.donation_name} 
@@ -114,6 +191,11 @@ const AdminPageDonationList = () => {
                     day={item.donation_period}
                     price={item.donation_goal}
                     percentage={item.donation_status}
+                    htmlId={item.htmlId} 
+                    name="선택"
+                    checked={item.checked}  
+                    value={item.htmlId}
+                    onChange={() => handleCheckBoxChange(item)}
                 />
             ))
           }
@@ -210,7 +292,7 @@ const CardWrap = styled.ul`
           display: inline-block;
         }
     }
-    @media ${media.tablet}{
+    @media ${media.desktop}{
         li {
             flex: 0 1 calc((100% / 2) - 10px);
         }
