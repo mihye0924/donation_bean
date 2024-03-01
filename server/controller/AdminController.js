@@ -43,4 +43,22 @@ export async function getUserList(req, res) {
     const result = await AdminReopository.getUserList(); 
     res.json({ ok: true, result: result });
   }
+export async function deleteUser(req, res) {  
+    const { user_no } = req.query;    
+    const result = await AdminReopository.deleteUser(user_no); 
+    if(result === "ok") { 
+        res.json({ ok: true });
+    }else{
+        res.json({ ok: false }); 
+    }   
+  }
+export async function updateUser(req, res) {  
+    const { user_no, user_enum } = req.query;   
+    const result = await AdminReopository.updateUser(user_no, user_enum); 
+    if(result === "ok") { 
+        res.json({ ok: true });
+    }else{
+        res.json({ ok: false }); 
+    }   
+  }
   

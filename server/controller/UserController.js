@@ -35,7 +35,7 @@ export async function insertUser(req, res) {
 
 export async function login(req, res) {
   const { id, pass } = req.body;
-  console.log(id, pass);
+  // console.log(id, pass);
   const result = await UserRepository.login(id);
   result.message = "";
   if (result.cnt === 1) {
@@ -58,7 +58,6 @@ export async function login(req, res) {
 
 export async function getUserInfo(req, res) {
   const { id } = req.query;
-  const result = await UserRepository.getUserInfo(id);
-  console.log(result);
+  const result = await UserRepository.getUserInfo(id); 
   res.json({ ok: true, userinfo: result });
 }

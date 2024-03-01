@@ -89,27 +89,32 @@ const sizes = {
 };
 
 const media = {
-  tablet: `(min-width: ${sizes.tablet})`,
-  desktop: `(min-width: ${sizes.desktop})`,
-  mobile: `(min-width: ${sizes.mobile})`,
+  tablet: `(max-width: ${sizes.tablet})`,
+  desktop: `(max-width: ${sizes.desktop})`,
+  mobile: `(max-width: ${sizes.mobile})`,
 };
 
 const HeaderPadding = styled.div` 
-  padding: 200px 20px 50px 20px;
+  padding: 200px 10px 50px 10px;
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
+  @media ${media.tablet} { 
+    padding: 170px 10px 50px 10px;
+  }
+  @media ${media.mobile} { 
+    padding: 130px 10px 50px 10px;
+  }
 `;
 
-const Center = styled.div`
-  margin: 0 auto;
-  /* width: 85%; */
-  display: flex;
-  flex-direction: column;
+const Center = styled.div` 
+  grid-template-columns: repeat(4, 1fr);
+  display: grid;
+  gap: 20px;
   @media ${media.tablet} {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
   }
 `;
 
@@ -153,7 +158,7 @@ const UserNameBox = styled.div`
 `;
 
 const Main = styled.div`
-  grid-column: span 2;
+  grid-column: span 3;
   li {
     padding: 15px 10px;
     display: flex;

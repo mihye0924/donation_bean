@@ -18,7 +18,7 @@ const CardList = (props: CardProps) => {
     <CardItem>
         <Link to={props.to}>
             <ImageInner>
-                <img src={props.imgSrc} alt={props.imgUrl} />
+                <img src={`${import.meta.env.VITE_SERVER_URL}/uploads/donation/${props.imgUrl}`} alt={props.imgSrc} />
             </ImageInner>
             <TextInner>
                 <div>
@@ -55,8 +55,10 @@ const ImageInner = styled.div`
     width: 100%;
     height: 165px;
     background-color: #ddd;
-    img {
-        display: none;
+    img { 
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 `
 const TextInner = styled.div`
@@ -76,6 +78,7 @@ const TopTitle = styled.div`
     strong{
         white-space: pre-wrap;
         font-size: 18px;
+        line-height: 1.3;
     }
     span {
         font-size: 12px

@@ -15,7 +15,7 @@ const Popup = (props: PopupProps) => {
                 <div>
                     {props.title}
                 </div>
-                <Button onClick={props.onClick}>
+                <Button onClick={props.onClick} width="20">
                     <i className="icon" />
                 </Button>
             </Header>

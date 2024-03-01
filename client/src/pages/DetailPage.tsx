@@ -245,9 +245,8 @@ const DetailPage = () =>  {
         agreeList.forEach((item) => { 
             if(item.checked) {
                 count++
-            } 
-             
-            count < 2 ? setAllAgree(false) : setAllAgree(true)
+            }  
+            count < agreeList.length ? setAllAgree(false) : setAllAgree(true)
         })
     },[agreeList])
  
@@ -336,7 +335,7 @@ const DetailPage = () =>  {
       
     return(
         <Article>
-            <ArticleInner image={'image01.jpg'}>
+            <ArticleInner image={donationQueryData?.donation_image}>
                 <ContentWrap> 
                     <aside>
                         <h1>후원신청</h1>
@@ -414,6 +413,7 @@ const DetailPage = () =>  {
                                                 <InputBox alignitem="center"><input type="text" value={price} onChange={() => setPrice(price)}/>원</InputBox>
                                                 <AmountButtonBox>
                                                     <Button 
+                                                        width="100"
                                                         bg="black"
                                                         color="#fff"
                                                         onClick={() => setPrice('20,000')}
@@ -421,6 +421,7 @@ const DetailPage = () =>  {
                                                         2만원
                                                     </Button>
                                                     <Button 
+                                                        width="100"
                                                         bg="black"
                                                         color="#fff"
                                                         onClick={() => setPrice('30,000')}
@@ -428,6 +429,7 @@ const DetailPage = () =>  {
                                                         3만원
                                                     </Button>
                                                     <Button 
+                                                        width="100"
                                                         bg="black"
                                                         color="#fff"
                                                         onClick={() => setPrice('50,000')}
@@ -469,6 +471,7 @@ const DetailPage = () =>  {
                                         } 
                                             <TermsWrap>
                                                 <CheckBox  
+                                                    icon
                                                     type="round" 
                                                     value={0}
                                                     htmlId="all_agree"
@@ -481,6 +484,7 @@ const DetailPage = () =>  {
                                                     AgreeList.map((item) => {
                                                         return( 
                                                         <CheckBox 
+                                                            icon
                                                             key={item.id}
                                                             type={item.type} 
                                                             value={item.value} 
