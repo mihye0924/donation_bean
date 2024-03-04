@@ -1,11 +1,11 @@
 import styled from "styled-components"
 import Button from "@/components/Button"
 import Select from "@/components/Select"
-import  { useState, useMemo, useCallback, ChangeEvent } from "react";
+import  { useState, useMemo, useCallback, ChangeEvent, useEffect } from "react";
 import Category from "@/api/main/Category.json"  
 import axios from "axios"
 import PopupStore from "@/store/popupStore";  
-import DonationStore from "@/store/donationStore"; 
+import DonationStore from "@/store/donationStore";  
 
 const AdminPopupUpdate = () => {
     const [donationName, setDonationName] = useState<string>("");
@@ -17,7 +17,7 @@ const AdminPopupUpdate = () => {
     const [saveImage, setSaveImage] = useState<File>(); 
     const [formData, setFormData] = useState<FormData>();
     const [donationStatus, setDonationStatus] = useState<string>("");   
-    const { donation } = DonationStore()
+    const { donation, status, category } = DonationStore()
  
     const { popup, popupState } = PopupStore();  
     const StatusList = useMemo(() => {
@@ -43,7 +43,7 @@ const AdminPopupUpdate = () => {
         setSaveImage(file) 
         setFormData(formData)  
       },[]);
-
+ 
     // 게시물 등록록
     const handleSubmit = useCallback(() => { 
        axios({
@@ -60,7 +60,7 @@ const AdminPopupUpdate = () => {
             donation_goal: Number(donationGoal || donation.donation_goal ),
             donation_period: donationPeriod || donation.donation_period,
             donation_category: donationCategory || donation.donation_category,
-            donation_status: donationStatus === "진행중" ? 0 : 1,
+            donation_status: Number(donationStatus) === 0 ? 0 : 1,
             donation_no: donation.donation_no,
         } 
         axios({
@@ -79,6 +79,10 @@ const AdminPopupUpdate = () => {
         })
     },[donation.donation_category, donation.donation_company, donation.donation_content, donation.donation_goal, donation.donation_image, donation.donation_name, donation.donation_no, donation.donation_period, donationCategory, donationCompany, donationContent, donationGoal, donationName, donationPeriod, donationStatus, formData, popup, popupState, saveImage?.name])
          
+
+    useEffect(() => {
+        console.log(status)
+    },[status])
   return (
     <PopupWrap>
         <Input>
@@ -156,21 +160,26 @@ const AdminPopupUpdate = () => {
         <Input>
             <label htmlFor="donation_category">카테고리</label>
             <SelectWrap> 
-                <Select
+                { 
+                    <Select
                     selectOptions={Category} 
-                    value={Category[1] || donation.donation_category}
+                    value={category}
                     onChange={(e) => setDonationCategory(e?.label as string)} 
-                />
+                    />
+                }
+                
             </SelectWrap>
         </Input>
         <Input>
             <label htmlFor="donation_status">기부상태</label>
             <SelectWrap> 
-                <Select
+                {
+                    <Select
                     selectOptions={StatusList} 
-                    value={StatusList[0]  || donation.donation_status}
-                    onChange={(e) =>  setDonationStatus(e?.label as string) } 
-                />
+                    value={status}
+                    onChange={(e) =>  setDonationStatus(e?.value as string) } 
+                    />
+                }
             </SelectWrap> 
         </Input>
         <ButtonBox>

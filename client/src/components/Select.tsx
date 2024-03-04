@@ -3,7 +3,9 @@ import ReactSelect, { SingleValue, StylesConfig } from 'react-select'
 
 export interface Option {
   value?: string;
-  label: string;
+  label?: string;
+  imgUrl?: string;
+  id?: string;
 }
 interface SelectProps {
   selectOptions: Option[];
