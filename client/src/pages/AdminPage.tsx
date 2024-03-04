@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { BsClipboard2Heart } from "react-icons/bs";
-import { FaRegUser } from "react-icons/fa6";
-import { FaRegHeart } from "react-icons/fa";
+import { FaRegUser } from "react-icons/fa6"; 
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { getUser } from "@/util/userinfo";

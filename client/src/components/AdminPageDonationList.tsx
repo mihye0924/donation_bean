@@ -63,6 +63,7 @@ const AdminPageDonationList = () => {
 
   // 라디오 카테고리 구분
   const [radioActive, setRadioActive] = useState<number>(0);
+  const [radioLabel, setRadioLabel] = useState<string>()
   const handleRadioChange = useCallback((e:Option, i:number) => {
     const chooseItemData =  chooseItem(donationData) 
     const dDayData =  dDay(chooseItemData)
@@ -73,6 +74,7 @@ const AdminPageDonationList = () => {
     
     // 라디오 active 
     setRadioActive(i)  
+    setRadioLabel(e.label)
     const data = dDayData.filter((item: {donation_category: string}) => {
       if(item.donation_category === e.label) { 
         return item
@@ -94,24 +96,28 @@ const AdminPageDonationList = () => {
   const handleSelectEvent = useCallback((e: Option) => {  
     let proceedingArray = []
     let completedArray = []
+    let data = []
     const chooseItemData =  chooseItem(donationData) 
     const dDayData =  dDay(chooseItemData)
     switch (e.label) {
         case "전체":   
         // console.log(newArray,"전체")
-        return setChangeData(dDayData)
+        data = dDayData.filter((item) => {return item.donation_category === radioLabel})
+        return setChangeData(data)
         case "진행중":  
-            proceedingArray = dDayData.filter((item) => item.donation_status === 0);
-            // console.log(proceedingArray,"진행중") 
-            setChangeData(proceedingArray);
-            break;
+          data = dDayData.filter((item) => {return item.donation_category === radioLabel})      
+          proceedingArray = data.filter((item) => item.donation_status === 0);
+          // console.log(proceedingArray,"진행중") 
+          setChangeData(proceedingArray);
+          break;
         case "종료": 
-            completedArray = dDayData.filter((item) => item.donation_status === 1);
-            // console.log(completedArray,"종료") 
-            setChangeData(completedArray);
-          break; 
+          data = dDayData.filter((item) => {return item.donation_category === radioLabel})
+          completedArray = data.filter((item) => item.donation_status === 1);
+          // console.log(completedArray,"종료") 
+          setChangeData(completedArray);
+        break; 
     } 
-}, [chooseItem, dDay, donationData]);
+}, [chooseItem, dDay, donationData, radioLabel]);
  
   // 셀렉트2 기능
   const handleSelect2Event = useCallback((e: Option) => {
@@ -122,10 +128,13 @@ const AdminPageDonationList = () => {
     let amountArray = []
     let percentArray = []
     let finalArray = []
+    let data = []
+    let categoryArray = [] 
 
       switch (e.value) {
           case "최신 순": 
-          recentArray = donationData.sort((a:DetailDonationDataProps, b:DetailDonationDataProps) => {
+            categoryArray = donationData.filter((item) => {return item.donation_category === radioLabel})   
+            recentArray = categoryArray.sort((a:DetailDonationDataProps, b:DetailDonationDataProps) => {
             // a와 b의 날짜를 비교하여 정렬 순서를 결정
             const dateA = new Date(String(a.donation_period).split('~')[0]);
             const dateB = new Date(String(b.donation_period).split('~')[0]); 
@@ -147,22 +156,25 @@ const AdminPageDonationList = () => {
           setChangeData(recentArrayDDay);
           break;
           case "참여금액 순":
-            amountArray = dDayData.sort((a:DetailDonationDataProps, b: DetailDonationDataProps) => { return b.donation_goal - a.donation_goal; });
+            data = dDayData.filter((item) => {return item.donation_category === radioLabel})
+            amountArray = data.sort((a:DetailDonationDataProps, b: DetailDonationDataProps) => { return b.donation_goal - a.donation_goal; });
             // console.log(amountArray ,"참여금액 순")
             setChangeData(amountArray);
           break;
           case "참여율 순":
-            percentArray = dDayData.sort((a:DetailDonationDataProps, b: DetailDonationDataProps) => { return b.donation_status - a.donation_status; });
+            data = dDayData.filter((item) => {return item.donation_category === radioLabel})
+            percentArray = data.sort((a:DetailDonationDataProps, b: DetailDonationDataProps) => { return b.donation_status - a.donation_status; });
             setChangeData(percentArray);
             // console.log(percentArray ,"참여율 순")
           break;
           case "종료 임박 순":
-            finalArray = dDayData.sort((a:DetailDonationDataProps, b: DetailDonationDataProps) => { return Number(a.donation_period) - Number(b.donation_period); });
+            data = dDayData.filter((item) => {return item.donation_category === radioLabel})
+            finalArray = data.sort((a:DetailDonationDataProps, b: DetailDonationDataProps) => { return Number(a.donation_period) - Number(b.donation_period); });
             setChangeData(finalArray);
             // console.log(finalArray ,"종료 임박 순")
           break;
         }
-  }, [chooseItem, dDay, donationData]);
+  }, [chooseItem, dDay, donationData, radioLabel]);
     
  
   // 카드리스트 체크
