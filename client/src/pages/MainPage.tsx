@@ -1,32 +1,20 @@
 // import CardList from "@/components/CardLise"
 import Radio from "@/components/Radio"
 import Select, { Option } from "@/components/Select"
-import { Key, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import styled from "styled-components"
 import { Swiper, SwiperSlide } from 'swiper/react'; 
 
 import { Autoplay, Navigation } from 'swiper/modules'; 
 import 'swiper/css';
 import axios from "axios"
-import { DetailDonationDataProps  } from "@/types/detail"
+import { CategoryTypes, DetailDonationDataProps  } from "@/types/detail"
 import CardList from "@/components/CardLise";
 import Button from "@/components/Button";
-import Category from '@/api/main/Category.json';
-// Select
-const selectOptions = [
-    {
-        value: "전체",
-        label: "전체"
-    },
-    {
-        value: "진행중",
-        label: "진행중"
-    },
-    {
-        value: "종료",
-        label: "종료"
-    }
-]
+import Category from '@/api/main/Category.json';  
+import Sort1 from "@/api/main/Sort1.json"
+import Sort2 from "@/api/main/Sort2.json"   
+
 const MainPage = () =>  {
     // Swiper Slide 더미
     const SlideList = useMemo(() => {
@@ -84,11 +72,11 @@ const MainPage = () =>  {
     // Swiper slide Index
     const [swiperIndex, setSwiperIndex] = useState<number>(1); 
     // Swiper slide progress
-    const progressProgress = useRef<any>(null);
-    const onAutoplayTimeLeft = (swiper: any, timeLeft: number, percentage: number) => {
-        progressProgress.current.style.setProperty('--progress', percentage);
-    };
-    const [swiper, setSwiper] = useState<any>(); // swiper 속성
+    const progressProgress = useRef<HTMLDivElement>(null);
+    const onAutoplayTimeLeft =  (s: string, time: number, progress: string)  => {
+        progressProgress.current?.style.setProperty('--progress', progress);
+    }; 
+    const [swiper, setSwiper] = useState<{autoplay : { stop: () => void, start: () => void}}>(); 
     const [pauseNum, setPauseNum] = useState<number>(0); // Swiper button 구분 number 
     const [swiperButton, setSwiperButton] = useState("icon-pause") // Swiper button icon 
     // Swiper 정지 재생 기능
@@ -96,19 +84,19 @@ const MainPage = () =>  {
         if(pauseNum === 0) {
             setPauseNum(1)
             setSwiperButton("icon-start")
-            swiper.autoplay.stop();
+            swiper?.autoplay.stop();
         } else {
             setPauseNum(0)
             setSwiperButton("icon-pause")
-            swiper.autoplay.start();
+            swiper?.autoplay.start();
         }
     }
     // Donation Data
-    const [donationQueryData, setDonationQueryData] = useState<any>([])
+    const [donationQueryData, setDonationQueryData] = useState<DetailDonationDataProps[]>([])
     // new Donation Data
-    const [donationData, setDonationData] = useState<any>([])
+    const [donationData, setDonationData] = useState<DetailDonationDataProps[]>([])
     // D-day 계산 전 기존 데이터 유지
-    const [selectDonaionData, setSelectDonaionData] = useState<any>([])
+    const [selectDonaionData, setSelectDonaionData] = useState<DetailDonationDataProps[]>([])
     // mySql data load
     const user_id = "test1" // test id
     useEffect(() => {
@@ -140,12 +128,12 @@ const MainPage = () =>  {
         // Radio Index
         const [radioActive, setRadioActive] = useState<number>(0);
         // 라디오 카테고리 구분
-        const handleRadioChange = useCallback((e:any, i:number) => {
+        const handleRadioChange = useCallback((e:CategoryTypes, i:number) => {
             // 라디오 active 
             setRadioActive(i)
-            donationQueryData.forEach((item: any) => {
+            donationQueryData.forEach((item: DetailDonationDataProps) => {
                 if(item.donation_category === e.label) {
-                    const newData = donationQueryData.filter((item: { donation_category: DetailDonationDataProps; }) => item.donation_category === e.label)
+                    const newData = donationQueryData.filter((item: { donation_category: string; }) => item.donation_category === e.label)
                     setDonationData(newData)
                 } else if (e.label === "전체") {
                     setDonationData(donationQueryData)
@@ -156,45 +144,26 @@ const MainPage = () =>  {
         const [limit, setLimit] = useState<number>(12)
         const handleLimitToggle = () => {
             donationData.length > limit && setLimit(limit + 12)
-        }
-        // 셀렉트 list2
-        const selectOptions2 = useMemo(() => {
-            return [
-                {
-                    value: "최신 순",
-                    label: "최신 순"
-                },
-                {
-                    value: "참여금액 순",
-                    label: "참여금액 순"
-                },
-                {
-                    value: "참여율 순",
-                    label: "참여율 순"
-                },
-                {
-                    value: "종료 임박 순",
-                    label: "종료 임박 순"
-                }
-            ]
-        }, [])
-        const handleSelectEvent = useCallback((e: any) => {
+        } 
+        const handleSelectEvent = useCallback((e: Option) => {
             // 새 배열에 도네이션 데이터를 추가해야 
             let newArray = [...donationData];
+            let updatedDonationData = []
             // 최신 순 배열
             let newArray2 = [...selectDonaionData];
             switch (e.value) {
                 case "최신 순":
                     console.log(newArray2)
-                    newArray2 = newArray2.sort((a:any, b:any) => {
+                    newArray2 = newArray2.sort((a:DetailDonationDataProps, b:DetailDonationDataProps) => {
                         // a와 b의 날짜를 비교하여 정렬 순서를 결정
-                        const dateA: any = new Date(a.donation_period.split('~')[0]);
-                        const dateB: any = new Date(b.donation_period.split('~')[0]);
-                        return dateB - dateA
+                        const dateA:Date = new Date(String(a.donation_period).split('~')[0]);
+                        const dateB:Date = new Date(String(b.donation_period).split('~')[0]);
+                        return Number(dateB) - Number(dateA)
                     });
+                    
                     // D-day 계산
-                    const updatedDonationData = newArray2.map((item: DetailDonationDataProps, index:number) => {
-                        const targetData = new Date(String(newArray2[index].donation_period.split('~')[1]));
+                    updatedDonationData = newArray2.map((item: DetailDonationDataProps, index:number) => { 
+                        const targetData = new Date(String(newArray2[index].donation_period).split('~')[1]);
                         const currentDate = new Date();
                         const timeDiff = targetData.getTime() - currentDate.getTime();
                         const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
@@ -202,7 +171,7 @@ const MainPage = () =>  {
                             ...item, // 기존 항목 복사
                             donation_period: daysRemaining // 기부 기간 업데이트
                         };
-                    });
+                    })
                     setDonationData(updatedDonationData);
                 break;
                 case "참여금액 순":
@@ -214,11 +183,11 @@ const MainPage = () =>  {
                     setDonationData(newArray);
                 break;
                 case "종료 임박 순":
-                    newArray = newArray.sort((a:any, b: any) => { return a.donation_period - b.donation_period; });
+                    newArray = newArray.sort((a:DetailDonationDataProps, b: DetailDonationDataProps) => { return Number(a.donation_period) - Number(b.donation_period); });
                     setDonationData(newArray);
                 break;
             }
-        }, [donationData, setDonationData]);
+        }, [donationData, selectDonaionData]);
         
         useEffect(() => {
         }, [donationData, donationQueryData, handleSelectEvent])
@@ -235,9 +204,9 @@ const MainPage = () =>  {
                         }}
                         navigation={true}
                         modules={[Autoplay, Navigation]}
-                        onSlideChange={(e:any) => setSwiperIndex(e.realIndex + 1)}
-                        onSwiper={(e:any) => setSwiper(e)}
-                        onAutoplayTimeLeft={onAutoplayTimeLeft}
+                        onSlideChange={(e:{realIndex: number}) => setSwiperIndex(e.realIndex + 1)}
+                        onSwiper={(e) => setSwiper(e)}
+                        onAutoplayTimeLeft={() => onAutoplayTimeLeft}
                         className="mySwiper"
                     >
                             {
@@ -260,22 +229,22 @@ const MainPage = () =>  {
             </SwiperWrap>
             <SelectWrap>
                 <Select 
-                    selectOptions={selectOptions}
-                    value={selectOptions[0]}
+                    selectOptions={Sort1}
+                    value={Sort1[0]}
                     size={120}
                     onChange={(e) => console.log(e)}
                 />
                 <Select 
-                    selectOptions={selectOptions2}
-                    value={selectOptions2[0]}
+                    selectOptions={Sort2}
+                    value={Sort2[0]}
                     size={120}
-                    onChange={handleSelectEvent}
+                    onChange={(e) => handleSelectEvent(e as Option)}
                 />
             </SelectWrap>
             <RadioWrap>
                 <form>
                 {
-                    Category.map((item: any, index:number) => {
+                    Category.map((item: CategoryTypes, index:number) => {
                         return (
                             <Radio 
                                 key={item.id}

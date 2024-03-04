@@ -15,10 +15,10 @@ interface CardProps {
     price: number;
     percentage: number;
     check?: boolean;  
-    htmlId: string;
-    checked: boolean;
-    name: string;
-    value: string | number;
+    htmlId?: string;
+    checked?: boolean;
+    name?: string;
+    value?: string | number;
     onChange?: () => void;
 }
 const CardList = (props: CardProps) => { 

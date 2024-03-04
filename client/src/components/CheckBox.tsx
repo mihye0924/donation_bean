@@ -4,10 +4,10 @@ export interface CheckboxProps{
     id?: number | string;
     type?: string;
     label?: string;
-    htmlId: string;
-    value: string | number;
-    name: string; 
-    checked: boolean;
+    htmlId?: string;
+    value?: string | number;
+    name?: string; 
+    checked?: boolean;
     icon?: boolean;
     onChange?: () => void;
 }

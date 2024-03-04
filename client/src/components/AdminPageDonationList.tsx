@@ -42,11 +42,10 @@ const AdminPageDonationList = () => {
               })
             })
           setDonationQueryData(data)
-          setDonationData(data)
-          setDonation(data)
+          setDonationData(data) 
       })
       })
-  },[setDonation]) 
+  },[]) 
 
   // 라디오 카테고리 구분
   const handleRadioChange = useCallback((e:Option, i:number) => {
