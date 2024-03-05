@@ -1,17 +1,18 @@
  
-import { useCallback, useEffect,  useState } from "react";
+import { useCallback, useEffect,  useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styled from "styled-components";  
 
 const Header = () => {
+  const router = useLocation() 
+  const path = router.pathname.split("/")[1]
   const [searchActive, setSearchActive] = useState(false);
   const [subHeaderActive, setSubHeaderActive] = useState("");
-  const [subNav, setSubNav] = useState<string[]>([]); 
   const [subNavActive, setSubNavActive] = useState(0);
+  const [isSubNavBar, setIsSubNavActive] = useState(true)
   const [navActvie, setNavActive] = useState(true);
-  const router = useLocation() 
-  // const path = router.pathname.split("/")[1]
-  // const [url, setUrl] = useState<string[]>([])  
+  const url = useRef<string[]>(["login","signin"])  
+  const subNav = useRef<string[]>(["전체", "진행중", "종료"]); 
 
   // 검색 버튼 토글
   const handleActiveSearch = useCallback(() => {
@@ -23,7 +24,7 @@ const Header = () => {
   }, [navActvie, searchActive]);
 
   // 스크롤시 헤더 숨김/보임
-  const handleScrollNav = () => {
+  const handleScrollNav = useCallback(() => {
     if (window.scrollY > 80) {
       setSubHeaderActive("active");
     } else {
@@ -32,28 +33,36 @@ const Header = () => {
     if (window.innerWidth <= 375) {
       setSubHeaderActive("");
     }
-  };
+  },[])
 
   // 화면 사이즈 변경시 검색기능 변경
-  const handleResizeWindow = () => {
+  const handleResizeWindow = useCallback(() => {
     if (window.innerWidth <= 375) {
       setSearchActive(false);
     } else {
       setNavActive(true);
     }
-  }; 
+  },[])
 
+  // 전체, 진행중, 종료 서브네비
+  const handleUrl = useCallback(() => {
+    if(url.current.includes(path)){
+      setIsSubNavActive(false)
+    }else{
+      setIsSubNavActive(true)  
+    }
+  },[path, url])
+ 
 
-  useEffect(() => {
-    // setUrl(["login","join"])
-    setSubNav(["전체", "진행중", "종료"]);
+  useEffect(() => { 
+    handleUrl()
     document.addEventListener("scroll", () => handleScrollNav());
     window.addEventListener("resize", () => handleResizeWindow());
     return () => {
       document.removeEventListener("scroll", () => handleScrollNav());
       window.removeEventListener("resize", () => handleResizeWindow());
     };
-  }, []);
+  }, [handleResizeWindow, handleScrollNav, handleUrl]);
 
   return (
     <HeaderWrap>
@@ -80,31 +89,36 @@ const Header = () => {
         </HeaderNav>
       </HeaderBorder>
       <HeaderBorder className={subHeaderActive}>
-        { navActvie ? (
-          <HeaderSubNav>
-            <ul>
-              {subNav.map((item, index) => {
-                return (
-                  <li
-                    key={item}
-                    className={subNavActive === index ? "active" : ""}
-                  >
-                    <button onClick={() => {setSubNavActive(index)}}>
-                      {item}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </HeaderSubNav>
-        ) : (
-          <HeaderSubSearch>
-            <div>
-              <input type="text" placeholder="검색어를 입력해주세요" />
-              <button />
-            </div>
-          </HeaderSubSearch>
-        )}
+        {
+          isSubNavBar && 
+          <>
+            { navActvie ? (
+              <HeaderSubNav>
+                <ul>
+                  {subNav.current.map((item, index) => {
+                    return (
+                      <li
+                        key={item}
+                        className={subNavActive === index ? "active" : ""}
+                      >
+                        <button onClick={() => {setSubNavActive(index)}}>
+                          {item}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </HeaderSubNav>
+            ) : (
+              <HeaderSubSearch>
+                <div>
+                  <input type="text" placeholder="검색어를 입력해주세요" />
+                  <button />
+                </div>
+              </HeaderSubSearch>
+            )}
+          </>
+        }
       </HeaderBorder>
     </HeaderWrap>
   );
