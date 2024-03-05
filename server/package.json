@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "main": "app.js",
-  "proxy": "http://localhost:8081",
+  "proxy": "http://127.0.0.1:8081",
   "scripts": {
     "dev": "nodemon app.js"
   },

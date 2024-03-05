@@ -13,9 +13,10 @@ import CardList from "@/components/CardLise";
 import Button from "@/components/Button";
 import Category from '@/api/main/Category.json';  
 import Sort1 from "@/api/main/Sort1.json"
-import Sort2 from "@/api/main/Sort2.json"   
+import Sort2 from "@/api/main/Sort2.json"     
+import DonationStore from "@/store/donationStore";
 
-const MainPage = () =>  {
+const MainPage = () =>  { 
     // Swiper Slide 더미
     const SlideList = useMemo(() => {
         return [
@@ -91,197 +92,109 @@ const MainPage = () =>  {
             swiper?.autoplay.start();
         }
     }
+ 
+    const {  
+      changeDonation, 
+      setDonation,  
+      setRecentDonation,
+      setAmountDonation,
+      setPercentDonation,
+      setExitDonation
+    } = DonationStore()
 
-    // -------------------------------------------------------------------------
-    // Donation Data 
-    const [donationData, setDonationData] = useState<DetailDonationDataProps[]>([])
-    const [changeData, setChangeData] = useState<DetailDonationDataProps[]>([])
-    // mySql data load
-    const user_id = "test1" // test id
-
-     // d-day 데이터
-    const dDay = useCallback((data: DetailDonationDataProps[]) => {
-        const updateData = data.map((item: DetailDonationDataProps, index:number) => {
-            const targetData = new Date(String(data[index].donation_period).split('~')[1]);
-            const currentDate = new Date();
-            const timeDiff = targetData.getTime() - currentDate.getTime();
-            const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-            return {
-                ...item, // 기존 항목 복사
-                donation_period: daysRemaining // 기부 기간 업데이트
-            };
-        });
-        return updateData;
-    },[])
-    
     // 라디오 카테고리 구분
+    const [select1, setSelect1] = useState<Option>({ value: "0", label: "전체" }) 
+    const [select2, setSelect2] = useState<Option>({ value: "최신 순" }) 
     const [radioActive, setRadioActive] = useState<number>(0);
     const [radioLabel, setRadioLabel] = useState<string>("전체")
-    const handleRadioChange = useCallback((e:Option, i:number) => { 
+    
+    // 셀렉트 선택시 리스트 변경 - 전체, 진행중, 종료
+    const handleChangeEvent1 = useCallback(() => { 
+      switch (select1.label) {
+          case "전체":    
+            switch (select2.value) { 
+              case "최신 순":   
+                setRecentDonation(radioLabel, select1)
+              break;
+              case "참여금액 순":    
+                setAmountDonation(radioLabel, select1)
+              break;
+              case "참여율 순":  
+                setPercentDonation(radioLabel, select1)
+              break;
+              case "종료 임박 순": 
+                setExitDonation(radioLabel, select1)
+              break;
+            }
+          break 
+          case "진행중":    
+            switch (select2.value) { 
+              case "최신 순":   
+                setRecentDonation(radioLabel, select1)
+              break;
+              case "참여금액 순":    
+                setAmountDonation(radioLabel, select1)
+              break;
+              case "참여율 순":  
+                setPercentDonation(radioLabel, select1)
+              break;
+              case "종료 임박 순": 
+                setExitDonation(radioLabel, select1)
+              break;
+            }
+          break; 
+          case "종료":   
+          switch (select2.value) { 
+            case "최신 순":   
+              setRecentDonation(radioLabel, select1)
+            break;
+            case "참여금액 순":   
+              setAmountDonation(radioLabel, select1)
+            break;
+            case "참여율 순":  
+              setPercentDonation(radioLabel, select1)
+            break;
+            case "종료 임박 순": 
+              setExitDonation(radioLabel, select1)
+            break;
+          } 
+          break;  
+      }  
+      
+    },[radioLabel, select1, select2.value, setAmountDonation, setExitDonation, setPercentDonation, setRecentDonation])
 
-        const dDayData =  dDay(donationData)  
+    
+    // 라디오 카테고리 구분
+    const handleRadioChange = useCallback((e:Option, i:number) => { 
+   
         // 라디오 클릭시 체크 초기화
-        dDayData.forEach((item) => {
+        changeDonation.forEach((item) => {
         item.checked = false
         })
         
         // 라디오 active 
-        setRadioActive(i)  
-        setRadioLabel(e.label as string)
-        const data = dDayData.filter((item: {donation_category: string}) => {
-        if(item.donation_category === e.label) { 
-            return item
-        }else if (e.label === "전체") {
-            return item
-        } 
-        }) 
-        
-        setChangeData(data)
-    }, [dDay, donationData]) 
-
-
+        setRadioActive(i)   
+        setRadioLabel(e.label as string)  
+    }, [changeDonation]) 
+ 
     // 카드리스트 limit 증가
     const [limit, setLimit] = useState<number>(12)
     const handleLimitToggle = () => {
-        donationData.length > limit && setLimit(limit + 12)
-    } 
-     
-    // 셀렉트1 기능 - 전체, 진행중, 진행종료 
-    const handleSelectEvent = useCallback((e: Option) => {  
-        let proceedingArray = []
-        let completedArray = [] 
-        let data = []
-        const dDayData =  dDay(donationData)
-        switch (e.label) {
-            case "전체":   
-                // console.log(newArray,"전체")
-                data = dDayData.filter((item) => {
-                    if(item.donation_category === radioLabel) { 
-                        return item
-                    }else if(radioLabel === "전체") {
-                        return item
-                    }
-                })  
-                return setChangeData(data)
-            case "진행중":   
-                data = dDayData.filter((item) => {
-                    if(item.donation_category === radioLabel) { 
-                        return item
-                    }else if(radioLabel === "전체") {
-                        return item
-                    }
-                })  
-                proceedingArray = data.filter((item) => item.donation_status === 0);
-                // console.log(proceedingArray,"진행중") 
-                setChangeData(proceedingArray);
-                break;
-            case "종료":  
-                data = dDayData.filter((item) => {
-                    if(item.donation_category === radioLabel) { 
-                        return item
-                    }else if(radioLabel === "전체") {
-                        return item
-                    }
-                })  
-                completedArray = data.filter((item) => item.donation_status === 1);
-                // console.log(completedArray,"종료") 
-                setChangeData(completedArray);
-            break; 
-        } 
-    }, [dDay, donationData, radioLabel]);
-  
-    // 셀렉트2 기능
-    const handleSelect2Event = useCallback((e: Option) => { 
-        const dDayData =  dDay(donationData)  
-        let recentArray = []
-        let recentArrayDDay = []
-        let amountArray = []
-        let percentArray = []
-        let finalArray = []
-        let categoryArray = [] 
-        let data = []
-        switch (e.value) {
-            case "최신 순": 
-              categoryArray = donationData.filter((item) => {
-                  if(item.donation_category === radioLabel) { 
-                      return item
-                  }else if(radioLabel === "전체") {
-                      return item
-                  }
-              })  
-              console.log(categoryArray) 
-              recentArray = categoryArray.sort((a:DetailDonationDataProps, b:DetailDonationDataProps) => {
-                // a와 b의 날짜를 비교하여 정렬 순서를 결정
-                const dateA = new Date(String(a.donation_period).split('~')[0]);
-                const dateB = new Date(String(b.donation_period).split('~')[0]); 
-                return Number(dateB) - Number(dateA)
-              });  
-              
-              // // D-day 계산
-              recentArrayDDay = recentArray.map((item: DetailDonationDataProps) => {  
-                  const targetData = new Date(String(item.donation_period).split('~')[1]); 
-                  const currentDate = new Date();
-                  const timeDiff = targetData.getTime() - currentDate.getTime();
-                  const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
-                  return {
-                      ...item, // 기존 항목 복사
-                      donation_period: daysRemaining // 기부 기간 업데이트
-                  };
-                })
-              // console.log(recentArrayDDay,"최신 순")
-              setChangeData(recentArrayDDay);
-            break;
-            case "참여금액 순":  
-              data = dDayData.filter((item) => {
-                  if(item.donation_category === radioLabel) { 
-                      return item
-                  }else if(radioLabel === "전체") {
-                      return item
-                  }
-              })  
-              amountArray = data.sort((a:DetailDonationDataProps, b: DetailDonationDataProps) => { return b.donation_goal - a.donation_goal; });
-              // console.log(amountArray ,"참여금액 순")
-              setChangeData(amountArray);
-            break;
-            case "참여율 순":
-              data = dDayData.filter((item) => {
-                  if(item.donation_category === radioLabel) { 
-                      return item
-                  }else if(radioLabel === "전체") {
-                      return item
-                  }
-              })  
-              percentArray = data.sort((a:DetailDonationDataProps, b: DetailDonationDataProps) => { return b.donation_status - a.donation_status; });
-              setChangeData(percentArray);
-              // console.log(percentArray ,"참여율 순")
-            break;
-            case "종료 임박 순":
-              data = dDayData.filter((item) => {
-                  if(item.donation_category === radioLabel) { 
-                      return item
-                  }else if(radioLabel === "전체") {
-                      return item
-                  }
-              })  
-              finalArray = data.sort((a:DetailDonationDataProps, b: DetailDonationDataProps) => { return Number(a.donation_period) - Number(b.donation_period); });
-              setChangeData(finalArray);
-              // console.log(finalArray ,"종료 임박 순")
-            break;
-        }
-    }, [dDay, donationData, radioLabel]);
+        changeDonation.length > limit && setLimit(limit + 12)
+    }  
+
 
     useEffect(() => {
         axios
-        .get(`http://localhost:8081/main/donation?user_id=${user_id}`) 
-        .then((res) => { 
-            setDonationData(res.data.result);  
-            const dDayData =  dDay(res.data.result)
-            setChangeData(dDayData)
+        .get(`http://localhost:8081/main/donation`) 
+        .then((res) => {  
+            setDonation(res.data.result);
+            handleChangeEvent1()
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
-        });
-    }, [dDay]);
+        }); 
+    }, [handleChangeEvent1, setDonation]);
     
     return(
         <MainInner>
@@ -324,13 +237,13 @@ const MainPage = () =>  {
                     selectOptions={Sort1}
                     value={Sort1[0]}
                     size={120}
-                    onChange={(e) => handleSelectEvent(e as Option)}
+                    onChange={(e) => {setSelect1(e as Option)}}
                 />
                 <Select 
                     selectOptions={Sort2}
                     value={Sort2[0]}
                     size={120}
-                    onChange={(e) => handleSelect2Event(e as Option)}
+                    onChange={(e) => {setSelect2(e as Option)}}
                 />
             </SelectWrap>
             <RadioWrap>
@@ -356,7 +269,7 @@ const MainPage = () =>  {
             </RadioWrap>
             <CardWrap>
                 {   
-                    changeData.map((item: DetailDonationDataProps, index: number) => (
+                    changeDonation.map((item: DetailDonationDataProps, index: number) => (
                         index < limit && <CardList
                         key={item.donation_no}
                         to={`/detail/${item.donation_no}`}
@@ -372,7 +285,7 @@ const MainPage = () =>  {
                 }
             </CardWrap>
             {
-                limit <= changeData.length ?
+                limit <= changeDonation.length ?
                     <ButtonWrap>
                         <Button border="#ddd" size="medium" onClick={handleLimitToggle}>
                             더보기

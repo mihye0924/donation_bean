@@ -23,7 +23,7 @@ router.get(`/donation`, getDonation);
 router.post(`/donation`, insertDonation); 
 router.put(`/donation`, updateDonation); 
 router.delete(`/donation`, deleteDonation); 
-router.post(`/upload`, upload.single('file'), upLoadFile); 
+router.post(`/upload`, upload.single('image'), upLoadFile); 
 router.get(`/user`, getUserList); 
 router.delete(`/user`, deleteUser); 
 router.put(`/user`, updateUser); 

@@ -1,9 +1,9 @@
 import { db } from "../db/database.js";
 
-export async function donationData(user_id) {
-    const sql = `select * from donation where user_id = ?`;
+export async function donationData() {
+    const sql = `select * from donation`;
   
     return db
-    .execute(sql, [user_id])
+    .execute(sql)
     .then((row) => row[0]);
 }

@@ -7,7 +7,7 @@ import styled from "styled-components";
 const Header = () => {
   const [searchActive, setSearchActive] = useState(false);
   const [subHeaderActive, setSubHeaderActive] = useState("");
-  const [subNav, setSubNav] = useState<string[]>([]);
+  const [subNav, setSubNav] = useState<string[]>([]); 
   const [subNavActive, setSubNavActive] = useState(0);
   const [navActvie, setNavActive] = useState(true);
   const [searchValue, setSearchValue] = useState<string>("");
@@ -51,7 +51,9 @@ const Header = () => {
     } else {
       setNavActive(true);
     }
-  };
+  }; 
+
+
   useEffect(() => {
     axios
     .get(`http://localhost:8081/main/donation?user_id=${user_id}`) 
@@ -116,7 +118,7 @@ const Header = () => {
         </HeaderNav>
       </HeaderBorder>
       <HeaderBorder className={subHeaderActive}>
-        {navActvie ? (
+        { navActvie ? (
           <HeaderSubNav>
             <ul>
               {subNav.map((item, index) => {
@@ -125,7 +127,7 @@ const Header = () => {
                     key={item}
                     className={subNavActive === index ? "active" : ""}
                   >
-                    <button onClick={() => setSubNavActive(index)}>
+                    <button onClick={() => {setSubNavActive(index)}}>
                       {item}
                     </button>
                   </li>
