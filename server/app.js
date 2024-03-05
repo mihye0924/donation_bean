@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(cors({
   // origin: ["http:/localhost:5173",""], 
   // credentials: true, // 크로스 도메인 허용 
-}));  
+}));   
 app.use(bodyParser.json({ limit:'100mb' }));
 app.use(express.static(path.join(__dirname, '/public')));  
 app.use("/user", UserRouter); 

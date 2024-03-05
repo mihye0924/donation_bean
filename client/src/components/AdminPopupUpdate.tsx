@@ -17,9 +17,8 @@ const AdminPopupUpdate = () => {
     const [saveImage, setSaveImage] = useState<File>(); 
     const [formData, setFormData] = useState<FormData>();
     const [donationStatus, setDonationStatus] = useState<string>("");   
-    const { donation, status, category } = DonationStore()
- 
-    const { popup, popupState } = PopupStore();  
+    const { donation, status, category } = DonationStore() 
+    const { popup, popupState } = PopupStore(); 
     const StatusList = useMemo(() => {
         return [
             {
@@ -39,29 +38,32 @@ const AdminPopupUpdate = () => {
         const formData = new FormData()  
         const file = e.target.files?.[0];
         if(!file) return; 
-        formData.append('file', file);    
+        formData.append('image', file);    
         setSaveImage(file) 
         setFormData(formData)  
       },[]);
  
     // 게시물 등록록
-    const handleSubmit = useCallback(() => { 
-       axios({
-            method:'post',
-            url:`${import.meta.env.VITE_SERVER_URL}/admin/upload`, 
-            headers: { 'Content-Type': 'multipart/form-data' },   
-            data: formData
-        }) 
+    const handleSubmit = useCallback(() => {
+        if(formData) {
+            axios({
+                 method:'post',
+                 url:`${import.meta.env.VITE_SERVER_URL}/admin/upload`, 
+                 headers: { 'Content-Type': 'multipart/form-data' },
+                 withCredentials: true,
+                 data: formData
+             }) 
+        }  
         const data = {
-            donation_name: donationName || donation.donation_name,
-            donation_image: saveImage?.name || donation.donation_image,
-            donation_content: donationContent || donation.donation_content,
-            donation_company: donationCompany || donation.donation_company,
-            donation_goal: Number(donationGoal || donation.donation_goal ),
-            donation_period: donationPeriod || donation.donation_period,
-            donation_category: donationCategory || donation.donation_category,
+            donation_name: donationName || donation[0].donation_name,
+            donation_image: saveImage?.name || donation[0].donation_image,
+            donation_content: donationContent || donation[0].donation_content,
+            donation_company: donationCompany || donation[0].donation_company,
+            donation_goal: Number(donationGoal || donation[0].donation_goal ),
+            donation_period: donationPeriod || donation[0].donation_period,
+            donation_category: donationCategory || donation[0].donation_category,
             donation_status: Number(donationStatus) === 0 ? 0 : 1,
-            donation_no: donation.donation_no,
+            donation_no: donation[0].donation_no,
         } 
         axios({
             method:'put',
@@ -77,7 +79,7 @@ const AdminPopupUpdate = () => {
             return  
             }
         })
-    },[donation.donation_category, donation.donation_company, donation.donation_content, donation.donation_goal, donation.donation_image, donation.donation_name, donation.donation_no, donation.donation_period, donationCategory, donationCompany, donationContent, donationGoal, donationName, donationPeriod, donationStatus, formData, popup, popupState, saveImage?.name])
+    },[donation, donationCategory, donationCompany, donationContent, donationGoal, donationName, donationPeriod, donationStatus, formData, popup, popupState, saveImage?.name])
          
 
     useEffect(() => {
@@ -91,14 +93,15 @@ const AdminPopupUpdate = () => {
                 type="text" 
                 id="donation_name" 
                 placeholder="기부명을 입력해주세요."
-                value={donationName || donation.donation_name || ""}
+                value={donationName || donation[0].donation_name || ""}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => { setDonationName(e.target.value)}}
             />
         </Input>
         <Input>
             <label htmlFor="donation_image">기부이미지</label>  
                 <input  
-                    name="file" 
+                    name="image" 
+                    id="filename"
                     type="file" 
                     onChange={handleUpLoadProfile}
                 />   
@@ -113,7 +116,7 @@ const AdminPopupUpdate = () => {
             </Image> 
             :
             <Image>
-                <img src={`${import.meta.env.VITE_SERVER_URL}/uploads/donation/${donation.donation_image}`} 
+                <img src={`${import.meta.env.VITE_SERVER_URL}/uploads/donation/${donation[0].donation_image}`} 
                     alt="기부이미지"
                 />
             </Image> 
@@ -123,7 +126,7 @@ const AdminPopupUpdate = () => {
             <textarea 
                 id="donation_content" 
                 placeholder="내용을 입력해주세요"
-                value={donationContent || donation.donation_content}
+                value={donationContent || donation[0].donation_content}
                 onChange={(e: ChangeEvent<HTMLTextAreaElement>) => { setDonationContent(e.target.value)}}
             /> 
         </Input>
@@ -133,7 +136,7 @@ const AdminPopupUpdate = () => {
                 type="text" 
                 id="donation_company" 
                 placeholder="기부처를 입력해주세요."
-                value={donationCompany || donation.donation_company || ""}
+                value={donationCompany || donation[0].donation_company || ""}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => { setDonationCompany(e.target.value)}}
             />                 
         </Input>
@@ -143,7 +146,7 @@ const AdminPopupUpdate = () => {
                 type="text" 
                 id="donation_goal" 
                 placeholder="900000"
-                value={donationGoal || donation.donation_goal || ""}
+                value={donationGoal || donation[0].donation_goal || ""}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => { setDonationGoal(e.target.value)}}
             /> 
         </Input>
@@ -153,7 +156,7 @@ const AdminPopupUpdate = () => {
                 type="text" 
                 id="donation_period" 
                 placeholder="2024-01-01 ~ 2024.12.31"
-                value={donationPeriod || donation.donation_period || ""}
+                value={donationPeriod || donation[0].donation_period || ""}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => { setDonationPeriod(e.target.value)}}
             /> 
         </Input>

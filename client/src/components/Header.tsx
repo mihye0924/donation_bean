@@ -1,13 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
+ 
+import { useCallback, useEffect,  useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import styled from "styled-components";  
 
 const Header = () => {
   const [searchActive, setSearchActive] = useState(false);
   const [subHeaderActive, setSubHeaderActive] = useState("");
-  const [subNav, setSubNav] = useState<string[]>([]);
+  const [subNav, setSubNav] = useState<string[]>([]); 
   const [subNavActive, setSubNavActive] = useState(0);
   const [navActvie, setNavActive] = useState(true);
+  const router = useLocation() 
+  // const path = router.pathname.split("/")[1]
+  // const [url, setUrl] = useState<string[]>([])  
 
   // 검색 버튼 토글
   const handleActiveSearch = useCallback(() => {
@@ -37,9 +41,12 @@ const Header = () => {
     } else {
       setNavActive(true);
     }
-  };
+  }; 
+
+
   useEffect(() => {
-    setSubNav(["전체", "진행중", "진행종료"]);
+    // setUrl(["login","join"])
+    setSubNav(["전체", "진행중", "종료"]);
     document.addEventListener("scroll", () => handleScrollNav());
     window.addEventListener("resize", () => handleResizeWindow());
     return () => {
@@ -73,7 +80,7 @@ const Header = () => {
         </HeaderNav>
       </HeaderBorder>
       <HeaderBorder className={subHeaderActive}>
-        {navActvie ? (
+        { navActvie ? (
           <HeaderSubNav>
             <ul>
               {subNav.map((item, index) => {
@@ -82,7 +89,7 @@ const Header = () => {
                     key={item}
                     className={subNavActive === index ? "active" : ""}
                   >
-                    <button onClick={() => setSubNavActive(index)}>
+                    <button onClick={() => {setSubNavActive(index)}}>
                       {item}
                     </button>
                   </li>

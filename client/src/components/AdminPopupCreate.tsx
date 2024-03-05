@@ -38,7 +38,7 @@ const AdminPopupCreate = () => {
         const formData = new FormData()  
         const file = e.target.files?.[0];
         if(!file) return; 
-        formData.append('file', file);    
+        formData.append('image', file);    
         setSaveImage(file) 
         setFormData(formData)  
       },[]);
@@ -48,7 +48,7 @@ const AdminPopupCreate = () => {
         axios({
             method:'post',
             url:`${import.meta.env.VITE_SERVER_URL}/admin/upload`, 
-            headers: { 'Content-Type': 'multipart/form-data' },   
+            headers: { 'Content-Type': 'multipart/form-data' },
             data: formData
         }) 
         const data = {
@@ -89,7 +89,8 @@ const AdminPopupCreate = () => {
         <Input>
             <label htmlFor="donation_image">기부이미지</label>  
                 <input  
-                    name="file" 
+                    name="image" 
+                    id="filename"
                     type="file" 
                     onChange={handleUpLoadProfile}
                 />   
