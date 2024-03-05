@@ -25,13 +25,18 @@ const Header = () => {
     }
   }, [navActvie, searchActive]);
   // 검색 기능
-  const handleSearch = (e:React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearch = useCallback((e:React.ChangeEvent<HTMLInputElement>) => {
+    console.log(searchValue)
     setSearchValue(e.target.value)
-    setFilteredData(donationData.filter((item:DetailDonationDataProps) =>
-      item.donation_name.toLowerCase().includes(searchValue.toLowerCase())
-    ))
-  }
-
+    setFilteredData(
+      donationData.filter(item => {
+        return item.donation_name.toLowerCase().includes(searchValue.toLowerCase());
+      })
+    )
+  }, [searchValue])
+  useEffect(() => {
+    console.log(searchValue)
+  },[])
   // 스크롤시 헤더 숨김/보임
   const handleScrollNav = () => {
     if (window.scrollY > 80) {
@@ -91,28 +96,31 @@ const Header = () => {
             </li>
             <li className={`${searchActive ? "active" : ""}`}>
               <div>
-                <input className={searchValue.length > 0 ? "active" : ""} type="text" placeholder="검색어를 입력해주세요!" onInput={handleSearch} />
-                {
-                  searchValue.length === 0 && <button
+                <input className={searchValue.length > 0 ? "active" : ""} value={searchValue} type="text" placeholder="검색어를 입력해주세요!" onChange={handleSearch} />
+                <button
                   className={!navActvie ? "active" : ""}
                   onClick={handleActiveSearch}
                 />
-                }
               </div>
-              <div className="search-list-wrap">
-                <ul>
-                  {
-                    searchValue.length === 0 ? <li className="search-none">검색어를 입력해주세요.</li> :
-                    filteredData.map((item:DetailDonationDataProps, index:number) => {
-                      return (
-                        <li key={index}>
-                            {item.donation_name}
-                        </li>
-                      )
-                    }
-                  )}
-                </ul>
-              </div>
+              {
+                searchActive === true &&
+                searchValue.length > 0 && <div className={filteredData.length < 5 ? "search-list-wrap pc" : "list-limit pc"}>
+                  <ul>
+                    {
+                      filteredData.length === 0 ? <li className="search-none">검색어가 일치하지 않습니다.</li> :
+                      filteredData.map((item:DetailDonationDataProps, index:number) => {
+                        return (
+                          <li key={index}>
+                            <a href={`/detail/${item.donation_no}`}>
+                              {item.donation_name}
+                            </a>
+                          </li>
+                        )
+                      }
+                    )}
+                  </ul>
+                </div>
+              }
             </li>
           </ul>
         </HeaderNav>
@@ -138,9 +146,25 @@ const Header = () => {
         ) : (
           <HeaderSubSearch>
             <div>
-              <input type="text" placeholder="검색어를 입력해주세요" />
+              <input type="text" placeholder="검색어를 입력해주세요"value={searchValue}  onChange={handleSearch} />
               <button />
             </div>
+            <div className={filteredData.length < 5 ? "search-list-wrap mb" : "list-limit mb"}>
+                  <ul>
+                    {
+                      filteredData.length === 0 ? <li className="search-none">검색어가 일치하지 않습니다.</li> :
+                      filteredData.map((item:DetailDonationDataProps, index:number) => {
+                        return (
+                          <li key={index}>
+                            <a href={`/detail/${item.donation_no}`}>
+                              {item.donation_name}
+                            </a>
+                          </li>
+                        )
+                      }
+                    )}
+                  </ul>
+                </div>
           </HeaderSubSearch>
         )}
       </HeaderBorder>
@@ -164,6 +188,12 @@ const media = {
 };
 
 const HeaderWrap = styled.header`
+  @media ${media.desktop}{
+    .mb {display: none}
+  }
+  @media ${media.mobile}{
+    .pc {display: none}
+  }
   background: #fff;
   position: fixed;
   width: 100%;
@@ -228,7 +258,7 @@ const HeaderNav = styled.nav`
       font-weight: 600;
       font-size: 18px;
     }
-    li:first-child {
+    & > li:first-child {
       &::after {
         content: "";
         display: inline-block;
@@ -248,15 +278,6 @@ const HeaderNav = styled.nav`
       & > div {
         width: 100%;
         gap: 0;
-      }
-      .search-list-wrap {
-        display: none;
-        width: 100%;
-        height: 200px;
-        position: absolute;
-        top: calc(100% + 10px);
-        right: 0;
-        border: 1px solid #000;
       }
       button {
         position: relative;
@@ -284,6 +305,9 @@ const HeaderNav = styled.nav`
         &:focus {
           outline: 0;
         }
+        .search-list-wrap {
+          display: none;
+        }
       }
     }
     li.active {
@@ -303,23 +327,42 @@ const HeaderNav = styled.nav`
       & > div {
         overflow: hidden;
       }
-      .search-list-wrap {
+      .search-list-wrap, .list-limit {
         display: block;
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
         border: 1px solid #f56400;
         border-radius: 25px;
         background-color: #fff;
+        padding: 5px 0;
+        &.list-limit {
+          overflow-y: scroll;
+          height: 300px;
+        }
         ul {
           width: 100%;
           height: 100%;
+          li {
+            width: 100%;
+            padding: 10px 20px;
+            a {
+                font-size: 16px;
+                font-weight: normal;
+              }
+            }
+            &:after {
+              display: none;
+            }
+          }
           .search-none {
             width: 100%;
             height: 100%;
+            padding: 10px 20px;
             display: flex;
             justify-content: center;
             align-items: center;
             font-size: 18px;
-            font-weight: 600;
-            color: #f56400;
           }
         }
       }
@@ -348,6 +391,7 @@ const HeaderNav = styled.nav`
               background: url("/images/btn-srch-close.svg") no-repeat;
               background-size: cover;
             }
+            
           }
         }
       }
@@ -445,10 +489,10 @@ const HeaderSubNav = styled.nav`
 const HeaderSubSearch = styled.div`
   width: 100%;
   justify-content: center !important;
-  height: 50px;
+  height: auto;
   display: flex;
   margin: 10px 0;
-  div {
+   & > div {
     margin: 0 10px;
     width: 100%;
     border: 1px solid #f56400;
@@ -476,5 +520,46 @@ const HeaderSubSearch = styled.div`
     }
     background-color: transparent;
     border: 0;
+  }
+  .search-list-wrap, .list-limit {
+    display: block;
+    width: 100%;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    border: none !important;
+    border-radius: 0 !important;
+    background-color: #fff;
+    padding: 5px 0;
+    margin: 0;
+    &.list-limit {
+      overflow-y: scroll;
+      height: 300px;
+    }
+    ul {
+      width: 100%;
+      height: 100%;
+      li {
+        width: 100%;
+        padding: 10px 20px;
+        a {
+            font-size: 14px !important;
+            font-weight: normal;
+          }
+        }
+        &:after {
+          display: none;
+        }
+      }
+      .search-none {
+        width: 100%;
+        height: 100%;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+      }
+    }
   }
 `;
