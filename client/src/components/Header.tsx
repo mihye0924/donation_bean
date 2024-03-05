@@ -1,3 +1,5 @@
+import { DetailDonationDataProps } from "@/types/detail";
+import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -8,6 +10,11 @@ const Header = () => {
   const [subNav, setSubNav] = useState<string[]>([]);
   const [subNavActive, setSubNavActive] = useState(0);
   const [navActvie, setNavActive] = useState(true);
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [donationData, setDonationData] = useState<DetailDonationDataProps[]>([])
+  const [filteredData, setFilteredData] = useState<DetailDonationDataProps[]>([])
+  // mySql data load
+  const user_id = "test1" // test id
 
   // 검색 버튼 토글
   const handleActiveSearch = useCallback(() => {
@@ -17,6 +24,13 @@ const Header = () => {
       setSearchActive(false);
     }
   }, [navActvie, searchActive]);
+  // 검색 기능
+  const handleSearch = (e:React.ChangeEvent<HTMLInputElement>) => {
+    setSearchValue(e.target.value)
+    setFilteredData(donationData.filter((item:DetailDonationDataProps) =>
+      item.donation_name.toLowerCase().includes(searchValue.toLowerCase())
+    ))
+  }
 
   // 스크롤시 헤더 숨김/보임
   const handleScrollNav = () => {
@@ -38,6 +52,17 @@ const Header = () => {
       setNavActive(true);
     }
   };
+  useEffect(() => {
+    axios
+    .get(`http://localhost:8081/main/donation?user_id=${user_id}`) 
+    .then((res) => { 
+        setDonationData(res.data.result);  
+    })
+    .catch(error => {
+        console.error('Error fetching data: ', error);
+    });
+}, []);
+
   useEffect(() => {
     setSubNav(["전체", "진행중", "진행종료"]);
     document.addEventListener("scroll", () => handleScrollNav());
@@ -63,11 +88,29 @@ const Header = () => {
               <Link to="/login">로그인</Link>
             </li>
             <li className={`${searchActive ? "active" : ""}`}>
-              <input type="text" placeholder="검색어를 입력해주세요!" />
-              <button
-                className={!navActvie ? "active" : ""}
-                onClick={handleActiveSearch}
-              />
+              <div>
+                <input className={searchValue.length > 0 ? "active" : ""} type="text" placeholder="검색어를 입력해주세요!" onInput={handleSearch} />
+                {
+                  searchValue.length === 0 && <button
+                  className={!navActvie ? "active" : ""}
+                  onClick={handleActiveSearch}
+                />
+                }
+              </div>
+              <div className="search-list-wrap">
+                <ul>
+                  {
+                    searchValue.length === 0 ? <li className="search-none">검색어를 입력해주세요.</li> :
+                    filteredData.map((item:DetailDonationDataProps, index:number) => {
+                      return (
+                        <li key={index}>
+                            {item.donation_name}
+                        </li>
+                      )
+                    }
+                  )}
+                </ul>
+              </div>
             </li>
           </ul>
         </HeaderNav>
@@ -174,7 +217,7 @@ const HeaderNav = styled.nav`
   justify-content: space-between;
   align-items: center;
   padding: 0 10px;
-  ul {
+  & > ul {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -197,8 +240,22 @@ const HeaderNav = styled.nav`
       }
     }
     li:last-child {
+      position: relative;
       width: 35px;
       display: flex;
+      & > div {
+        width: 100%;
+        gap: 0;
+      }
+      .search-list-wrap {
+        display: none;
+        width: 100%;
+        height: 200px;
+        position: absolute;
+        top: calc(100% + 10px);
+        right: 0;
+        border: 1px solid #000;
+      }
       button {
         position: relative;
         width: 35px;
@@ -228,8 +285,8 @@ const HeaderNav = styled.nav`
       }
     }
     li.active {
-      overflow: hidden;
       width: 320px;
+      height: 48px;
       border: 1px solid #f56400;
       border-radius: 25px;
       padding: 5px;
@@ -237,6 +294,32 @@ const HeaderNav = styled.nav`
       input {
         display: block;
         width: 260px;
+        &.active {
+          width: 100%;
+        }
+      }
+      & > div {
+        overflow: hidden;
+      }
+      .search-list-wrap {
+        display: block;
+        border: 1px solid #f56400;
+        border-radius: 25px;
+        background-color: #fff;
+        ul {
+          width: 100%;
+          height: 100%;
+          .search-none {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #f56400;
+          }
+        }
       }
     }
   }

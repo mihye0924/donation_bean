@@ -1,5 +1,6 @@
  
 export interface DetailDonationDataProps {
+    toLowerCase(): unknown;
     donation_no: number;
     user_id: string;
     donation_name: string; 
