@@ -12,7 +12,7 @@ const Header = () => {
   const [subNavActive, setSubNavActive] = useState(0);
   const [isSubNavBar, setIsSubNavActive] = useState(true)
   const [navActvie, setNavActive] = useState(true);
-  const url = useRef<string[]>(["login","signin","admin"])  
+  const url = useRef<string[]>(["login","signin","admin","mypage"])  
   const subNav = useRef<string[]>(["전체", "진행중", "종료"]); 
   const { setChangeStatus } = DonationStore()
 

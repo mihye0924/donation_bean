@@ -1,7 +1,9 @@
 import { getUser } from "@/util/userinfo";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { useCallback, useMemo, useState } from "react";
 import styled from "styled-components";
+import Select, { Option } from "./Select";
 interface Response {
   ok: boolean;
   userinfo: {
@@ -15,6 +17,7 @@ interface Response {
   };
 }
 const MyPageInfo = () => {
+  const [currentSelect, setCurrentSelect] = useState("");
   const user = getUser();
   const { data } = useQuery<Response>({
     queryKey: ["user"],
@@ -23,6 +26,37 @@ const MyPageInfo = () => {
         .get(`http://localhost:8081/user/me?id=${user?.id}`)
         .then((res) => res.data),
   });
+  
+  const emailSort = useMemo(()=>{
+    return[
+      {
+        "value": "0",
+        "label": "직접입력"
+      },
+      {
+          "value": "1",
+          "label": "gmail.com"
+      },
+      {
+          "value": "2",
+          "label": "naver.com"
+      },
+      {
+          "value": "3",
+          "label": "daum.net"
+      },
+      {
+          "value": "4",
+          "label": "nate.com"
+      }
+    ]
+  },[])
+
+  const onSelectChange = useCallback((e: Option) => {
+    // setValue("emailDomain", "");
+    setCurrentSelect(e.label as string);
+  },[]);
+
   return (
     <>
       {!data && "로딩중"}
@@ -40,7 +74,7 @@ const MyPageInfo = () => {
                 disabled
               />
             </PassCheck>
-            <Constraint>이름을 입력해 주세요</Constraint>
+            <Constraint>- 이름을 입력해 주세요</Constraint>
           </FormBox>
           <FormBox>
             <Label>닉네임</Label>
@@ -51,7 +85,7 @@ const MyPageInfo = () => {
                 defaultValue={`${data?.userinfo?.user_nick}`}
               />
             </PassCheck>
-            <Constraint>닉네임을 입력해 주세요</Constraint>
+            <Constraint>- 닉네임을 입력해 주세요</Constraint>
           </FormBox>
           <FormBox>
             <Label>이름</Label>
@@ -62,7 +96,7 @@ const MyPageInfo = () => {
                 defaultValue={`${data?.userinfo?.user_name}`}
               />
             </PassCheck>
-            <Constraint>이름을 입력해 주세요</Constraint>
+            <Constraint>- 이름을 입력해 주세요</Constraint>
           </FormBox>
 
           <FormBox>
@@ -71,7 +105,7 @@ const MyPageInfo = () => {
               <input placeholder="비밀번호" type="password" />
             </PassCheck>
             <Constraint>
-              영문, 대소문자, 숫자, 특수기호 조합 ~ 8자리 이상
+              - 영문, 대소문자, 숫자, 특수기호 조합 ~ 8자리 이상
             </Constraint>
           </FormBox>
           <FormBox>
@@ -80,7 +114,7 @@ const MyPageInfo = () => {
               <input placeholder="비밀번호 확인" type="password" />
             </PassCheck>
             <Constraint>
-              영문, 대소문자, 숫자, 특수기호 조합 ~ 8자리 이상
+              - 영문, 대소문자, 숫자, 특수기호 조합 ~ 8자리 이상
             </Constraint>
           </FormBox>
           <FormBox>
@@ -92,7 +126,7 @@ const MyPageInfo = () => {
                 defaultValue={`${data?.userinfo?.user_phone}`}
               />
             </PassCheck>
-            <Constraint>'-' 기호 없이 전화번호 11자리 입력해 주세요</Constraint>
+            <Constraint>- '-' 기호 없이 전화번호 11자리 입력해 주세요</Constraint>
           </FormBox>
           <FormBox>
             <Label>이메일</Label>
@@ -103,16 +137,15 @@ const MyPageInfo = () => {
                 defaultValue={`${data?.userinfo?.user_email.split("@")[0]}`}
               />
               <span>@</span>
-              <input type="text" />
-              <select name="domain">
-                <option value="">직접입력</option>
-                <option value="gmail.com">gmail.com</option>
-                <option value="naver.com">naver.com</option>
-                <option value="daum.net">daum.net</option>
-                <option value="nate.com">nate.com</option>
-              </select>
+              <input type="text" value={currentSelect}/>
+              <Select 
+                  selectOptions={emailSort}
+                  value={emailSort[0]}
+                  size={120}
+                  onChange={(e) => onSelectChange(e as Option)} 
+                />
             </EmailCheck>
-            <Constraint>이메일 주소를 입력해 주세요</Constraint>
+            <Constraint>- 이메일 주소를 입력해 주세요</Constraint>
           </FormBox>
           <ButtonArea>
             <button type="button">리셋</button>
@@ -128,68 +161,92 @@ export default MyPageInfo;
 
 const sizes = {
   tablet: "768px",
-  desktop: "1024px",
+  desktop: "1200px",
+  mobile: "375px",
 };
 
 const media = {
   tablet: `(min-width: ${sizes.tablet})`,
   desktop: `(min-width: ${sizes.desktop})`,
+  mobile: `(min-width: ${sizes.mobile})`,
 };
 
 const Center = styled.div`
   width: 100%;
-  margin: 0 auto;
-  @media ${media.tablet} {
-    width: 90%;
-    margin: 0 auto;
-  }
+  margin: 0 auto; 
 `;
 const Title = styled.h1`
-  @media ${media.tablet} {
-    font-size: 36px;
-    margin-bottom: 40px;
-    font-weight: 600;
+  display: none;
+  color: #f56400;
+  font-family: 'NanumSquareNeo-Variable';
+  font-weight: 900;
+  font-size: 30px;  
+  margin-top: 20px;
+  @media ${media.desktop}{ 
+    display: block;
+    margin-top: 0;
+    font-size: 40px;
   }
-  text-align: center;
-  font-size: 18px;
-  margin-bottom: 40px;
-  font-weight: bold;
+  @media ${media.tablet}{ 
+    display: block;
+  } 
 `;
 
 const Form = styled.form`
-  padding-top: 20px;
-  border-top: 2px solid lightgray;
+  padding-top: 0; 
+  @media ${media.tablet}{ 
+  padding-top: 20px; 
+  } 
 `;
 
-const Notice = styled.p`
-  text-align: center;
-  font-size: 16px;
-  margin-bottom: 40px;
+const Notice = styled.p` 
+  display: none;
+  font-family: 'NanumSquareNeo-Variable';
+  font-size: 18px;
+  margin-bottom: 30px;
+  @media ${media.tablet} {
+    display: block;
+    margin-bottom: 80px;
+    margin-bottom: 60px;
+  }
 `;
 
 const Label = styled.div`
   width: 100%;
   text-align: start;
+  font-weight: 900;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-family: 'NanumSquareNeo-Variable';
+  @media ${media.tablet} {
+    font-size: 16px;
+  }
 `;
 
 const PassCheck = styled.div`
   input {
     width: 100%;
     border: none;
-    border-bottom: 1px solid black;
-    padding-top: 15px;
-    padding-bottom: 10px;
+    border-bottom: 1px solid #aeaeae;;
+    padding: 15px 0;
+    font-size: 14px;
     outline: none;
     &:focus {
       border-bottom: 1px solid #f56400;
     }
     &::placeholder {
-      font-size: 14px;
-      color: lightgray;
+      font-size: 16px;
+      color: #aeaeae;
+    } 
+    &:disabled {
+      opacity: 0.4;
+    }
+    @media ${media.tablet} {
+      font-size: 16px;
     }
   }
   div {
-    border: 1px solid black;
+     border: 1px solid #aeaeae;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -198,24 +255,15 @@ const PassCheck = styled.div`
   }
 `;
 
-const EmailCheck = styled.div`
-  select {
-    width: 30%;
-    padding-top: 15px;
-    padding-bottom: 10px;
-    font-size: 14px;
-    margin-left: 10px;
-    border: none;
-    border-bottom: 1px solid black;
-    outline: none;
-  }
-  span {
-    width: 10%;
-  }
+const EmailCheck = styled.div` 
+  display: flex;
+  align-items: center; 
+  flex-wrap: wrap;
+  gap: 10px; 
   input {
-    width: 30%;
+    width: calc(50% - 18px);
     border: none;
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #aeaeae;
     padding-top: 15px;
     padding-bottom: 10px;
     font-size: 14px;
@@ -225,23 +273,36 @@ const EmailCheck = styled.div`
     }
     &::placeholder {
       font-size: 14px;
-      color: lightgray;
+      color: #aeaeae;
     }
+    &:disabled {
+      opacity: 0.4;
+    }
+    @media ${media.tablet} {  
+      width: 27%;
+    } 
   }
-  div {
-    border: 1px solid black;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 5px;
-    cursor: pointer;
-  }
+  .select { 
+    flex:1;
+    @media ${media.tablet} {  
+        flex:auto;
+    } 
+    &>div {
+      &>div {
+        width: 100%;
+      }
+    }
+  }  
 `;
+
 const Constraint = styled.div`
-  color: lightgray;
-  font-size: 12px;
+  color: #aeaeae;
+  font-size: 14px;
   text-align: start;
-  padding-top: 3px;
+  padding-top: 15px;
+  @media ${media.tablet} {
+      font-size: 16px;
+  }
 `;
 
 const FormBox = styled.div`
@@ -249,33 +310,35 @@ const FormBox = styled.div`
 `;
 
 const ButtonArea = styled.div`
-  margin-top: 40px;
+  margin-top: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column-reverse;
   @media ${media.tablet} {
     flex-direction: row;
+    margin-top: 70px;
   }
   button {
     cursor: pointer;
     @media ${media.tablet} {
-      font-weight: 600;
+      font-weight: 900;
       color: white;
       font-size: 14px;
       border: none;
       border-radius: 5px;
       margin: 0 15px;
-      padding: 20px 65px;
+      padding: 15px;
+      width: 170px;
     }
-    font-weight: 600;
+    font-weight: 900;
     color: white;
     font-size: 14px;
     width: 100%;
     border: none;
     border-radius: 5px;
     margin: 8px 0px;
-    padding: 20px 65px;
+    padding: 15px;
     &:first-child {
       background: #aeaeae;
     }
