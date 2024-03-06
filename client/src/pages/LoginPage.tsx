@@ -123,26 +123,30 @@ const media = {
 };
 
 const HeaderPadding = styled.div`
-  padding-top: 200px;
-  padding-bottom: 50px;
-  margin: 0 auto;
-`;
-
-const Wrapper = styled.form`
-  padding: 50px 10px 40px 10px;
-  font-weight: bold;
-  border: none;
-  margin: 0 auto;
+  margin-top: 120px; 
+  margin-bottom: 80px;
+  background-color: #fbfbfb;
   @media ${media.tablet} {
-    border: 1px solid #ececec;
-    border-radius: 10px;
-    width: 640px;
-    box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
-    -webkit-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
-    -moz-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
+    margin-top: 80px; 
+    padding: 120px 0;
   }
 `;
 
+const Wrapper = styled.div`
+  padding: 20px; 
+  border: none;
+  margin: 0 auto;
+  background-color: #fff;
+  @media ${media.tablet} { 
+    padding: 115px; 
+    border-radius: 16px; 
+    width: 700px;
+    box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.03);
+    -webkit-box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.03);
+    -moz-box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.03);
+    border: solid 1px #d9d9d9;
+  }
+`;
 const Center = styled.div`
   width: 100%;
   margin: 0 auto;
@@ -157,9 +161,10 @@ const Title = styled.h1`
     margin-bottom: 40px;
     font-weight: 600;
   }
+  font-family: 'NanumSquareNeo-Variable';
   text-align: center;
-  font-size: 18px;
-  margin-bottom: 40px;
+  font-size: 20px;
+  margin-bottom: 20px;
   font-weight: bold;
 `;
 
@@ -169,9 +174,8 @@ const InputBox = styled.div`
 const Input = styled.input`
   width: 100%;
   border: none;
-  border-bottom: 1px solid black;
-  padding-top: 15px;
-  padding-bottom: 10px;
+  border-bottom: 1px solid #aeaeae;
+  padding: 15px;
   outline: none;
   &:focus {
     border-bottom: 1px solid #f56400;
@@ -228,9 +232,11 @@ const FindInfo = styled.ul`
   align-items: center;
   font-weight: 600;
   li {
-    margin-left: 15px;
+    color: #aeaeae;
+    margin-left: 15px; 
   }
   li:first-child {
+      margin-left: 0;
     display: flex;
     align-items: center;
     &::after {
