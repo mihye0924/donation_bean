@@ -365,7 +365,7 @@ const DetailPage = () =>  {
                                                 <AccordionBody2>
                                                     <Percent>{`${paymentTotalData ? Math.floor((Number(paymentTotalData)/Number(donationQueryData?.donation_goal)) * 100) : 0}`}%</Percent>
                                                     <Progressbar
-                                                        percentage={4}
+                                                        percentage={paymentTotalData ? Math.floor((Number(paymentTotalData)/Number(donationQueryData?.donation_goal)) * 100) : 0}
                                                      />
                                                     <DonationPeriod>{donationQueryData?.donation_period}까지</DonationPeriod>
                                                     <DonationDDay>D-{dDay}</DonationDDay>
