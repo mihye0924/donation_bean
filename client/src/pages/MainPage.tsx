@@ -11,8 +11,7 @@ import axios from "axios"
 import { CategoryTypes, DetailDonationDataProps  } from "@/types/detail"
 import CardList from "@/components/CardLise";
 import Button from "@/components/Button";
-import Category from '@/api/main/Category.json';  
-import Sort1 from "@/api/main/Sort1.json"
+import Category from '@/api/main/Category.json';   
 import Sort2 from "@/api/main/Sort2.json"     
 import DonationStore from "@/store/donationStore";
 
@@ -94,12 +93,13 @@ const MainPage = () =>  {
     }
  
     const {  
+        status,
       changeDonation, 
       setDonation,  
       setRecentDonation,
       setAmountDonation,
       setPercentDonation,
-      setExitDonation
+      setExitDonation, 
     } = DonationStore()
 
     // 라디오 카테고리 구분
@@ -107,11 +107,13 @@ const MainPage = () =>  {
     const [select2, setSelect2] = useState<Option>({ value: "최신 순" }) 
     const [radioActive, setRadioActive] = useState<number>(0);
     const [radioLabel, setRadioLabel] = useState<string>("전체")
-    
+
     // 셀렉트 선택시 리스트 변경 - 전체, 진행중, 종료
-    const handleChangeEvent1 = useCallback(() => { 
+    const handleChangeEvent1 = useCallback(() => {  
+        console.log(status,"ddd")
       switch (select1.label) {
           case "전체":    
+            console.log("전체")
             switch (select2.value) { 
               case "최신 순":   
                 setRecentDonation(radioLabel, select1)
@@ -128,6 +130,7 @@ const MainPage = () =>  {
             }
           break 
           case "진행중":    
+          console.log("진행중")
             switch (select2.value) { 
               case "최신 순":   
                 setRecentDonation(radioLabel, select1)
@@ -144,6 +147,7 @@ const MainPage = () =>  {
             }
           break; 
           case "종료":   
+          console.log("종료")
           switch (select2.value) { 
             case "최신 순":   
               setRecentDonation(radioLabel, select1)
@@ -161,7 +165,7 @@ const MainPage = () =>  {
           break;  
       }  
       
-    },[radioLabel, select1, select2.value, setAmountDonation, setExitDonation, setPercentDonation, setRecentDonation])
+    },[radioLabel, select1, select2.value, setAmountDonation, setExitDonation, setPercentDonation, setRecentDonation, status])
 
     
     // 라디오 카테고리 구분
@@ -181,10 +185,10 @@ const MainPage = () =>  {
     const [limit, setLimit] = useState<number>(12)
     const handleLimitToggle = () => {
         changeDonation.length > limit && setLimit(limit + 12)
-    }  
-
+    }   
 
     useEffect(() => {
+        setSelect1(status)
         axios
         .get(`http://localhost:8081/main/donation`) 
         .then((res) => {  
@@ -194,7 +198,7 @@ const MainPage = () =>  {
         .catch(error => {
             console.error('Error fetching data: ', error);
         }); 
-    }, [handleChangeEvent1, setDonation]);
+    }, [handleChangeEvent1, setDonation, status]);
     
     return(
         <MainInner>
@@ -233,12 +237,12 @@ const MainPage = () =>  {
                 }
             </SwiperWrap>
             <SelectWrap>
-                <Select 
+                {/* <Select 
                     selectOptions={Sort1}
-                    value={Sort1[0]}
+                    value={select1}
                     size={120}
                     onChange={(e) => {setSelect1(e as Option)}}
-                />
+                /> */}
                 <Select 
                     selectOptions={Sort2}
                     value={Sort2[0]}

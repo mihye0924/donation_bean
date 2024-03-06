@@ -94,15 +94,15 @@ const media = {
 };
 
 const HeaderPadding = styled.div` 
-  padding: 200px 10px 50px 10px;
+  padding: 120px 10px 50px 10px;
   max-width: 1200px;
   width: 100%;
-  margin: 0 auto;
+  margin: 0 auto; 
   @media ${media.tablet} { 
-    padding: 170px 10px 50px 10px;
+    padding: 100px 10px 50px 10px;
   }
   @media ${media.mobile} { 
-    padding: 130px 10px 50px 10px;
+    padding: 80px 10px 50px 10px;
   }
 `;
 
@@ -124,6 +124,9 @@ const SidBar = styled.div`
     padding: 16px 0px 16px 20px;
     border-bottom: 1px solid #ececec;
     font-family: 'NanumSquareNeo-Variable';
+    &:last-child {
+      border-bottom:0;
+    }
     @media ${media.mobile} { 
       &:last-child { border-bottom:0; }
     }

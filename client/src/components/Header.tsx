@@ -1,4 +1,5 @@
  
+import DonationStore from "@/store/donationStore";
 import { useCallback, useEffect,  useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import styled from "styled-components";  
@@ -11,8 +12,9 @@ const Header = () => {
   const [subNavActive, setSubNavActive] = useState(0);
   const [isSubNavBar, setIsSubNavActive] = useState(true)
   const [navActvie, setNavActive] = useState(true);
-  const url = useRef<string[]>(["login","signin"])  
+  const url = useRef<string[]>(["login","signin","admin"])  
   const subNav = useRef<string[]>(["전체", "진행중", "종료"]); 
+  const { setChangeStatus } = DonationStore()
 
   // 검색 버튼 토글
   const handleActiveSearch = useCallback(() => {
@@ -52,6 +54,13 @@ const Header = () => {
       setIsSubNavActive(true)  
     }
   },[path, url])
+
+  const handleChangeEvent1 = useCallback((index: number)=> {
+    setChangeStatus({
+      label: subNav.current[index],
+      value: String(index)
+    })
+  },[setChangeStatus])
  
 
   useEffect(() => { 
@@ -101,7 +110,7 @@ const Header = () => {
                         key={item}
                         className={subNavActive === index ? "active" : ""}
                       >
-                        <button onClick={() => {setSubNavActive(index)}}>
+                        <button onClick={() => {setSubNavActive(index), handleChangeEvent1(index)}}>
                           {item}
                         </button>
                       </li>
