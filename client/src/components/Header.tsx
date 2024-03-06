@@ -1,18 +1,22 @@
 import { DetailDonationDataProps } from "@/types/detail";
 import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
+import { useCallback, useEffect,  useRef, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import styled from "styled-components";  
 
 const Header = () => {
+  const router = useLocation() 
+  const path = router.pathname.split("/")[1]
   const [searchActive, setSearchActive] = useState(false);
   const [subHeaderActive, setSubHeaderActive] = useState("");
-  const [subNav, setSubNav] = useState<string[]>([]); 
   const [subNavActive, setSubNavActive] = useState(0);
+  const [isSubNavBar, setIsSubNavActive] = useState(true)
   const [navActvie, setNavActive] = useState(true);
   const [searchValue, setSearchValue] = useState<string>("");
   const [donationData, setDonationData] = useState<DetailDonationDataProps[]>([])
   const [filteredData, setFilteredData] = useState<DetailDonationDataProps[]>([])
+  const url = useRef<string[]>(["login","signin"])  
+  const subNav = useRef<string[]>(["전체", "진행중", "종료"]); 
   // mySql data load
   const user_id = "test1" // test id
 
@@ -38,7 +42,7 @@ const Header = () => {
     console.log(searchValue)
   },[])
   // 스크롤시 헤더 숨김/보임
-  const handleScrollNav = () => {
+  const handleScrollNav = useCallback(() => {
     if (window.scrollY > 80) {
       setSubHeaderActive("active");
     } else {
@@ -47,17 +51,26 @@ const Header = () => {
     if (window.innerWidth <= 375) {
       setSubHeaderActive("");
     }
-  };
+  },[])
 
   // 화면 사이즈 변경시 검색기능 변경
-  const handleResizeWindow = () => {
+  const handleResizeWindow = useCallback(() => {
     if (window.innerWidth <= 375) {
       setSearchActive(false);
     } else {
       setNavActive(true);
     }
-  }; 
+  },[])
 
+  // 전체, 진행중, 종료 서브네비
+  const handleUrl = useCallback(() => {
+    if(url.current.includes(path)){
+      setIsSubNavActive(false)
+    }else{
+      setIsSubNavActive(true)  
+    }
+  },[path, url])
+ 
 
   useEffect(() => {
     axios
@@ -71,14 +84,14 @@ const Header = () => {
 }, []);
 
   useEffect(() => {
-    setSubNav(["전체", "진행중", "진행종료"]);
+    handleUrl()
     document.addEventListener("scroll", () => handleScrollNav());
     window.addEventListener("resize", () => handleResizeWindow());
     return () => {
       document.removeEventListener("scroll", () => handleScrollNav());
       window.removeEventListener("resize", () => handleResizeWindow());
     };
-  }, []);
+  }, [handleResizeWindow, handleScrollNav, handleUrl]);
 
   return (
     <HeaderWrap>
@@ -126,10 +139,13 @@ const Header = () => {
         </HeaderNav>
       </HeaderBorder>
       <HeaderBorder className={subHeaderActive}>
+      { 
+        isSubNavBar && 
+        <>
         { navActvie ? (
           <HeaderSubNav>
             <ul>
-              {subNav.map((item, index) => {
+              {subNav.current.map((item:string, index:number) => {
                 return (
                   <li
                     key={item}
@@ -167,6 +183,8 @@ const Header = () => {
                 </div>
           </HeaderSubSearch>
         )}
+        </>
+      }
       </HeaderBorder>
     </HeaderWrap>
   );
