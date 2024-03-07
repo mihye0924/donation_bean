@@ -35,7 +35,6 @@ export async function insertUser(req, res) {
 
 export async function login(req, res) {
   const { id, pass } = req.body;
-
   const result = await UserRepository.login(id);
   result.message = "";
   if (result.cnt === 1) {
@@ -58,9 +57,7 @@ export async function login(req, res) {
 
 export async function getUserInfo(req, res) {
   const { id } = req.query;
-  console.log(id);
   const result = await UserRepository.getUserInfo(id);
-  console.log(result);
   res.json({ ok: true, userinfo: result });
 }
 
@@ -107,7 +104,7 @@ export async function getFevList(req, res) {
 export async function kakaologin(req, res) {
   const { id, user_nick, user_avatar } = req.body;
   const checkExist = await UserRepository.socialCheck(id);
-  console.log(checkExist);
+
   if (checkExist.cnt === 1) {
     return res.json({ ok: true });
   }

@@ -40,7 +40,7 @@ const DetailPage = () =>  {
     const [list, setList] = useState<AccordionProps[]>([])  
     const [agreeList, setAgreeList] = useState<CheckboxProps[]>([])
     const [allAgree, setAllAgree] = useState<boolean>(false)  
-    const [submitMutate, {data: paymentData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/detail/payment`);
+    const [submitMutate, {data: paymentData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/payment`);
     const [donationQueryData, setDonationQueryData] = useState<DetailDonationDataProps>()
     const [paymentTotalData, setPaymentTotalData] = useState<number>()
     const [userQueryData, setUserQueryData] = useState<DetailUserDataProps>() 
@@ -153,21 +153,21 @@ const DetailPage = () =>  {
     // 사용자 데이터 가져오기
     const userData = useCallback(() => {
         axios
-        .get(`${import.meta.env.VITE_SERVER_URL}/detail/user?user_id=${user_id}`) 
+        .get(`${import.meta.env.VITE_SERVER_URL}/payment/user?user_id=${user_id}`) 
         .then((res) => setUserQueryData(res.data.result));
     },[])
 
     // 기부 데이터 가져오기
     const donationData = useCallback(() => {
         axios
-        .get(`${import.meta.env.VITE_SERVER_URL}/detail/donation?user_id=${user_id}&donation_no=${donation_no}`) 
+        .get(`${import.meta.env.VITE_SERVER_URL}/payment/donation?user_id=${user_id}&donation_no=${donation_no}`) 
         .then((res) => setDonationQueryData(res.data.result));
     },[donation_no])
 
     // 전체 결제 데이터 가져오기
     const paymentAllData = useCallback(() => {
         axios
-        .get(`${import.meta.env.VITE_SERVER_URL}/detail/paymentAll?user_id=${user_id}&donation_no=${donation_no}`) 
+        .get(`${import.meta.env.VITE_SERVER_URL}/payment/all?user_id=${user_id}&donation_no=${donation_no}`) 
         .then((res) => {    
             const arr: number[] = []
             res.data.result.forEach((item: DetailPaymentAllDataProps) => {
@@ -245,9 +245,8 @@ const DetailPage = () =>  {
         agreeList.forEach((item) => { 
             if(item.checked) {
                 count++
-            } 
-             
-            count < 2 ? setAllAgree(false) : setAllAgree(true)
+            }  
+            count < agreeList.length ? setAllAgree(false) : setAllAgree(true)
         })
     },[agreeList])
  
@@ -270,7 +269,7 @@ const DetailPage = () =>  {
             payment_account_num: accountNumber, //계좌번호
             payment_birth : ownerBirth, //생년월일
             payment_company_code : companyCode// 법인 사업자 
-        } 
+        }  
         submitMutate(data)  
         setPaymentFinally(data) 
         handleNext(index)
@@ -336,7 +335,7 @@ const DetailPage = () =>  {
       
     return(
         <Article>
-            <ArticleInner image={'image01.jpg'}>
+            <ArticleInner image={donationQueryData?.donation_image}>
                 <ContentWrap> 
                     <aside>
                         <h1>후원신청</h1>
@@ -366,7 +365,7 @@ const DetailPage = () =>  {
                                                 <AccordionBody2>
                                                     <Percent>{`${paymentTotalData ? Math.floor((Number(paymentTotalData)/Number(donationQueryData?.donation_goal)) * 100) : 0}`}%</Percent>
                                                     <Progressbar
-                                                        percentage={4}
+                                                        percentage={paymentTotalData ? Math.floor((Number(paymentTotalData)/Number(donationQueryData?.donation_goal)) * 100) : 0}
                                                      />
                                                     <DonationPeriod>{donationQueryData?.donation_period}까지</DonationPeriod>
                                                     <DonationDDay>D-{dDay}</DonationDDay>
@@ -414,6 +413,7 @@ const DetailPage = () =>  {
                                                 <InputBox alignitem="center"><input type="text" value={price} onChange={() => setPrice(price)}/>원</InputBox>
                                                 <AmountButtonBox>
                                                     <Button 
+                                                        width="100"
                                                         bg="black"
                                                         color="#fff"
                                                         onClick={() => setPrice('20,000')}
@@ -421,6 +421,7 @@ const DetailPage = () =>  {
                                                         2만원
                                                     </Button>
                                                     <Button 
+                                                        width="100"
                                                         bg="black"
                                                         color="#fff"
                                                         onClick={() => setPrice('30,000')}
@@ -428,6 +429,7 @@ const DetailPage = () =>  {
                                                         3만원
                                                     </Button>
                                                     <Button 
+                                                        width="100"
                                                         bg="black"
                                                         color="#fff"
                                                         onClick={() => setPrice('50,000')}
@@ -469,6 +471,7 @@ const DetailPage = () =>  {
                                         } 
                                             <TermsWrap>
                                                 <CheckBox  
+                                                    icon
                                                     type="round" 
                                                     value={0}
                                                     htmlId="all_agree"
@@ -481,6 +484,7 @@ const DetailPage = () =>  {
                                                     AgreeList.map((item) => {
                                                         return( 
                                                         <CheckBox 
+                                                            icon
                                                             key={item.id}
                                                             type={item.type} 
                                                             value={item.value} 
@@ -596,15 +600,18 @@ const DetailPage = () =>  {
                                                 <SelectWrap>
                                                     <Select
                                                         selectOptions={CardCompany} 
-                                                        onChange={(e) => { setCardName(e.label) }} 
+                                                        value={CardCompany[0]} 
+                                                        onChange={(e) => setCardName(e?.label as string)}  
                                                     />
                                                     <Select
                                                         selectOptions={CardDay} 
-                                                        onChange={(e) => { setCardExpiryMonth(e.label) }} 
+                                                        value={CardDay[0]} 
+                                                        onChange={(e) =>setCardExpiryMonth(e?.label as string)} 
                                                     />
                                                     <Select
                                                         selectOptions={CardYear} 
-                                                        onChange={(e) => { setCardExpiryYear(e.label) }} 
+                                                        value={CardYear[0]} 
+                                                        onChange={(e) =>setCardExpiryYear(e?.label as string)} 
                                                     />
                                                 </SelectWrap>
                                             </Title>
@@ -691,7 +698,8 @@ const DetailPage = () =>  {
                                                 <SelectWrap>
                                                     <Select
                                                         selectOptions={AccountName} 
-                                                        onChange={(e) => { setAccountCompany(e.label) }} 
+                                                        value={AccountName[0]} 
+                                                        onChange={(e) => setAccountCompany(e?.label as string)}
                                                     />  
                                                 </SelectWrap>
                                             </Title>
@@ -1124,6 +1132,9 @@ const PaymentDateBox = styled.div`
 const SelectWrap = styled.div`
     display: flex;
     gap:10px;
+    .select { 
+        min-width: 25%;
+    }
 `
 
 // 후원자 정보

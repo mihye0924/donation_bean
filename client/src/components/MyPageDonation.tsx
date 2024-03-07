@@ -3,6 +3,7 @@ import { IoIosArrowForward } from "react-icons/io";
 const MyPageDonation = () => {
   return (
     <Main>
+      <h1>나의 후원</h1>
       <MyCashGrid>
         <div>
           <div className="PriceTitle">
@@ -97,7 +98,7 @@ export default MyPageDonation;
 
 const sizes = {
   tablet: "768px",
-  desktop: "1024px",
+  desktop: "1200px",
 };
 
 const media = {
@@ -106,6 +107,22 @@ const media = {
 };
 
 const Main = styled.div`
+  h1 {
+    display: none;
+    color: #f56400;
+    font-family: 'NanumSquareNeo-Variable';
+    font-weight: 900;
+    font-size: 30px;  
+    margin-top: 20px;
+    @media ${media.desktop}{ 
+      display: block;
+      margin-top: 0;
+      font-size: 40px;
+    }
+    @media ${media.tablet}{ 
+      display: block;
+    } 
+   }
   grid-column: span 2;
   li {
     padding: 15px 10px;
@@ -136,6 +153,7 @@ const MyCashGrid = styled.div`
   border-bottom: 1px solid #ececec;
   padding: 30px 10px;
   @media ${media.tablet} {
+    margin-top: 30px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
   }
@@ -145,9 +163,11 @@ const MyCashGrid = styled.div`
     justify-content: space-between;
     margin: 0 10px;
     border-bottom: 1px solid #ececec;
-    padding-bottom: 20px;
+    padding: 20px 0;
     h2 {
       font-size: 19px;
+      font-weight: 700;
+      font-family: 'NanumSquareNeo-Variable';
     }
     h1 {
       font-size: 26px;
@@ -165,6 +185,7 @@ const DayLine = styled.div`
   color: #555555;
   position: relative;
   span {
+    font-family: 'NanumSquareNeo-Variable';
     padding: 0 15px;
     z-index: 20;
     position: relative;
@@ -195,8 +216,10 @@ const DonationRecord = styled.div`
   div:first-child {
     grid-column: span 4;
     display: flex;
+    font-size: 16px;
     align-items: center;
     .round {
+      font-family: 'NanumSquareNeo-Variable';
       width: 75px;
       height: 75px;
       border: 1px solid #f56400;
@@ -210,12 +233,12 @@ const DonationRecord = styled.div`
       margin-right: 15px;
     }
     div:last-child {
-      font-size: 14px;
+      font-size: 16px;
       color: #828282;
       .donationContent {
-        font-size: 16px;
+        font-size: 18px;
         color: black;
-        margin: 5px 0;
+        margin: 10px 0;
       }
     }
   }
