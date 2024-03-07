@@ -1,10 +1,10 @@
 import { db } from "../db/database.js";
 
-export async function insertPayment(user_id, donation_no, donation_support, donation_current, payment_method, payment_uid, payment_name) {
-    const sql = `insert into payment (user_id, donation_no, donation_support, donation_current, payment_method, payment_uid, payment_name, payment_createAt) values
-    (?, ?, ?, ?, ?, ?, ?, now());`;
+export async function insertPayment(user_id, donation_no, donation_support, donation_current, payment_method, payment_uid, payment_name, payment_transfer) {
+    const sql = `insert into payment (user_id, donation_no, donation_support, donation_current, payment_method, payment_uid, payment_name, payment_transfer, payment_createAt) values
+    (?, ?, ?, ?, ?, ?, ?, ?, now());`;
     return db
-    .execute(sql, [user_id, donation_no, donation_support, donation_current, payment_method, payment_uid, payment_name])
+    .execute(sql, [user_id, donation_no, donation_support, donation_current, payment_method, payment_uid, payment_name, payment_transfer])
     .then((row) => "ok");
 }
 

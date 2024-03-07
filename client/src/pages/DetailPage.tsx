@@ -7,29 +7,29 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import styled from "styled-components"
 import AgreeTerms from "@/api/detail/AgreeTerms.json"
 import Progressbar from "@/components/Progressbar" 
-// import Select from "@/components/Select" 
 import useMutation from "@/hooks/useMutation" 
 import axios from "axios"
 import { DetailDonationDataProps, DetailPaymentAllDataProps, DetailUserDataProps } from "@/types/detail"
 import { useLocation } from "react-router-dom"   
 import { RequestPayResponse } from "@/types/payment"
+import { getUser } from "@/util/userinfo"
 
 const DetailPage = () =>  {   
     const [support, setSupport] = useState<number>(1);  //후원방식
+    const [schedule, setSchedule] = useState<number>(1); // 후원방식 10일, 15일
     const [paymethod, setPaymethod] = useState<number>(1);  //결제수단  
-    const [price, setPrice] = useState('20,000') 
-    const [secondaryDate, setSecondaryDate] = useState<string>()
+    const [price, setPrice] = useState('20,000') // 결제금액
+    const priceNumber = Number(price.replace(",", "")); //결제금액 - 숫자
+    const [secondaryDate, setSecondaryDate] = useState<string>() //둘째주 월요일 찾기
     const [list, setList] = useState<AccordionProps[]>([])  
-    const [agreeList, setAgreeList] = useState<CheckboxProps[]>([])
-    const [allAgree, setAllAgree] = useState<boolean>(false)  
-    const [submitMutate, {data: paymentData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/payment`);
-    const [donationQueryData, setDonationQueryData] = useState<DetailDonationDataProps>()
-    const [paymentTotalData, setPaymentTotalData] = useState<number>()
-    const [userQueryData, setUserQueryData] = useState<DetailUserDataProps>() 
-    const [paymentResult, setPaymentResult] = useState<DetailPaymentAllDataProps>()
-    const priceNumber = Number(price.replace(",", "")); 
+    const [allAgree, setAllAgree] = useState<boolean>(false)  //전체 동의
+    const [agreeList, setAgreeList] = useState<CheckboxProps[]>([]) // 동의버튼
+    const [donationQueryData, setDonationQueryData] = useState<DetailDonationDataProps>() //기부데이터
+    const [paymentTotalData, setPaymentTotalData] = useState<number>() //결제 데이터
+    const [userQueryData, setUserQueryData] = useState<DetailUserDataProps>() //사용자 데이터
+    const [paymentResult, setPaymentResult] = useState<DetailPaymentAllDataProps>() //기부 결과 데이터
     const router = useLocation()
-    const user_id ="test1";
+    const user = getUser();
     const path = Number(router.pathname.split("/")[2]); 
     const donation_no = path;
 
@@ -119,24 +119,24 @@ const DetailPage = () =>  {
     // 사용자 데이터 가져오기
     const userData = useCallback(() => {
         axios
-        .get(`${import.meta.env.VITE_SERVER_URL}/payment/user?user_id=${user_id}`) 
+        .get(`${import.meta.env.VITE_SERVER_URL}/payment/user?user_id=${user.id}`) 
         .then((res) => {
-            setUserQueryData(res.data.result)
-            console.log(res.data.result,"result")
+            setUserQueryData(res.data.result) 
         });
-    },[])
+    },[user.id])
 
     // 기부 데이터 가져오기
     const donationData = useCallback(() => {
         axios
-        .get(`${import.meta.env.VITE_SERVER_URL}/payment/donation?user_id=${user_id}&donation_no=${donation_no}`) 
+        .get(`${import.meta.env.VITE_SERVER_URL}/payment/donation?user_id=${user.id}&donation_no=${donation_no}`) 
         .then((res) => setDonationQueryData(res.data.result));
-    },[donation_no])
+    },[donation_no, user.id])
 
     // 전체 결제 데이터 가져오기
+    const [submitMutate, {data: paymentData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/payment`);
     const paymentAllData = useCallback(() => {
         axios
-        .get(`${import.meta.env.VITE_SERVER_URL}/payment/all?user_id=${user_id}&donation_no=${donation_no}`) 
+        .get(`${import.meta.env.VITE_SERVER_URL}/payment/all?user_id=${user.id}&donation_no=${donation_no}`) 
         .then((res) => {    
             const arr: number[] = []
             res.data.result.forEach((item: DetailPaymentAllDataProps) => {
@@ -147,11 +147,11 @@ const DetailPage = () =>  {
                 setPaymentTotalData(Number(returnVal))
             }) 
         }); 
-    },[donation_no])
+    },[donation_no, user.id])
   
     // 디데이 계산
-    const dDay = useMemo(() => { 
-        const targetData = new Date(String(donationQueryData?.donation_period).split("~ ")[1])
+    const dDay = useMemo(() => {  
+        const targetData = new Date(String(donationQueryData?.donation_period).split("~")[1])
         const currentDate = new Date();
         const timeDiff = targetData.getTime() - currentDate.getTime();
         const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
@@ -221,28 +221,26 @@ const DetailPage = () =>  {
 
  
     // 후원하기
-    const onValid = useCallback((index: number, res: RequestPayResponse) => {  
-        console.log(res,"response")
+    const onValid = useCallback((index: number, res: RequestPayResponse) => {   
         const data = { 
-            user_id: user_id, //유저 아이디
+            user_id: user.id, //유저 아이디
             donation_no: donation_no, //기부 번호
             donation_support: support,
             donation_current : res.paid_amount, // 후원금액 
             payment_method : paymethod === 1 ? "카드" : "자동이체", // 카드, 자동이체
             payment_uid: res.merchant_uid, // 구매자고유번호 
-            payment_name: res.buyer_name, // 구매자명
-            // payment_account_transfer: radioActive4 === 0 ? "매월15일" : "매월25일", //은행 이체일 
-        }  
+            payment_name: res.buyer_name, // 구매자명 
+            payment_transfer: support === 2 && schedule === 0 ? "매월15일" : "매월25일", //은행 이체일 
+        }   
         submitMutate(data)  
         setPaymentResult(data)  
         handleNext(index)
-    },[donation_no, handleNext, paymethod, submitMutate, support])
-      
+    },[donation_no, handleNext, paymethod, schedule, submitMutate, support, user.id])
+       
     // 결제 연결하기
     const payment = useCallback((index: number) => {   
-        window.IMP?.init("imp84565065") 
-        const amount: number = 100;
-        if (!amount) {
+        window.IMP?.init("imp84565065")  
+        if (!priceNumber) {
             alert('결제 금액을 확인해주세요')
             return
         }
@@ -250,25 +248,24 @@ const DetailPage = () =>  {
             pg: 'html5_inicis.INIBillTst',// PG사
             pay_method: paymethod === 1 ? "card" : "trans",// 결제수단 card, trans
             merchant_uid: `mid_${new Date().getTime()}`,// 주문번호
-            amount: amount,// 결제금액
+            amount: priceNumber,// 결제금액
             name: '기부콩 결제',// 주문명
             buyer_name: userQueryData?.user_name,// 구매자 이름
             buyer_tel: Number(userQueryData?.user_phone),// 구매자 전화번호
             buyer_email: userQueryData?.user_email,// 구매자 이메일 
-            receipt_url: "https://www.my-service.com/payments/complete/mobile"
+            receipt_url: "https://www.my-service.com/payments/complete/mobile", 
           };
           const callback = (res: RequestPayResponse) => {
             const { success, error_msg } = res
-            if (success) {
+            if (success) { 
                 onValid(index, res)
             } else {
               alert(`결제 실패: ${error_msg}`)
             }
           }
           window.IMP?.request_pay(data, callback) 
-    },[onValid, paymethod, userQueryData?.user_email, userQueryData?.user_name, userQueryData?.user_phone])
-
-    
+    },[onValid, paymethod, priceNumber, userQueryData?.user_email, userQueryData?.user_name, userQueryData?.user_phone])
+ 
      
     useEffect(() => { 
         if(paymentData && paymentData.ok) { 
@@ -340,16 +337,16 @@ const DetailPage = () =>  {
                                     case 1:
                                         return <>
                                         <Title bottomBorder title="후원방식"> 
-                                            <RadioWrap>
-                                                <Radio
-                                                    className={support === 1 ? "active" : ""}
-                                                    type="round" 
-                                                    label="일시후원"
-                                                    id="temporary"
-                                                    value="1"
-                                                    name="donation_method"   
-                                                    onChange={() => setSupport(1)}
-                                                />
+                                            <Radio
+                                                className={support === 1 ? "active" : ""}
+                                                type="round" 
+                                                label="일시후원"
+                                                id="temporary"
+                                                value="1"
+                                                name="donation_method"   
+                                                onChange={() => setSupport(1)}
+                                            />
+                                            {/* <RadioWrap>
                                                 <Radio
                                                     className={support === 2 ? "active" : ""}
                                                     type="round" 
@@ -359,7 +356,7 @@ const DetailPage = () =>  {
                                                     name="donation_method"     
                                                     onChange={() => setSupport(2)}
                                                 />
-                                            </RadioWrap>
+                                            </RadioWrap> */}
                                         </Title> 
                                         <Title bottomBorder title="기부금액">
                                             <>
@@ -485,29 +482,32 @@ const DetailPage = () =>  {
                                                     onChange={() => { setPaymethod(2) }}
                                                 />
                                             </RadioWrap> 
-                                            {/* <Title flex={"1 0 70%"} bottomBorder title="이체일"> 
-                                                <RadioWrap>
-                                                    <Radio
-                                                        className={radioActive4 === 1 ? "active" : ""}
-                                                        type="round" 
-                                                        label="매월15일"
-                                                        id="fifthenfive"
-                                                        value="1"
-                                                        name="Transfer_date"   
-                                                        onChange={() => setRadioActive4(1)}
-                                                    />
-                                                    <Radio
-                                                        className={radioActive4 === 2 ? "active" : ""}
-                                                        type="round" 
-                                                        label="매월25일"
-                                                        id="twentyfive"
-                                                        value="2" 
-                                                        name="Transfer_date"     
-                                                        onChange={() => setRadioActive4(2)}
-                                                    />
-                                                </RadioWrap>
-                                            </Title> */}
+                                        </Title>  
+                                        { 
+                                            support === 2 &&
+                                            <Title flex={"1 0 70%"} bottomBorder title="이체일"> 
+                                            <RadioWrap>
+                                                <Radio
+                                                    className={schedule === 1 ? "active" : ""}
+                                                    type="round" 
+                                                    label="매월15일"
+                                                    id="fifthenfive"
+                                                    value="1"
+                                                    name="Transfer_date"   
+                                                    onChange={() => setSchedule(1)}
+                                                />
+                                                <Radio
+                                                    className={schedule === 2 ? "active" : ""}
+                                                    type="round" 
+                                                    label="매월25일"
+                                                    id="twentyfive"
+                                                    value="2" 
+                                                    name="Transfer_date"     
+                                                    onChange={() => setSchedule(2)}
+                                                />
+                                            </RadioWrap>
                                         </Title> 
+                                        }
                                         <ButtonBox>
                                             <Button bg="#f56400" color="#fff" onClick={() => payment(Number(item.id)+ 1)}>후원하기</Button>
                                         </ButtonBox>
@@ -530,7 +530,7 @@ const DetailPage = () =>  {
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">후원분야</th>
-                                                    <td>{donationQueryData?.donation_category}{String(paymentResult?.donation_current).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원</td> 
+                                                    <td>{donationQueryData?.donation_category}({String(paymentResult?.donation_current).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}원)</td> 
                                                 </tr>
                                                 <tr>
                                                     <th scope="row">후원금액</th>
@@ -542,7 +542,7 @@ const DetailPage = () =>  {
                                                     <th scope="row">납입방법</th>
                                                     <td>{paymentResult?.payment_method}</td> 
                                                 </tr>
-                                                <tr>
+                                                {/* <tr>
                                                     <th scope="row">납입정보</th>
                                                     <td>
                                                         <p>{paymentResult?.payment_method}</p>
@@ -554,7 +554,7 @@ const DetailPage = () =>  {
                                                             }
                                                         </ul>    
                                                     </td> 
-                                                </tr>
+                                                </tr> */}
                                             </tbody>
                                             <tfoot> 
                                             </tfoot>
@@ -616,8 +616,7 @@ const ContentWrap = styled.div`
     margin: 0 auto;
     padding: 50px 10px;
     aside {
-        flex: 1 0 20%;
-        /* border: 1px solid red; */
+        flex: 1 0 20%; 
         h1 {
             font-family: 'NanumSquareNeo-Variable';
             font-size: 32px;
@@ -633,8 +632,7 @@ const ContentWrap = styled.div`
     }
     section {
         flex: 1 0 70%; 
-        width: 100%;
-        /* border: 1px solid red; */
+        width: 100%; 
         >div {  
             &:not(:first-child) {
                 border: 1px solid #f1f1f1;
@@ -832,40 +830,7 @@ const DonationAmout = styled.div`
     margin-top: 10px;
     white-space: pre;
 `  
-
-// 후원납입
-const CardBox = styled.div`
-    display: flex;
-    input {
-        margin-right: 30px;
-        text-align: center;
-    } 
-    & div:last-of-type {
-        input {
-            margin-right: 0;
-        }
-    }
-    & div:not(:last-child) { 
-        &::after {
-            position: absolute;
-            content:'-'; 
-            right: 10px;
-            color: #cfcfcf;
-            top:50%;
-            transform: translateY(-50%);
-        }
-    }
-    @media ${media.tablet}{  
-        input {
-            margin-right: 20px;
-        } 
-        & div:not(:last-child) { 
-            &::after { 
-                right: 5px; 
-            }
-        }
-    }
-`
+ 
 const AmountButtonBox = styled.div`
     margin-top: 20px;
     button:not(:last-child) { 
@@ -893,15 +858,7 @@ const PaymentDateBox = styled.div`
             }
         }
     }
-`
-const SelectWrap = styled.div`
-    display: flex;
-    gap:10px;
-    .select { 
-        min-width: 25%;
-    }
-`
-
+` 
 // 후원자 정보
 const TermsWrap = styled.div`
     margin: 20px 0;
@@ -941,8 +898,7 @@ const TermsList = styled.ul`
 // 후원완료
 const ImgBox = styled.div`
     width: 100%; 
-    text-align: center;
-    /* border: 1px solid #000; */
+    text-align: center; 
     img {
         width: 200px;
         height: 200px;

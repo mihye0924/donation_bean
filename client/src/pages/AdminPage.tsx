@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { getUser } from "@/util/userinfo";
 import { Link, Outlet, useMatch, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 interface Response {
   ok: boolean;
@@ -32,11 +33,11 @@ const AdminPage = () => {
   const indexMatch = useMatch("/admin");
   const infoMatch = useMatch("/admin/account");
   const navigate = useNavigate();
-  // useEffect(() => {
-  //   if (!user) {
-  //     navigate("/login");
-  //   }
-  // }, [user, navigate]);
+  useEffect(() => {
+    // if (user.id !== "admin") {
+    //   navigate("/login");
+    // }
+  }, [user, navigate]);
   return (
     <HeaderPadding>
       <Center>

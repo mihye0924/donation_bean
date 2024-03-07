@@ -122,18 +122,9 @@ values (5, 'test1', '전문훈련을 통해 단 한아이의 손도 놓지 않�
 
 
 -- user
+
 insert into my_db.user (user_no, user_name, user_avatar, user_id, user_pw, user_email, user_nick, user_phone, user_enum) 
-values (1,'테스트1','','test1','Test1234!','test1@naver.com','유저1','01012341234',0); 
-insert into my_db.user (user_no, user_name, user_avatar, user_id, user_pw, user_email, user_nick, user_phone, user_enum) 
-values (2,'테스트2','','test2','Test1234!','test2@naver.com','유저2','01012341234',0); 
-insert into my_db.user (user_no, user_name, user_avatar, user_id, user_pw, user_email, user_nick, user_phone, user_enum) 
-values (3,'테스트3','','test3','Test1234!','test3@naver.com','유저3','01012341234',0); 
-insert into my_db.user (user_no, user_name, user_avatar, user_id, user_pw, user_email, user_nick, user_phone, user_enum) 
-values (4,'테스트4','','test4','Test1234!','test4@naver.com','유저4','01012341234',0); 
-insert into my_db.user (user_no, user_name, user_avatar, user_id, user_pw, user_email, user_nick, user_phone, user_enum) 
-values (5,'테스트5','','test5','Test1234!','test5@naver.com','유저5','01012341234',0); 
-insert into my_db.user (user_no, user_name, user_avatar, user_id, user_pw, user_email, user_nick, user_phone, user_enum) 
-values (6,'테스트6','','test6','Test1234!','test6@naver.com','유저6','01012341234',0);  
+values (1,'관리자','','admin','admin','admin@naver.com','기본이름','01012341234',0,now());  
 
 
 
@@ -198,6 +189,7 @@ CREATE TABLE my_db.payment (
   payment_method varchar(10) DEFAULT NULL,
   payment_uid varchar(1000) NOT NULL, 
   payment_name varchar(10) DEFAULT NULL, 
+  payment_transfer varchar(10) DEFAULT NULL, 
   payment_createAt date DEFAULT NULL,
   PRIMARY KEY (payment_no),
 	KEY user_id (user_id), 
@@ -205,4 +197,3 @@ CREATE TABLE my_db.payment (
   CONSTRAINT payment_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE,
   CONSTRAINT payment_ibfk_2 FOREIGN KEY (donation_no) REFERENCES donation (donation_no) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci; 
-

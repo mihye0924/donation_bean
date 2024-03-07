@@ -21,6 +21,7 @@ export interface DetailPaymentAllDataProps {
     payment_method: string;
     payment_uid: string;
     payment_name: string | undefined;
+    payment_transfer: string;
     payment_createAt?: Date;
 }
 
