@@ -1,24 +1,22 @@
-import { DetailDonationDataProps } from "@/types/detail";
-import axios from "axios";
-import { useCallback, useEffect,  useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import styled from "styled-components";  
+import { getUser, removeUser } from "@/util/userinfo";
+import DonationStore from "@/store/donationStore";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 const Header = () => {
-  const router = useLocation() 
-  const path = router.pathname.split("/")[1]
+  const router = useLocation();
+  const path = router.pathname.split("/")[1];
   const [searchActive, setSearchActive] = useState(false);
   const [subHeaderActive, setSubHeaderActive] = useState("");
   const [subNavActive, setSubNavActive] = useState(0);
-  const [isSubNavBar, setIsSubNavActive] = useState(true)
+  const [isSubNavBar, setIsSubNavActive] = useState(true);
   const [navActvie, setNavActive] = useState(true);
-  const [searchValue, setSearchValue] = useState<string>("");
-  const [donationData, setDonationData] = useState<DetailDonationDataProps[]>([])
-  const [filteredData, setFilteredData] = useState<DetailDonationDataProps[]>([])
-  const url = useRef<string[]>(["login","signin"])  
-  const subNav = useRef<string[]>(["전체", "진행중", "종료"]); 
-  // mySql data load
-  const user_id = "test1" // test id
+  const navigate = useNavigate();
+  const user = getUser();
+  const url = useRef<string[]>(["login", "signin", "admin", "mypage"]);
+  const subNav = useRef<string[]>(["전체", "진행중", "종료"]);
+  const { setChangeStatus } = DonationStore();
 
   // 검색 버튼 토글
   const handleActiveSearch = useCallback(() => {
@@ -28,19 +26,7 @@ const Header = () => {
       setSearchActive(false);
     }
   }, [navActvie, searchActive]);
-  // 검색 기능
-  const handleSearch = useCallback((e:React.ChangeEvent<HTMLInputElement>) => {
-    console.log(searchValue)
-    setSearchValue(e.target.value)
-    setFilteredData(
-      donationData.filter(item => {
-        return item.donation_name.toLowerCase().includes(searchValue.toLowerCase());
-      })
-    )
-  }, [searchValue])
-  useEffect(() => {
-    console.log(searchValue)
-  },[])
+
   // 스크롤시 헤더 숨김/보임
   const handleScrollNav = useCallback(() => {
     if (window.scrollY > 80) {
@@ -51,7 +37,7 @@ const Header = () => {
     if (window.innerWidth <= 375) {
       setSubHeaderActive("");
     }
-  },[])
+  }, []);
 
   // 화면 사이즈 변경시 검색기능 변경
   const handleResizeWindow = useCallback(() => {
@@ -60,31 +46,29 @@ const Header = () => {
     } else {
       setNavActive(true);
     }
-  },[])
+  }, []);
 
   // 전체, 진행중, 종료 서브네비
   const handleUrl = useCallback(() => {
-    if(url.current.includes(path)){
-      setIsSubNavActive(false)
-    }else{
-      setIsSubNavActive(true)  
+    if (url.current.includes(path)) {
+      setIsSubNavActive(false);
+    } else {
+      setIsSubNavActive(true);
     }
-  },[path, url])
- 
+  }, [path, url]);
+
+  const handleChangeEvent1 = useCallback(
+    (index: number) => {
+      setChangeStatus({
+        label: subNav.current[index],
+        value: String(index),
+      });
+    },
+    [setChangeStatus]
+  );
 
   useEffect(() => {
-    axios
-    .get(`http://localhost:8081/main/donation?user_id=${user_id}`) 
-    .then((res) => { 
-        setDonationData(res.data.result);  
-    })
-    .catch(error => {
-        console.error('Error fetching data: ', error);
-    });
-}, []);
-
-  useEffect(() => {
-    handleUrl()
+    handleUrl();
     document.addEventListener("scroll", () => handleScrollNav());
     window.addEventListener("resize", () => handleResizeWindow());
     return () => {
@@ -92,6 +76,14 @@ const Header = () => {
       window.removeEventListener("resize", () => handleResizeWindow());
     };
   }, [handleResizeWindow, handleScrollNav, handleUrl]);
+
+  /* 
+  }, [handleResizeWindow, handleScrollNav, handleUrl]); */
+  //로그아웃 클릭이벤트
+  const onLogOutClick = () => {
+    removeUser();
+    navigate("/login");
+  };
 
   return (
     <HeaderWrap>
@@ -105,86 +97,58 @@ const Header = () => {
           </div>
           <ul>
             <li>
-              <Link to="/login">로그인</Link>
+              {user?.id ? (
+                <Link to={"/login"} onClick={onLogOutClick}>
+                  로그아웃
+                </Link>
+              ) : (
+                <Link to="/login">로그인</Link>
+              )}
             </li>
             <li className={`${searchActive ? "active" : ""}`}>
-              <div>
-                <input className={searchValue.length > 0 ? "active" : ""} value={searchValue} type="text" placeholder="검색어를 입력해주세요!" onChange={handleSearch} />
-                <button
-                  className={!navActvie ? "active" : ""}
-                  onClick={handleActiveSearch}
-                />
-              </div>
-              {
-                searchActive === true &&
-                searchValue.length > 0 && <div className={filteredData.length < 5 ? "search-list-wrap pc" : "list-limit pc"}>
-                  <ul>
-                    {
-                      filteredData.length === 0 ? <li className="search-none">검색어가 일치하지 않습니다.</li> :
-                      filteredData.map((item:DetailDonationDataProps, index:number) => {
-                        return (
-                          <li key={index}>
-                            <a href={`/detail/${item.donation_no}`}>
-                              {item.donation_name}
-                            </a>
-                          </li>
-                        )
-                      }
-                    )}
-                  </ul>
-                </div>
-              }
+              <input type="text" placeholder="검색어를 입력해주세요!" />
+              <button
+                className={!navActvie ? "active" : ""}
+                onClick={handleActiveSearch}
+              />
             </li>
           </ul>
         </HeaderNav>
       </HeaderBorder>
       <HeaderBorder className={subHeaderActive}>
-      { 
-        isSubNavBar && 
-        <>
-        { navActvie ? (
-          <HeaderSubNav>
-            <ul>
-              {subNav.current.map((item:string, index:number) => {
-                return (
-                  <li
-                    key={item}
-                    className={subNavActive === index ? "active" : ""}
-                  >
-                    <button onClick={() => {setSubNavActive(index)}}>
-                      {item}
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-          </HeaderSubNav>
-        ) : (
-          <HeaderSubSearch>
-            <div>
-              <input type="text" placeholder="검색어를 입력해주세요"value={searchValue}  onChange={handleSearch} />
-              <button />
-            </div>
-            <div className={filteredData.length < 5 ? "search-list-wrap mb" : "list-limit mb"}>
-                  <ul>
-                    {
-                      filteredData.length === 0 ? <li className="search-none">검색어가 일치하지 않습니다.</li> :
-                      filteredData.map((item:DetailDonationDataProps, index:number) => {
-                        return (
-                          <li key={index}>
-                            <a href={`/detail/${item.donation_no}`}>
-                              {item.donation_name}
-                            </a>
-                          </li>
-                        )
-                      }
-                    )}
-                  </ul>
+        {isSubNavBar && (
+          <>
+            {navActvie ? (
+              <HeaderSubNav>
+                <ul>
+                  {subNav.current.map((item, index) => {
+                    return (
+                      <li
+                        key={item}
+                        className={subNavActive === index ? "active" : ""}
+                      >
+                        <button
+                          onClick={() => {
+                            setSubNavActive(index), handleChangeEvent1(index);
+                          }}
+                        >
+                          {item}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </HeaderSubNav>
+            ) : (
+              <HeaderSubSearch>
+                <div>
+                  <input type="text" placeholder="검색어를 입력해주세요" />
+                  <button />
                 </div>
-          </HeaderSubSearch>
+              </HeaderSubSearch>
+            )}
+          </>
         )}
-        </>
-      }
       </HeaderBorder>
     </HeaderWrap>
   );
@@ -206,12 +170,6 @@ const media = {
 };
 
 const HeaderWrap = styled.header`
-  @media ${media.desktop}{
-    .mb {display: none}
-  }
-  @media ${media.mobile}{
-    .pc {display: none}
-  }
   background: #fff;
   position: fixed;
   width: 100%;
@@ -267,7 +225,7 @@ const HeaderNav = styled.nav`
   justify-content: space-between;
   align-items: center;
   padding: 0 10px;
-  & > ul {
+  ul {
     display: flex;
     justify-content: flex-end;
     align-items: center;
@@ -276,7 +234,7 @@ const HeaderNav = styled.nav`
       font-weight: 600;
       font-size: 18px;
     }
-    & > li:first-child {
+    li:first-child {
       &::after {
         content: "";
         display: inline-block;
@@ -290,13 +248,8 @@ const HeaderNav = styled.nav`
       }
     }
     li:last-child {
-      position: relative;
       width: 35px;
       display: flex;
-      & > div {
-        width: 100%;
-        gap: 0;
-      }
       button {
         position: relative;
         width: 35px;
@@ -323,14 +276,11 @@ const HeaderNav = styled.nav`
         &:focus {
           outline: 0;
         }
-        .search-list-wrap {
-          display: none;
-        }
       }
     }
     li.active {
+      overflow: hidden;
       width: 320px;
-      height: 48px;
       border: 1px solid #f56400;
       border-radius: 25px;
       padding: 5px;
@@ -338,51 +288,6 @@ const HeaderNav = styled.nav`
       input {
         display: block;
         width: 260px;
-        &.active {
-          width: 100%;
-        }
-      }
-      & > div {
-        overflow: hidden;
-      }
-      .search-list-wrap, .list-limit {
-        display: block;
-        position: absolute;
-        top: calc(100% + 10px);
-        right: 0;
-        border: 1px solid #f56400;
-        border-radius: 25px;
-        background-color: #fff;
-        padding: 5px 0;
-        &.list-limit {
-          overflow-y: scroll;
-          height: 300px;
-        }
-        ul {
-          width: 100%;
-          height: 100%;
-          li {
-            width: 100%;
-            padding: 10px 20px;
-            a {
-                font-size: 16px;
-                font-weight: normal;
-              }
-            }
-            &:after {
-              display: none;
-            }
-          }
-          .search-none {
-            width: 100%;
-            height: 100%;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 18px;
-          }
-        }
       }
     }
   }
@@ -409,7 +314,6 @@ const HeaderNav = styled.nav`
               background: url("/images/btn-srch-close.svg") no-repeat;
               background-size: cover;
             }
-            
           }
         }
       }
@@ -507,10 +411,10 @@ const HeaderSubNav = styled.nav`
 const HeaderSubSearch = styled.div`
   width: 100%;
   justify-content: center !important;
-  height: auto;
+  height: 50px;
   display: flex;
   margin: 10px 0;
-   & > div {
+  div {
     margin: 0 10px;
     width: 100%;
     border: 1px solid #f56400;
@@ -538,46 +442,5 @@ const HeaderSubSearch = styled.div`
     }
     background-color: transparent;
     border: 0;
-  }
-  .search-list-wrap, .list-limit {
-    display: block;
-    width: 100%;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    border: none !important;
-    border-radius: 0 !important;
-    background-color: #fff;
-    padding: 5px 0;
-    margin: 0;
-    &.list-limit {
-      overflow-y: scroll;
-      height: 300px;
-    }
-    ul {
-      width: 100%;
-      height: 100%;
-      li {
-        width: 100%;
-        padding: 10px 20px;
-        a {
-            font-size: 14px !important;
-            font-weight: normal;
-          }
-        }
-        &:after {
-          display: none;
-        }
-      }
-      .search-none {
-        width: 100%;
-        height: 100%;
-        padding: 10px 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 14px;
-      }
-    }
   }
 `;
