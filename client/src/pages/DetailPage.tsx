@@ -135,7 +135,7 @@ const DetailPage = () =>  {
     const [submitMutate, {data: paymentData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/payment`);
     const paymentAllData = useCallback(() => {
         axios
-        .get(`${import.meta.env.VITE_SERVER_URL}/payment/all?user_id=${user.id}&donation_no=${donation_no}`) 
+        .get(`${import.meta.env.VITE_SERVER_URL}/payment/all?donation_no=${donation_no}`) 
         .then((res) => {    
             const arr: number[] = []
             res.data.result.forEach((item: DetailPaymentAllDataProps) => {
@@ -146,7 +146,7 @@ const DetailPage = () =>  {
                 setPaymentTotalData(Number(returnVal))
             }) 
         }); 
-    },[donation_no, user.id])
+    },[donation_no])
   
     // 디데이 계산
     const dDay = useMemo(() => {  

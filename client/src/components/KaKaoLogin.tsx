@@ -39,7 +39,7 @@ const KaKaoLogin = () => {
           ); //setitem
           loginMutation({
             id: res.id,
-            user_nick: res.properties.nickname,
+            user_nick: res.properties.nick_name,
             user_avatar: res.properties.profile_image,
           });
         });

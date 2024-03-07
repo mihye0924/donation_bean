@@ -12,8 +12,10 @@ export interface DetailDonationDataProps {
   donation_status: number;
   checked: boolean;
   htmlId: string;
+  percentage?: number;
 }
-export interface DetailPaymentAllDataProps {  
+export interface DetailPaymentAllDataProps {
+    reduce(arg0: (prev: any, curr: any) => any, arg1: number): unknown;  
     user_id: string;
     donation_no: number;
     donation_support: number;

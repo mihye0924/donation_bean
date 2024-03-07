@@ -23,10 +23,10 @@ export async function getUser(user_id) {
     .then((row) => row[0][0]);
 }
 
-export async function getPayment(donation_no, user_id) {
-    const sql = `select * from payment where donation_no = ? and user_id = ?`;
+export async function getPayment(donation_no) {
+    const sql = `select * from payment where donation_no = ?`;
   
     return db
-    .execute(sql, [user_id, donation_no])
+    .execute(sql, [donation_no])
     .then((row) => row[0]);
 }

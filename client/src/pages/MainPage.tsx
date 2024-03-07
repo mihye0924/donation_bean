@@ -8,13 +8,14 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import axios from "axios";
-import { CategoryTypes, DetailDonationDataProps } from "@/types/detail";
+import { CategoryTypes, DetailDonationDataProps, DetailPaymentAllDataProps } from "@/types/detail";
 import CardList from "@/components/CardLise";
 import Button from "@/components/Button";
 import Category from "@/api/main/Category.json";
 import Sort2 from "@/api/main/Sort2.json";
 import DonationStore from "@/store/donationStore";
 import { getUser } from "@/util/userinfo";
+import useMutation from "@/hooks/useMutation";
 
 const MainPage = () => {
   // Swiper Slide 더미
@@ -110,7 +111,7 @@ const MainPage = () => {
     // console.log(status, "ddd");
     switch (select1.label) {
       case "전체":
-        console.log("전체");
+        // console.log("전체");
         switch (select2.value) {
           case "최신 순":
             setRecentDonation(radioLabel, select1);
@@ -127,7 +128,7 @@ const MainPage = () => {
         }
         break;
       case "진행중":
-        console.log("진행중");
+        // console.log("진행중");
         switch (select2.value) {
           case "최신 순":
             setRecentDonation(radioLabel, select1);
@@ -144,7 +145,7 @@ const MainPage = () => {
         }
         break;
       case "종료":
-        console.log("종료");
+        // console.log("종료");
         switch (select2.value) {
           case "최신 순":
             setRecentDonation(radioLabel, select1);
@@ -185,33 +186,50 @@ const MainPage = () => {
   };
 
   // 좋아요 데이터 넣기
-  const [submitMutate, {data: likeData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/payment`);
-  const insertLike = useCallback(() => {
-    const queryData = {
-      user_id: user.id,
-      donation_no: "클릭할 번호 숫자타입으로",
-    };
-    submitMutate(queryData)
-  },[submitMutate, user.id])
-
-     
-//   useEffect(() => { 
-//     if(likeData && likeData.ok) {  
-//         return
-//     }  
-// },[likeData]) 
+  // const [submitMutate] = useMutation(`${import.meta.env.VITE_SERVER_URL}/payment`);
+  // const insertLike = useCallback(() => {
+  //   const queryData = {
+  //     user_id: user.id,
+  //     donation_no: "클릭할 번호 숫자타입으로",
+  //   };
+  //   submitMutate(queryData)
+  // },[submitMutate, user.id])
+ 
 
 
   // 좋아요 데이터 넣기
-  const getLike = useCallback(() => {
-    axios
-    .get(`${import.meta.env.VITE_SERVER_URL}/main/like?user_id=${user.id}&donation_no=${"클릭할 번호 숫자타입으로"}`) 
-    .then((res) => console.log(res.data.result));
-  },[])
+  // const getLike = useCallback(() => {
+  //   axios
+  //   .get(`${import.meta.env.VITE_SERVER_URL}/main/like?user_id=${user.id}&donation_no=${"클릭할 번호 숫자타입으로"}`) 
+  //   .then((res) => console.log(res.data.result));
+  // },[user.id])
 
-  useEffect(() => {
-    getLike()
-  },[getLike])
+  // useEffect(() => {
+  //   getLike()
+  // },[getLike])
+
+
+  // 퍼센트 구하기  
+  const addData = useRef<number[]>([])
+  const paymentAllData = useCallback((index: number) => { 
+    console.log(index,"index")
+    const arr: number[] = []
+    axios
+    .get(`${import.meta.env.VITE_SERVER_URL}/payment/all?donation_no=${index}`) 
+    .then((res) => { 
+      res.data.result.forEach((item: DetailPaymentAllDataProps, index2:number) => { 
+        arr[index2] = Number(item.donation_current)
+      })
+
+      addData.current[index] = arr.reduce((prev, curr) => {
+        return prev + curr 
+        },0)     
+      })
+      console.log(addData.current)
+   return addData.current[index]
+},[addData])
+
+ 
 
   useEffect(() => {
     setSelect1(status);
@@ -318,7 +336,7 @@ const MainPage = () => {
                 agency={item.donation_company}
                 day={item.donation_period}
                 price={item.donation_goal}
-                percentage={item.donation_status}
+                percentage={Math.floor(paymentAllData(item.donation_no) / item.donation_goal * 100)}
               />
             )
         )}

@@ -11,6 +11,7 @@ import { Response } from "@/types/user";
 
 const AdminPage = () => {
   const user = getUser();
+  console.log(user,"user")
   const { data } = useQuery<Response>({
     queryKey: ["user"],
     queryFn: () =>

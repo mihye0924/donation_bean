@@ -33,8 +33,8 @@ export async function getUser(req, res) {
 }
 
 export async function getPayment(req, res) {   
-    const { user_id, donation_no } = req.query; 
-    const result = await PaymentRepository.getPayment(user_id, donation_no);   
+    const { donation_no } = req.query; 
+    const result = await PaymentRepository.getPayment(donation_no);   
     if(result) { 
         res.json({ ok: true, result });
     }else{
