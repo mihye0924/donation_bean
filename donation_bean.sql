@@ -122,26 +122,21 @@ values (5, 'test1', '전문훈련을 통해 단 한아이의 손도 놓지 않�
 
 
 -- user
-insert into my_db.user (user_no, user_name, user_avatar, user_id, user_pw, user_email, user_nick, user_phone, user_enum) 
-values (1,'테스트1','','test1','Test1234!','test1@naver.com','유저1','01012341234',0); 
-insert into my_db.user (user_no, user_name, user_avatar, user_id, user_pw, user_email, user_nick, user_phone, user_enum) 
-values (2,'테스트2','','test2','Test1234!','test2@naver.com','유저2','01012341234',0); 
-insert into my_db.user (user_no, user_name, user_avatar, user_id, user_pw, user_email, user_nick, user_phone, user_enum) 
-values (3,'테스트3','','test3','Test1234!','test3@naver.com','유저3','01012341234',0); 
-insert into my_db.user (user_no, user_name, user_avatar, user_id, user_pw, user_email, user_nick, user_phone, user_enum) 
-values (4,'테스트4','','test4','Test1234!','test4@naver.com','유저4','01012341234',0); 
-insert into my_db.user (user_no, user_name, user_avatar, user_id, user_pw, user_email, user_nick, user_phone, user_enum) 
-values (5,'테스트5','','test5','Test1234!','test5@naver.com','유저5','01012341234',0); 
-insert into my_db.user (user_no, user_name, user_avatar, user_id, user_pw, user_email, user_nick, user_phone, user_enum) 
-values (6,'테스트6','','test6','Test1234!','test6@naver.com','유저6','01012341234',0);  
 
+insert into my_db.user (user_no, user_name, user_avatar, user_id, user_pw, user_email, user_nick, user_phone, user_enum) 
+values (1,'관리자','','admin1234','adminADMIN1234@','admin@naver.com','기본이름','01012341234',0,now()); 
 
-
---  payment
-insert into my_db.payment (payment_no, user_id, donation_no, donation_support, donation_current, payment_division, payment_method, payment_card_name, payment_card_company, payment_card_expiry, 
-payment_card_num, payment_account_name, payment_account_company, payment_account_transfer, payment_account_num, payment_birth, payment_company_code, payment_createAt) values
- (1, 'test1', 1, '일시', 30000, '개인', '카드', '테스트1', '신한카드', '2025년도/2월', '1111-2222-3333-4444', null, null, null, null, '970924', null, now());
-
+-- payment 더미데이터
+insert into my_db.payment (payment_no, user_id, donation_no, donation_support, donation_current, payment_method, payment_uid, payment_name, payment_transfer, payment_createAt) values 
+(1, "3378160893", 1, 1, 20000, "카드", "", "테스트1", "", now());
+insert into my_db.payment (payment_no, user_id, donation_no, donation_support, donation_current, payment_method, payment_uid, payment_name, payment_transfer, payment_createAt) values 
+(2, "3378160893", 1, 1, 20000, "카드", "", "테스트1", "", now());
+insert into my_db.payment (payment_no, user_id, donation_no, donation_support, donation_current, payment_method, payment_uid, payment_name, payment_transfer, payment_createAt) values 
+(3, "3378160893", 1, 1, 20000, "카드", "", "테스트1", "", now());
+insert into my_db.payment (payment_no, user_id, donation_no, donation_support, donation_current, payment_method, payment_uid, payment_name, payment_transfer, payment_createAt) values 
+(4, "3378160893", 1, 1, 20000, "카드", "", "테스트1", "", now());
+insert into my_db.payment (payment_no, user_id, donation_no, donation_support, donation_current, payment_method, payment_uid, payment_name, payment_transfer, payment_createAt) values 
+(5, "3378160893", 1, 1, 20000, "카드", "", "테스트1", "", now());
 
 
 
@@ -195,23 +190,13 @@ CREATE TABLE my_db.payment (
   donation_no int DEFAULT NULL,
   donation_support varchar(10) NOT NULL,
   donation_current bigInt NOT NULL,
-  payment_division varchar(10) NOT NULL,
   payment_method varchar(10) DEFAULT NULL,
-  payment_card_name varchar(10) DEFAULT NULL,
-  payment_card_company varchar(10) DEFAULT NULL,
-  payment_card_expiry varchar(30) DEFAULT NULL,
-  payment_card_num varchar(100) DEFAULT NULL,
-  payment_account_name varchar(10) DEFAULT NULL,
-  payment_account_company varchar(10) DEFAULT NULL,
-  payment_account_transfer varchar(10) DEFAULT NULL,
-  payment_account_num varchar(100) DEFAULT NULL,
-  payment_birth varchar(10) DEFAULT NULL COMMENT '개인: 생년월일',
-  payment_company_code varchar(20) DEFAULT NULL COMMENT '법인: 사업자등록번호',
+  payment_uid varchar(1000) NOT NULL, 
+  payment_name varchar(10) DEFAULT NULL, 
+  payment_transfer varchar(10) DEFAULT NULL, 
   payment_createAt date DEFAULT NULL,
-  PRIMARY KEY (payment_no),
-	KEY user_id (user_id), 
+  PRIMARY KEY (payment_no), 
 	KEY donation_no (donation_no), 
-  CONSTRAINT payment_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id) ON DELETE CASCADE,
-  CONSTRAINT payment_ibfk_2 FOREIGN KEY (donation_no) REFERENCES donation (donation_no) ON DELETE CASCADE
+  CONSTRAINT payment_ibfk_1 FOREIGN KEY (donation_no) REFERENCES donation (donation_no) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci; 
 

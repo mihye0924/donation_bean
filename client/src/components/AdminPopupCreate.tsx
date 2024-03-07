@@ -6,6 +6,7 @@ import Category from "@/api/main/Category.json"
 import useMutation from "@/hooks/useMutation"
 import axios from "axios"
 import PopupStore from "@/store/popupStore";  
+import { getUser } from "@/util/userinfo";
 
 const AdminPopupCreate = () => {
     const [donationName, setDonationName] = useState<string>("");
@@ -18,8 +19,8 @@ const AdminPopupCreate = () => {
     const [formData, setFormData] = useState<FormData>();
     const [donationStatus, setDonationStatus] = useState<string>("");    
     const [submitMutate, {data: donationData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/admin/donation`); 
-    const { popup, popupState } = PopupStore(); 
-    const user_id = "test1"
+    const { popup, popupState } = PopupStore();
+    const user = getUser();   
     const StatusList = useMemo(() => {
         return [
             {
@@ -45,14 +46,16 @@ const AdminPopupCreate = () => {
 
     // 게시물 등록록
     const handleSubmit = useCallback(() => { 
-        axios({
-            method:'post',
-            url:`${import.meta.env.VITE_SERVER_URL}/admin/upload`, 
-            headers: { 'Content-Type': 'multipart/form-data' },
-            data: formData
-        }) 
+        if(formData) {
+            axios({
+                method:'post',
+                url:`${import.meta.env.VITE_SERVER_URL}/admin/upload`, 
+                headers: { 'Content-Type': 'multipart/form-data' },
+                data: formData
+            }) 
+        }
         const data = {
-            user_id: user_id,
+            user_id: user.id,
             donation_name: donationName,
             donation_image: saveImage?.name,
             donation_content: donationContent,
@@ -63,7 +66,7 @@ const AdminPopupCreate = () => {
             donation_status: donationStatus === "진행중" ? 0 : 1
         }
         submitMutate(data)
-    },[donationCategory, donationCompany, donationContent, donationGoal, donationName, donationPeriod, donationStatus, formData, saveImage?.name, submitMutate])
+    },[donationCategory, donationCompany, donationContent, donationGoal, donationName, donationPeriod, donationStatus, formData, saveImage?.name, submitMutate, user.id])
      
 
     useEffect(() => {

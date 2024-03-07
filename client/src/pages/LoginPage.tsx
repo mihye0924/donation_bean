@@ -7,16 +7,28 @@ import { Cookies } from "react-cookie";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-
+import { RiKakaoTalkFill } from "react-icons/ri";
+import { SiNaver } from "react-icons/si";
 interface IFrom {
   id: string;
   pass: string;
 }
 
 const LoginPage = () => {
+  const onKakaoLoginClick = () => {
+    const REST_API_KEY = "b35378defa1b862c0f8fc59bf0292c25";
+    const REDIRECT_URI = "http://localhost:5173/kakao/oauth";
+    const link = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}`;
+    window.location.href = link;
+  };
+  const onNaverLoginClick = () => {
+    const CLIENT_ID = `QocupXFUwSvjcgU9M9pE`;
+    const CALLBACK_URL = `http://localhost:5173/naver/oauth`;
+    const link = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${CLIENT_ID}&state=test&redirect_uri=${CALLBACK_URL}`;
+    window.location.href = link;
+  };
   const [svgCheck, setSvgCheck] = useState(false);
   const [session, setSession] = useState(true);
-  console.log(session);
 
   const navigate = useNavigate();
   const onSVGClick = useCallback(() => {
@@ -102,8 +114,12 @@ const LoginPage = () => {
             <div></div>
           </SNSLine>
           <SNSBox>
-            <div />
-            <div />
+            <div onClick={onKakaoLoginClick}>
+              <RiKakaoTalkFill />
+            </div>
+            <div id="naver" onClick={onNaverLoginClick}>
+              <SiNaver />
+            </div>
           </SNSBox>
         </Center>
       </Wrapper>
@@ -123,26 +139,30 @@ const media = {
 };
 
 const HeaderPadding = styled.div`
-  padding-top: 200px;
-  padding-bottom: 50px;
-  margin: 0 auto;
-`;
-
-const Wrapper = styled.form`
-  padding: 50px 10px 40px 10px;
-  font-weight: bold;
-  border: none;
-  margin: 0 auto;
+  margin-top: 120px;
+  /* margin-bottom: 80px; */
+  background-color: #fbfbfb;
   @media ${media.tablet} {
-    border: 1px solid #ececec;
-    border-radius: 10px;
-    width: 640px;
-    box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
-    -webkit-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
-    -moz-box-shadow: 10px 10px 5px 0px rgba(0, 0, 0, 0.75);
+    margin-top: 80px;
+    padding: 120px 0;
   }
 `;
 
+const Wrapper = styled.form`
+  padding: 20px;
+  border: none;
+  margin: 0 auto;
+  background-color: #fff;
+  @media ${media.tablet} {
+    padding: 115px;
+    border-radius: 16px;
+    width: 700px;
+    box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.03);
+    -webkit-box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.03);
+    -moz-box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.03);
+    border: solid 1px #d9d9d9;
+  }
+`;
 const Center = styled.div`
   width: 100%;
   margin: 0 auto;
@@ -157,9 +177,10 @@ const Title = styled.h1`
     margin-bottom: 40px;
     font-weight: 600;
   }
+  font-family: "NanumSquareNeo-Variable";
   text-align: center;
-  font-size: 18px;
-  margin-bottom: 40px;
+  font-size: 20px;
+  margin-bottom: 20px;
   font-weight: bold;
 `;
 
@@ -169,9 +190,8 @@ const InputBox = styled.div`
 const Input = styled.input`
   width: 100%;
   border: none;
-  border-bottom: 1px solid black;
-  padding-top: 15px;
-  padding-bottom: 10px;
+  border-bottom: 1px solid #aeaeae;
+  padding: 15px;
   outline: none;
   &:focus {
     border-bottom: 1px solid #f56400;
@@ -228,9 +248,11 @@ const FindInfo = styled.ul`
   align-items: center;
   font-weight: 600;
   li {
+    color: #aeaeae;
     margin-left: 15px;
   }
   li:first-child {
+    margin-left: 0;
     display: flex;
     align-items: center;
     &::after {
@@ -275,5 +297,29 @@ const SNSBox = styled.div`
     background: lightgray;
     margin: 0 20px;
     border-radius: 100%;
+  }
+  div:first-child {
+    background: #fae100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    svg {
+      fill: #3c1e1e;
+      width: 25px;
+      height: 25px;
+    }
+  }
+  #naver {
+    background: #03c75a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    svg {
+      fill: white;
+      width: 20px;
+      height: 20px;
+    }
   }
 `;
