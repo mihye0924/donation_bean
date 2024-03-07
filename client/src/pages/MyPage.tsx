@@ -5,7 +5,7 @@ import { FaRegHeart } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { getUser } from "@/util/userinfo";
-import { Link, Outlet, useMatch, useNavigate } from "react-router-dom"; 
+import { Link, Outlet, useMatch, useNavigate } from "react-router-dom";
 
 interface Response {
   ok: boolean;
@@ -33,20 +33,22 @@ const MyPage = () => {
   const indexMatch = useMatch("/mypage");
   const infoMatch = useMatch("/mypage/info");
   const favMatch = useMatch("/mypage/fav");
-  const navigate = useNavigate();
-  // useEffect(() => {
-  //   if (!user) {
-  //     navigate("/login");
-  //   }
-  // }, [user, navigate]);
   return (
     <HeaderPadding>
       <Center>
         <SidBar>
           <UserNameBox>
-            <p>{data?.userinfo?.user_nick}님,</p>
+            <p>
+              {data?.userinfo?.user_nick ? data?.userinfo?.user_nick : user.id}
+              님,
+            </p>
             <p>반갑습니다</p>
-            <span>기부콩과 만난지 {data?.userinfo?.user_createAt}일째</span>
+            <span>
+              기부콩과 만난지
+              {data?.userinfo?.user_createAt &&
+                data?.userinfo?.user_createAt + 1}
+              일째
+            </span>
           </UserNameBox>
           <ul>
             <li>
@@ -106,21 +108,20 @@ const media = {
   mobile: `(max-width: ${sizes.mobile})`,
 };
 
-
-const HeaderPadding = styled.div` 
+const HeaderPadding = styled.div`
   padding: 120px 10px 50px 10px;
   max-width: 1200px;
   width: 100%;
-  margin: 0 auto; 
-  @media ${media.tablet} { 
+  margin: 0 auto;
+  @media ${media.tablet} {
     padding: 100px 10px 50px 10px;
   }
-  @media ${media.mobile} { 
+  @media ${media.mobile} {
     padding: 80px 10px 50px 10px;
   }
 `;
 
-const Center = styled.div` 
+const Center = styled.div`
   grid-template-columns: repeat(4, 1fr);
   display: grid;
   gap: 20px;
@@ -131,6 +132,16 @@ const Center = styled.div`
   }
 `;
 
+const Center = styled.div`
+  grid-template-columns: repeat(4, 1fr);
+  display: grid;
+  gap: 20px;
+  @media ${media.tablet} {
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+  }
+`;
 
 const SidBar = styled.div`
   width: 100%;
@@ -138,12 +149,14 @@ const SidBar = styled.div`
   li {
     padding: 16px 0px 16px 20px;
     border-bottom: 1px solid #ececec;
-    font-family: 'NanumSquareNeo-Variable';
+    font-family: "NanumSquareNeo-Variable";
     &:last-child {
-      border-bottom:0;
+      border-bottom: 0;
     }
-    @media ${media.mobile} { 
-      &:last-child { border-bottom:0; }
+    @media ${media.mobile} {
+      &:last-child {
+        border-bottom: 0;
+      }
     }
     span {
       font-weight: bolder;
@@ -154,8 +167,8 @@ const SidBar = styled.div`
   }
 `;
 
-const UserNameBox = styled.div` 
-  font-family: 'NanumSquareNeo-Variable';
+const UserNameBox = styled.div`
+  font-family: "NanumSquareNeo-Variable";
   background: #f56400;
   padding: 30px 15px 20px 15px;
   color: white;

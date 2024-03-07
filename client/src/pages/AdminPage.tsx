@@ -1,10 +1,10 @@
 import styled from "styled-components";
 import { BsClipboard2Heart } from "react-icons/bs";
-import { FaRegUser } from "react-icons/fa6"; 
+import { FaRegUser } from "react-icons/fa6";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { getUser } from "@/util/userinfo";
-import { Link, Outlet, useMatch, useNavigate } from "react-router-dom"; 
+import { Link, Outlet, useMatch, useNavigate } from "react-router-dom";
 
 interface Response {
   ok: boolean;
@@ -30,7 +30,7 @@ const AdminPage = () => {
   });
 
   const indexMatch = useMatch("/admin");
-  const infoMatch = useMatch("/admin/account"); 
+  const infoMatch = useMatch("/admin/account");
   const navigate = useNavigate();
   // useEffect(() => {
   //   if (!user) {
@@ -68,7 +68,7 @@ const AdminPage = () => {
                 </span>
                 <span>회원목록</span>
               </Link>
-            </li> 
+            </li>
           </ul>
         </SidBar>
         <Main>
@@ -93,20 +93,20 @@ const media = {
   mobile: `(max-width: ${sizes.mobile})`,
 };
 
-const HeaderPadding = styled.div` 
+const HeaderPadding = styled.div`
   padding: 120px 10px 50px 10px;
   max-width: 1200px;
   width: 100%;
-  margin: 0 auto; 
-  @media ${media.tablet} { 
+  margin: 0 auto;
+  @media ${media.tablet} {
     padding: 100px 10px 50px 10px;
   }
-  @media ${media.mobile} { 
+  @media ${media.mobile} {
     padding: 80px 10px 50px 10px;
   }
 `;
 
-const Center = styled.div` 
+const Center = styled.div`
   grid-template-columns: repeat(4, 1fr);
   display: grid;
   gap: 20px;
@@ -123,12 +123,14 @@ const SidBar = styled.div`
   li {
     padding: 16px 0px 16px 20px;
     border-bottom: 1px solid #ececec;
-    font-family: 'NanumSquareNeo-Variable';
+    font-family: "NanumSquareNeo-Variable";
     &:last-child {
-      border-bottom:0;
+      border-bottom: 0;
     }
-    @media ${media.mobile} { 
-      &:last-child { border-bottom:0; }
+    @media ${media.mobile} {
+      &:last-child {
+        border-bottom: 0;
+      }
     }
     span {
       font-weight: bolder;
@@ -138,8 +140,8 @@ const SidBar = styled.div`
     }
   }
 `;
-const UserNameBox = styled.div` 
-  font-family: 'NanumSquareNeo-Variable';
+const UserNameBox = styled.div`
+  font-family: "NanumSquareNeo-Variable";
   background: #f56400;
   padding: 30px 15px 20px 15px;
   color: white;

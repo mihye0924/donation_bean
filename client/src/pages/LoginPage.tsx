@@ -7,16 +7,28 @@ import { Cookies } from "react-cookie";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-
+import { RiKakaoTalkFill } from "react-icons/ri";
+import { SiNaver } from "react-icons/si";
 interface IFrom {
   id: string;
   pass: string;
 }
 
 const LoginPage = () => {
+  const onKakaoLoginClick = () => {
+    const REST_API_KEY = "b35378defa1b862c0f8fc59bf0292c25";
+    const REDIRECT_URI = "http://localhost:5173/kakao/oauth";
+    const link = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}`;
+    window.location.href = link;
+  };
+  const onNaverLoginClick = () => {
+    const CLIENT_ID = `QocupXFUwSvjcgU9M9pE`;
+    const CALLBACK_URL = `http://localhost:5173/naver/oauth`;
+    const link = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${CLIENT_ID}&state=test&redirect_uri=${CALLBACK_URL}`;
+    window.location.href = link;
+  };
   const [svgCheck, setSvgCheck] = useState(false);
   const [session, setSession] = useState(true);
-  console.log(session);
 
   const navigate = useNavigate();
   const onSVGClick = useCallback(() => {
@@ -102,8 +114,12 @@ const LoginPage = () => {
             <div></div>
           </SNSLine>
           <SNSBox>
-            <div />
-            <div />
+            <div onClick={onKakaoLoginClick}>
+              <RiKakaoTalkFill />
+            </div>
+            <div id="naver" onClick={onNaverLoginClick}>
+              <SiNaver />
+            </div>
           </SNSBox>
         </Center>
       </Wrapper>
@@ -123,23 +139,23 @@ const media = {
 };
 
 const HeaderPadding = styled.div`
-  margin-top: 120px; 
+  margin-top: 120px;
   margin-bottom: 80px;
   background-color: #fbfbfb;
   @media ${media.tablet} {
-    margin-top: 80px; 
+    margin-top: 80px;
     padding: 120px 0;
   }
 `;
 
-const Wrapper = styled.div`
-  padding: 20px; 
+const Wrapper = styled.form`
+  padding: 20px;
   border: none;
   margin: 0 auto;
   background-color: #fff;
-  @media ${media.tablet} { 
-    padding: 115px; 
-    border-radius: 16px; 
+  @media ${media.tablet} {
+    padding: 115px;
+    border-radius: 16px;
     width: 700px;
     box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.03);
     -webkit-box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.03);
@@ -161,7 +177,7 @@ const Title = styled.h1`
     margin-bottom: 40px;
     font-weight: 600;
   }
-  font-family: 'NanumSquareNeo-Variable';
+  font-family: "NanumSquareNeo-Variable";
   text-align: center;
   font-size: 20px;
   margin-bottom: 20px;
@@ -233,10 +249,10 @@ const FindInfo = styled.ul`
   font-weight: 600;
   li {
     color: #aeaeae;
-    margin-left: 15px; 
+    margin-left: 15px;
   }
   li:first-child {
-      margin-left: 0;
+    margin-left: 0;
     display: flex;
     align-items: center;
     &::after {
@@ -281,5 +297,29 @@ const SNSBox = styled.div`
     background: lightgray;
     margin: 0 20px;
     border-radius: 100%;
+  }
+  div:first-child {
+    background: #fae100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    svg {
+      fill: #3c1e1e;
+      width: 25px;
+      height: 25px;
+    }
+  }
+  #naver {
+    background: #03c75a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    svg {
+      fill: white;
+      width: 20px;
+      height: 20px;
+    }
   }
 `;
