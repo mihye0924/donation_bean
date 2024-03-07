@@ -1,20 +1,22 @@
- 
+import { getUser, removeUser } from "@/util/userinfo";
 import DonationStore from "@/store/donationStore";
-import { useCallback, useEffect,  useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import styled from "styled-components";  
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import styled from "styled-components";
 
 const Header = () => {
-  const router = useLocation() 
-  const path = router.pathname.split("/")[1]
+  const router = useLocation();
+  const path = router.pathname.split("/")[1];
   const [searchActive, setSearchActive] = useState(false);
   const [subHeaderActive, setSubHeaderActive] = useState("");
   const [subNavActive, setSubNavActive] = useState(0);
-  const [isSubNavBar, setIsSubNavActive] = useState(true)
+  const [isSubNavBar, setIsSubNavActive] = useState(true);
   const [navActvie, setNavActive] = useState(true);
-  const url = useRef<string[]>(["login","signin","admin","mypage"])  
-  const subNav = useRef<string[]>(["전체", "진행중", "종료"]); 
-  const { setChangeStatus } = DonationStore()
+  const navigate = useNavigate();
+  const user = getUser();
+  const url = useRef<string[]>(["login", "signin", "admin", "mypage"]);
+  const subNav = useRef<string[]>(["전체", "진행중", "종료"]);
+  const { setChangeStatus } = DonationStore();
 
   // 검색 버튼 토글
   const handleActiveSearch = useCallback(() => {
@@ -35,7 +37,7 @@ const Header = () => {
     if (window.innerWidth <= 375) {
       setSubHeaderActive("");
     }
-  },[])
+  }, []);
 
   // 화면 사이즈 변경시 검색기능 변경
   const handleResizeWindow = useCallback(() => {
@@ -44,27 +46,29 @@ const Header = () => {
     } else {
       setNavActive(true);
     }
-  },[])
+  }, []);
 
   // 전체, 진행중, 종료 서브네비
   const handleUrl = useCallback(() => {
-    if(url.current.includes(path)){
-      setIsSubNavActive(false)
-    }else{
-      setIsSubNavActive(true)  
+    if (url.current.includes(path)) {
+      setIsSubNavActive(false);
+    } else {
+      setIsSubNavActive(true);
     }
-  },[path, url])
+  }, [path, url]);
 
-  const handleChangeEvent1 = useCallback((index: number)=> {
-    setChangeStatus({
-      label: subNav.current[index],
-      value: String(index)
-    })
-  },[setChangeStatus])
- 
+  const handleChangeEvent1 = useCallback(
+    (index: number) => {
+      setChangeStatus({
+        label: subNav.current[index],
+        value: String(index),
+      });
+    },
+    [setChangeStatus]
+  );
 
-  useEffect(() => { 
-    handleUrl()
+  useEffect(() => {
+    handleUrl();
     document.addEventListener("scroll", () => handleScrollNav());
     window.addEventListener("resize", () => handleResizeWindow());
     return () => {
@@ -72,6 +76,14 @@ const Header = () => {
       window.removeEventListener("resize", () => handleResizeWindow());
     };
   }, [handleResizeWindow, handleScrollNav, handleUrl]);
+
+  /* 
+  }, [handleResizeWindow, handleScrollNav, handleUrl]); */
+  //로그아웃 클릭이벤트
+  const onLogOutClick = () => {
+    removeUser();
+    navigate("/login");
+  };
 
   return (
     <HeaderWrap>
@@ -85,7 +97,13 @@ const Header = () => {
           </div>
           <ul>
             <li>
-              <Link to="/login">로그인</Link>
+              {user?.id ? (
+                <Link to={"/login"} onClick={onLogOutClick}>
+                  로그아웃
+                </Link>
+              ) : (
+                <Link to="/login">로그인</Link>
+              )}
             </li>
             <li className={`${searchActive ? "active" : ""}`}>
               <input type="text" placeholder="검색어를 입력해주세요!" />
@@ -98,10 +116,9 @@ const Header = () => {
         </HeaderNav>
       </HeaderBorder>
       <HeaderBorder className={subHeaderActive}>
-        {
-          isSubNavBar && 
+        {isSubNavBar && (
           <>
-            { navActvie ? (
+            {navActvie ? (
               <HeaderSubNav>
                 <ul>
                   {subNav.current.map((item, index) => {
@@ -110,7 +127,11 @@ const Header = () => {
                         key={item}
                         className={subNavActive === index ? "active" : ""}
                       >
-                        <button onClick={() => {setSubNavActive(index), handleChangeEvent1(index)}}>
+                        <button
+                          onClick={() => {
+                            setSubNavActive(index), handleChangeEvent1(index);
+                          }}
+                        >
                           {item}
                         </button>
                       </li>
@@ -127,7 +148,7 @@ const Header = () => {
               </HeaderSubSearch>
             )}
           </>
-        }
+        )}
       </HeaderBorder>
     </HeaderWrap>
   );

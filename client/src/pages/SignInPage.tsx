@@ -30,54 +30,47 @@ const SignInPage = () => {
 
   const onIdExistClick = useCallback(() => {
     axios
-      .get(`${import.meta.env.VITE_SERVER_URL}/user/signin?id=${watch("user_id")}`)
+      .get(
+        `${import.meta.env.VITE_SERVER_URL}/user/signin?id=${watch("user_id")}`
+      )
       .then((res) => setQueryData(res.data));
   }, []);
 
-  useEffect(() => {
-    if (queryData && queryData.join) {
-      setIdExist(false);
-      return alert("사용 가능한 아이디입니다.");
-    }
-    if (queryData && !queryData.join) {
-      setIdExist(true);
-      return alert("이미 존재하는 아이디입니다.");
-    }
-  }, [queryData]);
-  console.log(queryData);
   const { register, handleSubmit, setValue, setFocus, reset, watch } =
     useForm<IFormData>();
 
+  const emailSort = useMemo(() => {
+    return [
+      {
+        value: "0",
+        label: "직접입력",
+      },
+      {
+        value: "1",
+        label: "gmail.com",
+      },
+      {
+        value: "2",
+        label: "naver.com",
+      },
+      {
+        value: "3",
+        label: "daum.net",
+      },
+      {
+        value: "4",
+        label: "nate.com",
+      },
+    ];
+  }, []);
 
-  const emailSort = useMemo(()=>{
-    return[
-      {
-        "value": "0",
-        "label": "직접입력"
-      },
-      {
-          "value": "1",
-          "label": "gmail.com"
-      },
-      {
-          "value": "2",
-          "label": "naver.com"
-      },
-      {
-          "value": "3",
-          "label": "daum.net"
-      },
-      {
-          "value": "4",
-          "label": "nate.com"
-      }
-    ]
-  },[])
-
-  const onSelectChange = useCallback((e: Option) => {
+  const onSelectChange = useCallback(
+    (e: Option) => {
       setValue("emailDomain", "");
       setCurrentSelect(e.label as string);
-    },[setValue]);
+    },
+    [setValue]
+  );
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -97,34 +90,47 @@ const SignInPage = () => {
     setIdExist(true);
   }, [watch("user_id")]);
 
-  const onValid = useCallback((data: IFormData) => {  if (idExist === true) {
-    return alert("중복 확인을 해주세요");
-  } else {
-    const {
-      user_id,
-      user_pw,
-      user_pw_check,
-      user_phone,
-      emailPrefix,
-      emailDomain,
-      user_name,
-    } = data;
+  const onValid = (data: IFormData) => {
+    if (!idExist) {
+      const {
+        user_id,
+        user_pw,
+        user_pw_check,
+        user_phone,
+        emailPrefix,
+        emailDomain,
+        user_name,
+      } = data;
 
-    if (user_pw !== user_pw_check) {
-      alert("비밀번호가 일치하지 않습니다.");
-      return setFocus("user_pw_check");
+      if (user_pw !== user_pw_check) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return setFocus("user_pw_check");
+      }
+
+      singInMutation({
+        user_id,
+        user_pw,
+        user_phone,
+        user_name,
+        user_email: emailPrefix + "@" + emailDomain,
+      });
+      reset();
+    } else if (idExist) {
+      alert("중복 확인을 해주세요");
     }
+  };
 
-    singInMutation({
-      user_id,
-      user_pw,
-      user_phone,
-      user_name,
-      user_email: emailPrefix + "@" + emailDomain,
-    });
-    reset();
-  }
-  }, []);
+  useEffect(() => {
+    if (queryData && queryData.join) {
+      setIdExist(false);
+
+      return alert("사용 가능한 아이디입니다.");
+    }
+    if (queryData && !queryData.join) {
+      setIdExist(true);
+      return alert("이미 존재하는 아이디입니다.");
+    }
+  }, [queryData]);
 
   return (
     <HeaderPadding>
@@ -144,10 +150,7 @@ const SignInPage = () => {
                   placeholder="아이디"
                   type="text"
                 />
-                <div
-                  style={{ background: "#fbfbfb" }}
-                  onClick={onIdExistClick}
-                >
+                <div style={{ background: "#fbfbfb" }} onClick={onIdExistClick}>
                   중복확인
                 </div>
               </DoubleCheck>
@@ -228,16 +231,50 @@ const SignInPage = () => {
                   placeholder="이메일 주소"
                 />
                 <span>@</span>
+                {currentSelect !== "직접입력" ? (
+                  <input
+                    {...register("emailDomain", { required: true })}
+                    type="text"
+                    value={currentSelect !== "직접입력" ? currentSelect : ""}
+                  />
+                ) : (
+                  <input
+                    {...register("emailDomain", { required: true })}
+                    type="text"
+                  />
+                )}
+
+                {/*  <select
+                  onChange={onSelectChange}
+                  value={currentSelect || ""}
+                  name="domain"
+                >
+                  <option key={""} value="">
+                    직접입력
+                  </option>
+                  <option key={"gmail.com"} value="gmail.com">
+                    gmail.com
+                  </option>
+                  <option key={"naver.com"} value="naver.com">
+                    naver.com
+                  </option>
+                  <option key={"daum.net"} value="daum.net">
+                    daum.net
+                  </option>
+                  <option key={"nate.com"} value="nate.com">
+                    nate.com
+                  </option>
+                </select>
                 <input
                   {...register("emailDomain", { required: true })}
                   type="text"
                   value={currentSelect === "" ? undefined : currentSelect}
-                /> 
-                <Select 
+                />  */}
+                <Select
                   selectOptions={emailSort}
                   value={emailSort[0]}
                   size={120}
-                  onChange={(e) => onSelectChange(e as Option)} 
+                  onChange={(e) => onSelectChange(e as Option)}
                 />
               </EmailCheck>
               <Constraint>- 이메일 주소를 입력해 주세요</Constraint>
@@ -267,24 +304,23 @@ const media = {
   mobile: `(min-width: ${sizes.mobile})`,
 };
 
-
 const HeaderPadding = styled.div`
   margin-top: 80px;
   padding: 0;
   background-color: #fbfbfb;
-  @media ${media.tablet} { 
-  padding: 120px 0;
+  @media ${media.tablet} {
+    padding: 120px 0;
   }
 `;
 
 const Wrapper = styled.div`
-  padding: 20px; 
+  padding: 20px;
   border: none;
   margin: 0 auto;
   background-color: #fff;
-  @media ${media.tablet} { 
-    padding: 115px; 
-    border-radius: 16px; 
+  @media ${media.tablet} {
+    padding: 115px;
+    border-radius: 16px;
     width: 700px;
     box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.03);
     -webkit-box-shadow: 0 10px 20px 0 rgba(0, 0, 0, 0.03);
@@ -295,7 +331,7 @@ const Wrapper = styled.div`
 
 const Center = styled.div`
   width: 100%;
-  margin: 0 auto; 
+  margin: 0 auto;
 `;
 const Title = styled.h1`
   @media ${media.tablet} {
@@ -307,14 +343,14 @@ const Title = styled.h1`
   font-size: 18px;
   margin-bottom: 20px;
   font-weight: bold;
-  font-family: 'NanumSquareNeo-Variable';
+  font-family: "NanumSquareNeo-Variable";
 `;
 
 const Form = styled.form`
   padding-top: 20px;
   border-top: 1px solid #aeaeae;
   @media ${media.tablet} {
-  padding-top: 30px;
+    padding-top: 30px;
   }
 `;
 
@@ -333,7 +369,7 @@ const Label = styled.div`
   font-weight: 900;
   margin-bottom: 10px;
   font-size: 14px;
-  font-family: 'NanumSquareNeo-Variable';
+  font-family: "NanumSquareNeo-Variable";
   @media ${media.tablet} {
     font-size: 16px;
   }
@@ -343,8 +379,8 @@ const DoubleCheck = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  input { 
-    outline: none; 
+  input {
+    outline: none;
     grid-column: span 2;
     width: 100%;
     padding: 15px 0;
@@ -352,7 +388,7 @@ const DoubleCheck = styled.div`
     border-bottom: 1px solid #aeaeae;
     border-radius: 0;
     font-size: 14px;
-    outline: none; 
+    outline: none;
     &:focus {
       border-bottom: 1px solid #f56400;
     }
@@ -364,7 +400,7 @@ const DoubleCheck = styled.div`
       font-size: 16px;
     }
   }
-  div { 
+  div {
     border: 1px solid #aeaeae;
     background: #fbfbfb;
     display: flex;
@@ -378,14 +414,14 @@ const DoubleCheck = styled.div`
 `;
 const PassCheck = styled.div`
   input {
-    outline: none;  
+    outline: none;
     width: 100%;
     padding: 15px 0;
     height: 44px;
     font-size: 14px;
     border-bottom: 1px solid #aeaeae;
     border-radius: 0;
-    outline: none; 
+    outline: none;
     &:focus {
       border-bottom: 1px solid #f56400;
     }
@@ -407,11 +443,11 @@ const PassCheck = styled.div`
   }
 `;
 
-const EmailCheck = styled.div` 
+const EmailCheck = styled.div`
   display: flex;
-  align-items: center; 
+  align-items: center;
   flex-wrap: wrap;
-  gap: 10px; 
+  gap: 10px;
   input {
     width: calc(50% - 18px);
     border: none;
@@ -427,30 +463,33 @@ const EmailCheck = styled.div`
       font-size: 14px;
       color: #aeaeae;
     }
-    @media ${media.tablet} {  
+    @media ${media.tablet} {
       width: 27%;
-    } 
+    }
+    @media ${media.tablet} {
+      width: 27%;
+    }
   }
-  .select { 
-    flex:1;
-    @media ${media.tablet} {  
-        flex:auto;
-    } 
-    &>div {
-      &>div {
+  .select {
+    flex: 1;
+    @media ${media.tablet} {
+      flex: auto;
+    }
+    & > div {
+      & > div {
         width: 100%;
       }
     }
-  }  
+  }
 `;
 
-const Constraint = styled.div` 
+const Constraint = styled.div`
   color: #aeaeae;
   font-size: 14px;
   text-align: start;
-  padding-top: 15px; 
+  padding-top: 15px;
   @media ${media.tablet} {
-      font-size: 16px;
+    font-size: 16px;
   }
 `;
 
