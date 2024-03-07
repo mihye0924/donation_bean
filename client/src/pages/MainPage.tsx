@@ -211,8 +211,7 @@ const MainPage = () => {
 
   // 퍼센트 구하기  
   const addData = useRef<number[]>([])
-  const paymentAllData = useCallback((index: number) => { 
-    console.log(index,"index")
+  const paymentAllData = useCallback((index: number) => {  
     const arr: number[] = []
     axios
     .get(`${import.meta.env.VITE_SERVER_URL}/payment/all?donation_no=${index}`) 
@@ -224,8 +223,7 @@ const MainPage = () => {
       addData.current[index] = arr.reduce((prev, curr) => {
         return prev + curr 
         },0)     
-      })
-      console.log(addData.current)
+      }) 
    return addData.current[index]
 },[addData])
 

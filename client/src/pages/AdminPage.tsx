@@ -10,8 +10,7 @@ import { Response } from "@/types/user";
  
 
 const AdminPage = () => {
-  const user = getUser();
-  console.log(user,"user")
+  const user = getUser(); 
   const { data } = useQuery<Response>({
     queryKey: ["user"],
     queryFn: () =>
@@ -23,11 +22,11 @@ const AdminPage = () => {
   const indexMatch = useMatch("/admin");
   const infoMatch = useMatch("/admin/account");
   const navigate = useNavigate();
-  useEffect(() => {
-    if (user.id !== "admin1234") {
+  useEffect(() => {  
+    if (data?.userinfo?.user_enum && data?.userinfo?.user_enum !== 1) {
       navigate("/login");
     }
-  }, [user, navigate]);
+  }, [user, navigate, data?.userinfo.user_id, data?.userinfo]);
   return (
     <HeaderPadding>
       <Center>

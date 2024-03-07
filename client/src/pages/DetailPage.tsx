@@ -10,7 +10,7 @@ import Progressbar from "@/components/Progressbar"
 import useMutation from "@/hooks/useMutation" 
 import axios from "axios"
 import { DetailDonationDataProps, DetailPaymentAllDataProps } from "@/types/detail"
-import { useLocation } from "react-router-dom"   
+import { useLocation, useNavigate } from "react-router-dom"   
 import { RequestPayResponse } from "@/types/payment"
 import { getUser } from "@/util/userinfo"
 import { useQuery } from "@tanstack/react-query"
@@ -30,6 +30,7 @@ const DetailPage = () =>  {
     const [paymentTotalData, setPaymentTotalData] = useState<number>() //결제 데이터 
     const [paymentResult, setPaymentResult] = useState<DetailPaymentAllDataProps>() //기부 결과 데이터
     const router = useLocation()
+    const navigate = useNavigate();
     const user = getUser(); 
     const path = Number(router.pathname.split("/")[2]); 
     const donation_no = path;
@@ -82,14 +83,14 @@ const DetailPage = () =>  {
             .get(`http://localhost:8081/user/me?id=${user?.id}`)
             .then((res) => res.data),
       }); 
-
+ 
     // info 데이터 셋팅
     const Info = useMemo(() => {
         return [ 
             {
                 id: 1,
                 title: "아이디",
-                data: user.id
+                data:  data?.userinfo?.user_id
             }, 
             {
                 id: 2,
@@ -97,7 +98,7 @@ const DetailPage = () =>  {
                 data: data?.userinfo?.user_nick
             }
         ]
-    },[data?.userinfo?.user_nick, user.id])
+    },[data?.userinfo?.user_id, data?.userinfo?.user_nick])
 
     // agree 데이터 셋팅
     const AgreeList = useMemo(() => {
@@ -173,6 +174,11 @@ const DetailPage = () =>  {
         const content = document.querySelector(`section > div:nth-child(${index + 1})`);  
         const location = (content as HTMLElement).offsetTop  
         if( index === 3 ) {  
+            if(data?.userinfo?.user_id === undefined){
+                alert("로그인이 필요합니다.")
+                navigate("/login")
+                return 
+            }
             if(!agreeList[0].checked){
                     return alert("이용 약관 동의를 선택해주세요.")
             }
@@ -185,7 +191,7 @@ const DetailPage = () =>  {
         setTimeout(() => {
             window.scrollTo({top:location, behavior:'smooth'}); 
         }, 100); 
-    },[agreeList, list]);
+    },[agreeList, data?.userinfo?.user_id, list, navigate]);
 
     // 이전
     const handlePrev = useCallback((index: number) => {    
@@ -221,20 +227,20 @@ const DetailPage = () =>  {
  
     // 후원하기
     const onValid = useCallback((index: number, res: RequestPayResponse) => {   
-        const data = { 
-            user_id: user.id, //유저 아이디
+        const queryData = { 
+            user_id: data?.userinfo?.user_id ? data?.userinfo?.user_id : "", //유저 아이디
             donation_no: donation_no, //기부 번호
             donation_support: support,
-            donation_current : res.paid_amount, // 후원금액 
+            donation_current : res.paid_amount ? res.paid_amount : 0, // 후원금액 
             payment_method : paymethod === 1 ? "카드" : "자동이체", // 카드, 자동이체
             payment_uid: res.merchant_uid, // 구매자고유번호 
-            payment_name: res.buyer_name, // 구매자명 
+            payment_name: res.buyer_name ? res.buyer_name : "", // 구매자명 
             payment_transfer: support === 2 && schedule === 0 ? "매월15일" : "매월25일", //은행 이체일 
         }   
-        submitMutate(data)  
-        setPaymentResult(data)  
+        submitMutate(queryData)  
+        setPaymentResult(queryData)  
         handleNext(index)
-    },[donation_no, handleNext, paymethod, schedule, submitMutate, support, user.id])
+    },[data?.userinfo?.user_id, donation_no, handleNext, paymethod, schedule, submitMutate, support])
        
     // 결제 연결하기
     const payment = useCallback((index: number) => {   
@@ -408,7 +414,8 @@ const DetailPage = () =>  {
                                         </>  
                                     case 2:
                                         return<>
-                                        {
+                                         {
+                                            data?.userinfo?.user_id !== undefined ? 
                                             Info.map((item) => {
                                                 return(
                                                 <Title bottomBorder title={item.title} key={item.id}>
@@ -416,6 +423,10 @@ const DetailPage = () =>  {
                                                 </Title> 
                                                 )
                                             })
+                                            :
+                                            <NotContent onClick={() => navigate('/login')}>
+                                                로그인이 필요한 서비스입니다.
+                                            </NotContent>
                                         } 
                                             <TermsWrap>
                                                 <CheckBox  
@@ -779,7 +790,19 @@ const InputBox = styled.div<{flexdirection?: string; alignitem?: string}>`
             font-size:12px;
         }
     }
-`   
+`  
+
+const NotContent = styled.button`
+    cursor: pointer;
+    width: 100%;
+    height: 200px;
+    border-radius: 10px;
+    font-size: 18px;
+    letter-spacing: 0px;
+    font-weight: 900; 
+    color: #fff;
+    background-color: #f56400; 
+`
 
 // 후원분야
 const Percent = styled.div` 

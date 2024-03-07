@@ -14,15 +14,14 @@ export interface DetailDonationDataProps {
   htmlId: string;
   percentage?: number;
 }
-export interface DetailPaymentAllDataProps {
-    reduce(arg0: (prev: any, curr: any) => any, arg1: number): unknown;  
+export interface DetailPaymentAllDataProps { 
     user_id: string;
     donation_no: number;
     donation_support: number;
-    donation_current: number | undefined;
+    donation_current: number;
     payment_method: string;
     payment_uid: string;
-    payment_name: string | undefined;
+    payment_name: string;
     payment_transfer: string;
     payment_createAt?: Date;
 }

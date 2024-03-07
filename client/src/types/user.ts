@@ -22,6 +22,7 @@ export interface Response {
       user_email: string;
       user_nick: string;
       user_phone: string;
+      user_enum: number
       user_createAt: number;
     };
   }
