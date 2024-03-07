@@ -9,10 +9,10 @@ export async function insertPayment(user_id, donation_no, donation_support, dona
 }
 
 export async function getDonation(donation_no, user_id) {
-    const sql = `select * from donation where donation_no = ? and user_id = ?`;
+    const sql = `select * from donation where donation_no = ?`;
   
     return db
-    .execute(sql, [user_id, donation_no])
+    .execute(sql, [donation_no])
     .then((row) => row[0][0]);
 }
 export async function getUser(user_id) {

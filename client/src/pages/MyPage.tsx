@@ -6,20 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { getUser } from "@/util/userinfo";
 import { Link, Outlet, useMatch, useNavigate } from "react-router-dom";
+import { Response } from "@/types/user";
 
-interface Response {
-  ok: boolean;
-  userinfo: {
-    user_name: string;
-    user_avatar: string | null;
-    user_id: string;
-    user_email: string;
-    user_nick: string;
-    user_phone: string;
-    user_createAt: number;
-  };
-}
-
+ 
 const MyPage = () => {
   const user = getUser();
   const { data } = useQuery<Response>({

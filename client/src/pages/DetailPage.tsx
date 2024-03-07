@@ -9,10 +9,12 @@ import AgreeTerms from "@/api/detail/AgreeTerms.json"
 import Progressbar from "@/components/Progressbar" 
 import useMutation from "@/hooks/useMutation" 
 import axios from "axios"
-import { DetailDonationDataProps, DetailPaymentAllDataProps, DetailUserDataProps } from "@/types/detail"
+import { DetailDonationDataProps, DetailPaymentAllDataProps } from "@/types/detail"
 import { useLocation } from "react-router-dom"   
 import { RequestPayResponse } from "@/types/payment"
 import { getUser } from "@/util/userinfo"
+import { useQuery } from "@tanstack/react-query"
+import { Response } from "@/types/user"
 
 const DetailPage = () =>  {   
     const [support, setSupport] = useState<number>(1);  //후원방식
@@ -25,11 +27,10 @@ const DetailPage = () =>  {
     const [allAgree, setAllAgree] = useState<boolean>(false)  //전체 동의
     const [agreeList, setAgreeList] = useState<CheckboxProps[]>([]) // 동의버튼
     const [donationQueryData, setDonationQueryData] = useState<DetailDonationDataProps>() //기부데이터
-    const [paymentTotalData, setPaymentTotalData] = useState<number>() //결제 데이터
-    const [userQueryData, setUserQueryData] = useState<DetailUserDataProps>() //사용자 데이터
+    const [paymentTotalData, setPaymentTotalData] = useState<number>() //결제 데이터 
     const [paymentResult, setPaymentResult] = useState<DetailPaymentAllDataProps>() //기부 결과 데이터
     const router = useLocation()
-    const user = getUser();
+    const user = getUser(); 
     const path = Number(router.pathname.split("/")[2]); 
     const donation_no = path;
 
@@ -74,22 +75,29 @@ const DetailPage = () =>  {
             }
         ] 
     }, []) 
+    const { data } = useQuery<Response>({
+        queryKey: ["user"],
+        queryFn: () =>
+          axios
+            .get(`http://localhost:8081/user/me?id=${user?.id}`)
+            .then((res) => res.data),
+      }); 
 
     // info 데이터 셋팅
     const Info = useMemo(() => {
         return [ 
             {
                 id: 1,
-                title: "이름",
-                data: userQueryData?.user_name
+                title: "아이디",
+                data: user.id
             }, 
             {
                 id: 2,
-                title: "이메일",
-                data: userQueryData?.user_email
+                title: "이름",
+                data: data?.userinfo?.user_nick
             }
         ]
-    },[userQueryData?.user_email, userQueryData?.user_name])
+    },[data?.userinfo?.user_nick, user.id])
 
     // agree 데이터 셋팅
     const AgreeList = useMemo(() => {
@@ -114,23 +122,14 @@ const DetailPage = () =>  {
             }
         ] 
     },[])  
- 
-    
-    // 사용자 데이터 가져오기
-    const userData = useCallback(() => {
-        axios
-        .get(`${import.meta.env.VITE_SERVER_URL}/payment/user?user_id=${user.id}`) 
-        .then((res) => {
-            setUserQueryData(res.data.result) 
-        });
-    },[user.id])
+  
 
     // 기부 데이터 가져오기
     const donationData = useCallback(() => {
         axios
-        .get(`${import.meta.env.VITE_SERVER_URL}/payment/donation?user_id=${user.id}&donation_no=${donation_no}`) 
+        .get(`${import.meta.env.VITE_SERVER_URL}/payment/donation?donation_no=${donation_no}`) 
         .then((res) => setDonationQueryData(res.data.result));
-    },[donation_no, user.id])
+    },[donation_no])
 
     // 전체 결제 데이터 가져오기
     const [submitMutate, {data: paymentData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/payment`);
@@ -244,15 +243,15 @@ const DetailPage = () =>  {
             alert('결제 금액을 확인해주세요')
             return
         }
-        const data = {
+        const queryData = {
             pg: 'html5_inicis.INIBillTst',// PG사
             pay_method: paymethod === 1 ? "card" : "trans",// 결제수단 card, trans
             merchant_uid: `mid_${new Date().getTime()}`,// 주문번호
             amount: priceNumber,// 결제금액
             name: '기부콩 결제',// 주문명
-            buyer_name: userQueryData?.user_name,// 구매자 이름
-            buyer_tel: Number(userQueryData?.user_phone),// 구매자 전화번호
-            buyer_email: userQueryData?.user_email,// 구매자 이메일 
+            buyer_name: data?.userinfo?.user_nick,// 구매자 이름
+            buyer_tel: Number(data?.userinfo?.user_phone ? data?.userinfo?.user_phone : 0),// 구매자 전화번호
+            buyer_email: data?.userinfo?.user_email ? data?.userinfo?.user_email : "" ,// 구매자 이메일 
             receipt_url: "https://www.my-service.com/payments/complete/mobile", 
           };
           const callback = (res: RequestPayResponse) => {
@@ -263,8 +262,8 @@ const DetailPage = () =>  {
               alert(`결제 실패: ${error_msg}`)
             }
           }
-          window.IMP?.request_pay(data, callback) 
-    },[onValid, paymethod, priceNumber, userQueryData?.user_email, userQueryData?.user_name, userQueryData?.user_phone])
+          window.IMP?.request_pay(queryData, callback) 
+    },[data, onValid, paymethod, priceNumber])
  
      
     useEffect(() => { 
@@ -278,10 +277,9 @@ const DetailPage = () =>  {
         setList(StepList)
         setAgreeList(AgreeList)
         executeOnSecondMonday()  
-        donationData()  
-        userData()
+        donationData()   
         paymentAllData()
-    },[AgreeList, StepList, allAgree, donationData, donationQueryData?.donation_period, paymentAllData, userData])
+    },[AgreeList, StepList, allAgree, donationData, paymentAllData])
       
     return(
         <Article>
@@ -516,7 +514,7 @@ const DetailPage = () =>  {
                                         return<>
                                         <ImgBox>
                                             <img src="/images/donation-complete.png" alt="후원완료"/>
-                                            <p>{userQueryData?.user_name} 님, 후원신청이 완료되었습니다.</p>
+                                            <p>{data?.userinfo?.user_nick} 님, 후원신청이 완료되었습니다.</p>
                                             <p>감사합니다.</p>
                                         </ImgBox>
                                         <Table>

@@ -6,19 +6,8 @@ import axios from "axios";
 import { getUser } from "@/util/userinfo";
 import { Link, Outlet, useMatch, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-
-interface Response {
-  ok: boolean;
-  userinfo: {
-    user_name: string;
-    user_avatar: string | null;
-    user_id: string;
-    user_email: string;
-    user_nick: string;
-    user_phone: string;
-    user_createAt: number;
-  };
-}
+import { Response } from "@/types/user";
+ 
 
 const AdminPage = () => {
   const user = getUser();
@@ -34,9 +23,9 @@ const AdminPage = () => {
   const infoMatch = useMatch("/admin/account");
   const navigate = useNavigate();
   useEffect(() => {
-    // if (user.id !== "admin") {
-    //   navigate("/login");
-    // }
+    if (user.id !== "admin1234") {
+      navigate("/login");
+    }
   }, [user, navigate]);
   return (
     <HeaderPadding>

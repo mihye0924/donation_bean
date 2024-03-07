@@ -7,19 +7,8 @@ import LoadingSpinner from "./LoadingSpinner";
 import { useForm } from "react-hook-form";
 import useMutation from "@/hooks/useMutation";
 import { useNavigate } from "react-router-dom";
-import Select, { Option } from "./Select";
-interface Response {
-  ok: boolean;
-  userinfo: {
-    user_name: string;
-    user_avatar: string | null;
-    user_id: string;
-    user_email: string;
-    user_nick: string;
-    user_phone: string;
-    user_createAt: number;
-  };
-}
+import Select, { Option } from "./Select"; 
+import { Response } from "@/types/user";
 interface IFormData {
   user_avatar?: FileList;
   user_id: string;
@@ -31,8 +20,7 @@ interface IFormData {
   user_name: string;
   user_nick: string;
 }
-const MyPageInfo = () => {
-  const [currentSelect, setCurrentSelect] = useState("");
+const MyPageInfo = () => { 
   const user = getUser();
   const navigate = useNavigate();
   const [currentSelect, setCurrentSelect] = useState("init");
