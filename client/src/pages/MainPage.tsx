@@ -12,6 +12,7 @@ import { CategoryTypes, DetailDonationDataProps  } from "@/types/detail"
 import CardList from "@/components/CardLise";
 import Button from "@/components/Button";
 import Category from '@/api/main/Category.json';   
+import Sort1 from "@/api/main/Sort1.json"     
 import Sort2 from "@/api/main/Sort2.json"     
 import DonationStore from "@/store/donationStore";
 
@@ -110,7 +111,7 @@ const MainPage = () =>  {
 
     // 셀렉트 선택시 리스트 변경 - 전체, 진행중, 종료
     const handleChangeEvent1 = useCallback(() => {  
-        console.log(status,"ddd")
+      setSelect1(status) 
       switch (select1.label) {
           case "전체":    
             console.log("전체")
@@ -188,7 +189,6 @@ const MainPage = () =>  {
     }   
 
     useEffect(() => {
-        setSelect1(status)
         axios
         .get(`http://localhost:8081/main/donation`) 
         .then((res) => {  

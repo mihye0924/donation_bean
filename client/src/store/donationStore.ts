@@ -55,8 +55,8 @@ const DonationStore = create<DonationBaseStore>()(
             }
         ], 
         status: {
-            label: "",
-            value: ""
+            label: "전체",
+            value: "0"
         },
         category: {
             label : "",
