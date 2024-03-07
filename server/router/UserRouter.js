@@ -5,6 +5,7 @@ import {
   getId,
   getUserInfo,
   insertUser,
+  kakaologin,
   login,
   updateUser,
 } from "../controller/UserController.js";
@@ -17,7 +18,7 @@ router.post(`/login`, login);
 router.get(`/me`, getUserInfo);
 router.post(`/edit`, updateUser);
 router.get("/fav", getFevList);
-
+router.post("/kakaologin", kakaologin);
 const upload = multer({
   storage: multer.diskStorage({
     destination: function (req, file, cb) {

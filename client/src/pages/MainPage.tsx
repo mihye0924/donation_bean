@@ -1,136 +1,116 @@
-import CardList from "@/components/CardLise"
+// import CardList from "@/components/CardLise"
 import Radio from "@/components/Radio"
 import Select from "@/components/Select"
-import { useEffect, useRef, useState } from "react"
+import { Key, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import styled from "styled-components"
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation } from 'swiper/modules';
 import 'swiper/css';
+import axios from "axios"
+import { DetailDonationDataProps  } from "@/types/detail"
+import CardList from "@/components/CardLise";
 // Radio
 const RadioList = [
     {   
-        label: '전체1',
+        label: '전체',
         id: 'option1',
         value: 'option1',
-        imgUrl: 'img'
+        imgUrl: 'been'
     },
     {
-        label: '전체1',
+        label: '다문화',
         id: 'option2',
         value: 'option2',
-        imgUrl: 'img'
+        imgUrl: 'multiculturalism'
     },
     {
-        label: '전체1',
+        label: '동물',
         id: 'option3',
         value: 'option3',
-        imgUrl: 'img'
+        imgUrl: 'animal'
     },
     {
-        label: '전체1',
+        label: '아동*청소년',
         id: 'option4',
         value: 'option4',
-        imgUrl: 'img'
+        imgUrl: 'kids'
     },
     {
-        label: '전체1',
+        label: '시민사회',
         id: 'option5',
         value: 'option5',
-        imgUrl: 'img'
-    }
-]
-// Card
-const CardItemList = [
-    {
-        id: 0,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day:1231,
-        price:2313,
-        percentage: 50
+        imgUrl: 'civilsociety'
+    },
+    {   
+        label: '장애인',
+        id: 'option6',
+        value: 'option6',
+        imgUrl: 'disabledperson'
     },
     {
-        id: 1,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day:1231,
-        price:2313,
-        percentage: 50
+        label: '어르신',
+        id: 'option7',
+        value: 'option7',
+        imgUrl: 'elders'
     },
     {
-        id: 2,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day:1231,
-        price:2313,
-        percentage: 50
+        label: '가족*여성',
+        id: 'option8',
+        value: 'option8',
+        imgUrl: 'woman'
     },
     {
-        id: 3,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day:1231,
-        price:2313,
-        percentage: 50
+        label: '기타',
+        id: 'option9',
+        value: 'option9',
+        imgUrl: 'etc'
     },
     {
-        id: 4,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day:1231,
-        price:2313,
-        percentage: 50
+        label: '환경',
+        id: 'option10',
+        value: 'option10',
+        imgUrl: 'environment'
     },
     {
-        id: 5,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day:1231,
-        price:2313,
-        percentage: 50
-    },
-    {
-        id: 6,
-        to:"/",
-        imgSrc:"./", 
-        imgUrl:"./" ,
-        title:"sdadasdasd\nasdsa",
-        agency:"sadsads",
-        day:1231,
-        price:2313,
-        percentage: 50
+        label: '지구촌',
+        id: 'option11',
+        value: 'option11',
+        imgUrl: 'earth'
     }
 ]
 // Select
 const selectOptions = [
     {
-        value: "123",
-        label: "123"
+        value: "전체",
+        label: "전체"
     },
     {
-        value: "12",
-        label: "13"
+        value: "진행중",
+        label: "진행중"
+    },
+    {
+        value: "종료",
+        label: "종료"
     }
 ]
-
+const selectOptions2 = [
+    {
+        value: "최신 순",
+        label: "최신 순"
+    },
+    {
+        value: "참여금액 순",
+        label: "참여금액 순"
+    },
+    {
+        value: "참여율 순",
+        label: "참여율 순"
+    },
+    {
+        value: "종료 임박 순",
+        label: "종료 임박 순"
+    }
+]
 // Slide
 const SlideList = [
     {
@@ -148,33 +128,102 @@ const SlideList = [
     {
         id: 3,
         img: '/images/slideBanner4.png'
+    },
+    {
+        id: 4,
+        img: '/images/slideBanner1.png'
+    },
+    {
+        id: 5,
+        img: '/images/slideBanner2.png'
+    },
+    {
+        id: 6,
+        img: '/images/slideBanner3.png'
+    },
+    {
+        id: 7,
+        img: '/images/slideBanner4.png'
+    },
+    {
+        id: 8,
+        img: '/images/slideBanner1.png'
+    },
+    {
+        id: 9,
+        img: '/images/slideBanner2.png'
+    },
+    {
+        id: 10,
+        img: '/images/slideBanner3.png'
+    },
+    {
+        id: 11,
+        img: '/images/slideBanner4.png'
     }
 ]
 const MainPage = () =>  {
     // Radio Index
-    const [radioActive, setRadioActive] = useState<number>();
+    const [radioActive, setRadioActive] = useState<number>(0);
     // Swiper slide Index
     const [swiperIndex, setSwiperIndex] = useState<number>(1); 
     // Swiper slide progress
     const progressProgress = useRef<any>(null);
     const onAutoplayTimeLeft = (s:any, time:any, progress:any) => {
-        progressProgress.current.style.setProperty('--progress', 1 - progress);
+        progressProgress.current.style.setProperty('--progress', progress);
     };
-    // slide 정지 기능
+    // slide Pause
     const [swiperPause, setSwiperPause] = useState<any>(); 
     const [pauseNum, setPauseNum] = useState<number>(0); 
+    const [swiperButton, setSwiperButton] = useState("icon-pause")
+    const user_id = "test1"
     const handleSlidePause = () => {
         if(pauseNum === 0) {
             setPauseNum(1)
+            setSwiperButton("icon-start")
             swiperPause.autoplay.stop();
         } else {
             setPauseNum(0)
+            setSwiperButton("icon-pause")
             swiperPause.autoplay.start();
         }
     }
+    // donations data
+    const [donationQueryData, setDonationQueryData] = useState<any>([])
+    interface DetailDonationDataProps {
+        donation_category: any; donation_no: Key | null | undefined; donation_name: string; donation_image: string; donation_company: string; donation_period: string | number; donation_goal: number; donation_status: number; 
+}
+    useEffect(() => {
+        axios
+        .get(`http://localhost:8081/main/donation?user_id=${user_id}`) 
+        .then((res) => {
+            res.data.result.forEach((item: DetailDonationDataProps, index:number) => {
+                // 날짜 구하기
+                const targetData = new Date(String(res.data.result[index].donation_period.split("~ ")[1]))
+                const currentDate = new Date();
+                const timeDiff = targetData.getTime() - currentDate.getTime();
+                const daysRemaining = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+                item.donation_period = daysRemaining;
+                setDonationQueryData(res.data.result)
+            })
+        })
+    }, [])
+        // 라디오 카테고리 구분
+        const [donationData, setDonationData] = useState<any>(donationQueryData)  
+        const handleRadioChange = useCallback((e:any, i:number) => {
+            // 라디오 active 
+            setRadioActive(i)
+            donationQueryData.forEach((item: any) => {
+                if(item.donation_category === e.label) {
+                    const newData = donationQueryData.filter((item: { donation_category: any; }) => item.donation_category === e.label)
+                    setDonationData(newData)
+                } else if (e.label === "전체") {
+                    setDonationData(donationQueryData)
+                }
+            })
+        }, [donationQueryData])
     return(
         <MainInner>
-            {/* 슬라이드 확정시 변경 */}{swiperIndex}
             <SwiperWrap>
                 <Swiper
                     spaceBetween={30}
@@ -193,22 +242,29 @@ const MainPage = () =>  {
                         {
                             SlideList.map((item) => {
                                 return (
-                                    <SwiperSlide key={item.id}><img src={item.img} alt="배너" />${swiperIndex}</SwiperSlide>
+                                    <SwiperSlide key={item.id}><img src={item.img} alt="배너" />{String(swiperIndex).padStart(2, "0")}</SwiperSlide>
                                 )
                             })
                         }  
                     <div className="autoplay-progress" slot="container-end">
-                        <span>{swiperIndex}</span>
-                        <div ref={progressProgress} />
-                        <span>{SlideList.length}</span>
-                        <button onClick={handleSlidePause}>정지</button>
+                        <span className="autoplay-progress-num left">{String(swiperIndex).padStart(2, "0")}</span>
+                        <div className="autoplay-progress-bar">
+                            <div ref={progressProgress} />
+                        </div>
+                        <span className="autoplay-progress-num right">{String(SlideList.length).padStart(2, "0")}</span>
+                        <button onClick={handleSlidePause}><i className={swiperButton}/></button>
                     </div>
                 </Swiper>
             </SwiperWrap>
             <SelectWrap>
                 <Select 
                     selectOptions={selectOptions}
-                    size={300}
+                    size={120}
+                    onChange={(e) => console.log(e)}
+                />
+                <Select 
+                    selectOptions={selectOptions2}
+                    size={120}
                     onChange={(e) => console.log(e)}
                 />
             </SelectWrap>
@@ -226,7 +282,7 @@ const MainPage = () =>  {
                                     imgUrl={item.imgUrl}  
                                     type="image"
                                     name="기부리스트" 
-                                    onChange={() => setRadioActive(index)}
+                                    onChange={() => handleRadioChange(item, index)}
                                 />
                             )
                         })
@@ -234,22 +290,21 @@ const MainPage = () =>  {
                 </form>
             </RadioWrap>
             <CardWrap>
+
                 {
-                    CardItemList.map((item) => {
-                        return (
-                            <CardList 
-                                key={item.id}
-                                to={item.to}
-                                imgSrc={item.imgSrc} 
-                                imgUrl={item.imgUrl} 
-                                title={item.title}
-                                agency={item.agency}
-                                day={item.day}
-                                price={item.price}
-                                percentage={item.percentage}
-                            />
-                        )
-                    })
+                    donationData.map((item: DetailDonationDataProps) => (
+                        <CardList
+                            key={item.donation_no}
+                            to={`/detail/${item.donation_no}`}
+                            imgSrc={item.donation_name} 
+                            imgUrl={item.donation_image} 
+                            title={item.donation_name}
+                            agency={item.donation_company}
+                            day={item.donation_period}
+                            price={item.donation_goal}
+                            percentage={item.donation_status}
+                        />
+                    ))
                 }
             </CardWrap>
         </MainInner>
@@ -272,6 +327,9 @@ const MainInner = styled.div`
     width: 100%;
     margin: 0 auto;
     padding-top: 147px;
+    @media ${media.mobile}{
+        padding-top: 112px;
+    }
 `
 const SwiperWrap = styled.div`
     height: 500px;
@@ -284,63 +342,108 @@ const SwiperWrap = styled.div`
                 height: 100%;
             }
         }
-        @media ${media.tablet}{  
-            .swiper-slide {
-                height: 307px;
-                img {
-                    width: 100%;
-                    height: 100%;
-                }
-            }
-        }
-        @media ${media.mobile}{  
-            .swiper-slide {
-                height: 150px;
-                img {
-                    width: 100%;
-                    height: 100%;
-                }
-            }
-        }
         .autoplay-progress {
             position: absolute;
-            right: 16px;
-            bottom: 16px;
+            left: 110px;
+            bottom: 50px;
+            width: 70px;
             z-index: 10;
-            width: 48px;
-            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: var(--swiper-theme-color);
+            color: #f56400;
+            &-num {
+                font: {
+                    size: 20px;
+                }
+                &.left {
+                    position: absolute;
+                    left: -22px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                }
+                &.right {
+                    position: absolute;
+                    right: -22px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                }
+            }
+            &-bar{
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 70px;
+                height:2px;
+                background-color: #ddd;
+                div {
+                    --progress: 0;
+                    z-index: 10;
+                    width: calc(100% * (1 - var(--progress)));
+                    height: 2px;
+                    background-color: #f56400;
+                  }
+            }
+            button {
+                position: absolute;
+                right: -50px;
+                width: 20px;
+                height: 20px;
+                i{
+                    display: inline-block;
+                    width: 100%;
+                    height: 100%;
+                }
+                .icon {
+                    &-pause {
+                        background: url('/images/icon-pause.svg') no-repeat center/ contain;
+                    }
+                    &-start {
+                        background: url('/images/icon-start.svg') no-repeat center/ contain;
+                    }
+                }
+            }
           }
-          
-          .autoplay-progress div {
-            --progress: 0;
-            position: absolute;
-            left: 0;
-            top: 0px;
-            z-index: 10;
-            width: calc(100% * (1 - var(--progress)));
-            height: 2px;
-            background-color: var(--swiper-theme-color);
+        }
+        @media ${media.tablet}{  
+          height: 307px;
+          .swiper-slide {
+              height: 307px;
+              img {
+                  width: 100%;
+                  height: 100%;
+              }
           }
-    }
+      }
+      @media ${media.mobile}{  
+          height: 150px;
+          .swiper-slide {
+              height: 150px;
+              img {
+                  width: 100%;
+                  height: 100%;
+              }
+          }
+      }
 `
 const SelectWrap = styled.div`
-
+    margin-top: 20px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
 `
 
 const RadioWrap = styled.div`
-    margin: 60px auto 20px;
-    radio.active {
-        border-color: blue;
-    }
-    form {
-        display: flex;
-        gap: 8px;
-    }
+    margin: 20px auto 20px;
+    overflow: scroll;
+        &::-webkit-scrollbar {
+            display: none;
+        }
+        form {
+                display: flex;
+                gap: 8px;
+        }
 `
 
 const CardWrap = styled.ul`
@@ -348,6 +451,16 @@ const CardWrap = styled.ul`
     flex-wrap: wrap;
     gap: 20px;
     li {
-        flex: 0 1 calc((100% / 4) - 20px)
+        flex: 0 1 calc((100% / 4) - 15px);
+    }
+    @media ${media.tablet}{
+        li {
+            flex: 0 1 calc((100% / 2) - 10px);
+        }
+    }
+    @media ${media.mobile}{
+        li {
+            flex: 0 1 100%;
+        }
     }
 `

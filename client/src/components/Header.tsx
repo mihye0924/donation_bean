@@ -1,5 +1,6 @@
+import { getUser, removeUser } from "@/util/userinfo";
 import { useCallback, useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
 const Header = () => {
@@ -8,6 +9,8 @@ const Header = () => {
   const [subNav, setSubNav] = useState<string[]>([]);
   const [subNavActive, setSubNavActive] = useState(0);
   const [navActvie, setNavActive] = useState(true);
+  const navigate = useNavigate();
+  const user = getUser();
 
   // 검색 버튼 토글
   const handleActiveSearch = useCallback(() => {
@@ -47,6 +50,16 @@ const Header = () => {
       window.removeEventListener("resize", () => handleResizeWindow());
     };
   }, []);
+  //로그아웃 클릭이벤트
+  const onLogOutClick = () => {
+    removeUser();
+    navigate("/login");
+  };
+  useEffect(() => {
+    if (user && user.id) {
+      console.log(user.id);
+    }
+  }, [user]);
 
   return (
     <HeaderWrap>
@@ -60,7 +73,13 @@ const Header = () => {
           </div>
           <ul>
             <li>
-              <Link to="/login">로그인</Link>
+              {user?.id ? (
+                <Link to={"/login"} onClick={onLogOutClick}>
+                  로그아웃
+                </Link>
+              ) : (
+                <Link to="/login">로그인</Link>
+              )}
             </li>
             <li className={`${searchActive ? "active" : ""}`}>
               <input type="text" placeholder="검색어를 입력해주세요!" />

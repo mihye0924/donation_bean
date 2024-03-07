@@ -27,8 +27,8 @@ const Radio = (props: RadioProps) => {
                       value={props.value}
                       onChange={props.onChange}
                   />
-                  <i className={props.imgUrl} />
-                  {props.label}
+                  <i className={`icon-${props.imgUrl}`} />
+                  <span>{props.label}</span>
               </RadioItem>
               )
               case "round": 
@@ -68,9 +68,95 @@ mobile: `(max-width: ${sizes.mobile})`,
 const RadioItem = styled.label`
     border: 1px solid #ddd;
     border-radius: 20px;
-    padding: 8px 6px;
+    height: 42px;
+    padding: 0 10px;
+    white-space: nowrap;
+    @media ${media.tablet} {
+      height: 38px;
+      padding: 0 15px;
+    }
+    i {
+      display: inline-block;
+      vertical-align:middle;
+      width: 27px;
+      height: 100%;
+      margin-right: 4px;
+      &::before {
+        content: "";
+        display:inline-block;
+        width:100%;
+        height: 100%;
+        vertical-align: middle;
+        background-repeat: no-repeat;
+        background-size: 100%;
+      }
+      &.icon-been {
+        &::before {
+          background: url('/images/icon-been.svg') no-repeat center/contain;
+        }
+      }
+      &.icon-multiculturalism {
+        &::before {
+          background: url('/images/icon-multiculturalism.svg') no-repeat center/contain;
+        }
+      }
+      &.icon-animal {
+        &::before {
+          background: url('/images/icon-animal.svg') no-repeat center/contain;
+        }
+      }
+      &.icon-kids {
+        &::before {
+          background: url('/images/icon-kids.svg') no-repeat center/contain;
+        }
+      }
+      &.icon-civilsociety {
+        &::before {
+          background: url('/images/icon-civilsociety.svg') no-repeat center/contain;
+        }
+      }
+      &.icon-disabledperson {
+        &::before {
+          background: url('/images/icon-disabledperson.svg') no-repeat center/contain;
+        }
+      }
+      &.icon-elders {
+        &::before {
+          background: url('/images/icon-elders.svg') no-repeat center/contain;
+        }
+      }
+      &.icon-woman {
+        &::before {
+          background: url('/images/icon-woman.svg') no-repeat center/contain;
+        }
+      }
+      &.icon-etc {
+        &::before {
+          background: url('/images/icon-etc.svg') no-repeat center/contain;
+        }
+      }
+      &.icon-environment {
+        &::before {
+          background: url('/images/icon-environment.svg') no-repeat center/contain;
+        }
+      }
+      &.icon-earth {
+        &::before {
+          background: url('/images/icon-earth.svg') no-repeat center/contain;
+        }
+      }
+    }
+    span {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    input {
+      display: none;
+    }
     &.active {
-      border-color: blue;
+      background-color: #f56400;
+      border-color: #f56400;
+      color: #fff
     } 
 `
 const RadioRound = styled.div`

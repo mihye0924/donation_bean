@@ -21,13 +21,27 @@ export const getUser = () => {
 };
 
 export const removeUser = () => {
+  const userLoginType = sessionStorage.getItem("login_type");
+  if (userLoginType) {
+    cookies.remove("auth_donation", { path: "/" });
+    localStorage.removeItem("login_type");
+    const YOUR_REST_API_KEY = `b35378defa1b862c0f8fc59bf0292c25`;
+    const YOUR_LOGOUT_REDIRECT_URI = `http://localhost:5173/kakao/oauth/logout`;
+    const link = `https://kauth.kakao.com/oauth/logout?client_id=${YOUR_REST_API_KEY}&logout_redirect_uri=${YOUR_LOGOUT_REDIRECT_URI}`;
+    window.location.href = link;
+  }
   cookies.remove("auth_donation");
   localStorage.removeItem("info");
   sessionStorage.removeItem("info");
+  sessionStorage.removeItem("img");
 };
 
-/* export const useUser = () => {
-
+/* export const kakaoLogout = () => {
+  cookies.remove("auth_donation", { path: "/" });
+  const YOUR_REST_API_KEY = `b35378defa1b862c0f8fc59bf0292c25`;
+  const YOUR_LOGOUT_REDIRECT_URI = `http://localhost:5173/kakao/oauth/logout`;
+  const link = `https://kauth.kakao.com/oauth/logout?client_id=${YOUR_REST_API_KEY}&logout_redirect_uri=${YOUR_LOGOUT_REDIRECT_URI}`;
+  window.location.href = link;
 }; */
 
 /* 

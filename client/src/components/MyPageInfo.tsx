@@ -5,7 +5,7 @@ import styled from "styled-components";
 import LoadingSpinner from "./LoadingSpinner";
 import { useForm } from "react-hook-form";
 import useMutation from "@/hooks/useMutation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 interface Response {
   ok: boolean;
@@ -20,7 +20,7 @@ interface Response {
   };
 }
 interface IFormData {
-  user_avatar: FileList;
+  user_avatar?: FileList;
   user_id: string;
   user_pw: string;
   user_pw_check: string;
@@ -33,23 +33,36 @@ interface IFormData {
 const MyPageInfo = () => {
   const user = getUser();
   const navigate = useNavigate();
+  const [currentSelect, setCurrentSelect] = useState("custom");
+  const onSelectChange = useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      if (e.target.value === "custom") {
+        setValue("emailDomain", "");
+        setCurrentSelect(e.currentTarget.value);
+      }
+
+      setCurrentSelect(e.currentTarget.value);
+    },
+    [currentSelect]
+  );
   const { data } = useQuery<Response>({
     queryKey: ["mypageinfo"],
     queryFn: () =>
       axios
-        .get(`http://localhost:8081/user/me?id=${user?.id}`)
+        .get(`http://localhost:8081/user/me?id=${user.id}`)
         .then((res) => res.data),
   });
   const [avatarPreview, setAvatarPreview] = useState("");
-  const { handleSubmit, register, watch, setFocus } = useForm<IFormData>({
-    defaultValues: {
-      user_nick: data?.userinfo?.user_nick,
-      user_name: data?.userinfo?.user_name,
-      emailPrefix: data?.userinfo?.user_email.split("@")[0],
-      emailDomain: data?.userinfo?.user_email.split("@")[1],
-      user_phone: data?.userinfo?.user_phone,
-    },
-  });
+  const { handleSubmit, register, watch, setFocus, setValue } =
+    useForm<IFormData>({
+      defaultValues: {
+        user_nick: data?.userinfo?.user_nick,
+        user_name: data?.userinfo?.user_name,
+        /*         emailPrefix: data?.userinfo?.user_email.split("@")[0],
+        emailDomain: data?.userinfo?.user_email.split("@")[1], */
+        user_phone: data?.userinfo?.user_phone,
+      },
+    });
   const avatarChange = watch("user_avatar");
 
   useEffect(() => {
@@ -85,17 +98,18 @@ const MyPageInfo = () => {
         form
       );
       console.log(response);
+
+      editMutation({
+        user_avatar: user.id + "." + avatarChange[0].name.split(".")[1],
+        user_id: user.id,
+        user_nick,
+        user_name,
+        user_pw,
+        user_phone,
+        emailPrefix,
+        emailDomain,
+      });
     }
-    editMutation({
-      user_avatar: user.id + "." + avatarChange[0].name.split(".")[1],
-      user_id: user.id,
-      user_nick,
-      user_name,
-      user_pw,
-      user_phone,
-      emailPrefix,
-      emailDomain,
-    });
   };
 
   useEffect(() => {
@@ -118,15 +132,17 @@ const MyPageInfo = () => {
         <Form onSubmit={handleSubmit(onValid)}>
           <Notice>개인정보를 입력해 주세요</Notice>
           <ImageBox>
-            {avatarPreview && <img src={avatarPreview} alt="" />}
-            {!avatarPreview && data?.userinfo?.user_avatar ? (
+            {avatarPreview ? (
+              <img src={avatarPreview} alt="" />
+            ) : data?.userinfo?.user_avatar ? (
               <img
                 src={`http://localhost:8081/uploads/${data?.userinfo?.user_avatar}`}
                 alt=""
               />
             ) : (
-              <div />
+              <div className="noImg" />
             )}
+
             <label htmlFor="photo">
               사진 변경하기
               <input
@@ -155,6 +171,7 @@ const MyPageInfo = () => {
             <PassCheck>
               <input
                 {...register("user_nick", { maxLength: 8 })}
+                defaultValue={data?.userinfo?.user_nick}
                 placeholder="닉네임"
                 type="text"
               />
@@ -172,6 +189,7 @@ const MyPageInfo = () => {
                   minLength: 2,
                   maxLength: 4,
                 })}
+                defaultValue={data?.userinfo?.user_name}
               />
             </PassCheck>
             <Constraint>이름을 입력해 주세요</Constraint>
@@ -220,6 +238,7 @@ const MyPageInfo = () => {
                   minLength: 11,
                   maxLength: 11,
                 })}
+                defaultValue={data?.userinfo?.user_phone}
                 placeholder="전화번호"
                 type="tel"
               />
@@ -230,21 +249,53 @@ const MyPageInfo = () => {
             <Label>이메일</Label>
             <EmailCheck>
               <input
-                placeholder="이메일 주소"
                 {...register("emailPrefix", { required: true })}
+                defaultValue={data?.userinfo?.user_email?.split("@")[0]}
+                name="emailPrefix"
+                placeholder="이메일 주소"
               />
               <span>@</span>
-              <input
-                type="text"
-                {...register("emailDomain", { required: true })}
-                defaultValue={`${data?.userinfo?.user_email.split("@")[1]}`}
-              />
-              <select name="domain">
-                <option value="">직접입력</option>
-                <option value="gmail.com">gmail.com</option>
-                <option value="naver.com">naver.com</option>
-                <option value="daum.net">daum.net</option>
-                <option value="nate.com">nate.com</option>
+
+              {currentSelect === "custom" && (
+                <input
+                  {...register("emailDomain", { required: true })}
+                  type="text"
+                  defaultValue={
+                    data?.userinfo?.user_email?.split("@")[1]
+                      ? data?.userinfo?.user_email?.split("@")[1]
+                      : ""
+                  }
+                />
+              )}
+
+              {currentSelect !== "custom" && (
+                <input
+                  {...register("emailDomain", { required: true })}
+                  type="text"
+                  value={currentSelect || ""}
+                />
+              )}
+
+              <select
+                onChange={onSelectChange}
+                value={currentSelect}
+                name="domain"
+              >
+                <option key={"custom"} value="custom">
+                  직접입력
+                </option>
+                <option key={"gmail.com"} value="gmail.com">
+                  gmail.com
+                </option>
+                <option key={"naver.com"} value="naver.com">
+                  naver.com
+                </option>
+                <option key={"daum.net"} value="daum.net">
+                  daum.net
+                </option>
+                <option key={"nate.com"} value="nate.com">
+                  nate.com
+                </option>
               </select>
             </EmailCheck>
             <Constraint>이메일 주소를 입력해 주세요</Constraint>
@@ -423,6 +474,13 @@ const ButtonArea = styled.div`
 const ImageBox = styled.div`
   display: flex;
   align-items: center;
+  .noImg {
+    width: 75px;
+    height: 75px;
+    border-radius: 100%;
+    background: gray;
+    margin-right: 10px;
+  }
   label {
     border: none;
     background: #f56400;

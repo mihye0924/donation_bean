@@ -7,13 +7,26 @@ import { Cookies } from "react-cookie";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import styled from "styled-components";
-
+import { RiKakaoTalkFill } from "react-icons/ri";
+import { SiNaver } from "react-icons/si";
 interface IFrom {
   id: string;
   pass: string;
 }
 
 const LoginPage = () => {
+  const onKakaoLoginClick = () => {
+    const REST_API_KEY = "b35378defa1b862c0f8fc59bf0292c25";
+    const REDIRECT_URI = "http://localhost:5173/kakao/oauth";
+    const link = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}`;
+    window.location.href = link;
+  };
+  const onNaverLoginClick = () => {
+    const CLIENT_ID = `QocupXFUwSvjcgU9M9pE`;
+    const CALLBACK_URL = `http://localhost:5173/naver/oauth`;
+    const link = `https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=${CLIENT_ID}&state=test&redirect_uri=${CALLBACK_URL}`;
+    window.location.href = link;
+  };
   const [svgCheck, setSvgCheck] = useState(false);
   const [session, setSession] = useState(true);
 
@@ -24,7 +37,7 @@ const LoginPage = () => {
   }, []);
   const { handleSubmit, register } = useForm<IFrom>();
   const [loginMutate, { loading: LoginLoading, data: LoginData }] = useMutation(
-    `http://localhost:8081/user/login`
+    `${import.meta.env.VITE_SERVER_URL}/user/login`
   );
 
   useEffect(() => {
@@ -32,7 +45,7 @@ const LoginPage = () => {
       alert(LoginData?.result?.message);
     }
     if (LoginData && LoginData.ok === true) {
-      let cookie = new Cookies();
+      const cookie = new Cookies();
       cookie.set("auth_donation", LoginData?.result?.token);
       const userId = jwtDecode(LoginData.result.token);
       if (session) {
@@ -101,8 +114,12 @@ const LoginPage = () => {
             <div></div>
           </SNSLine>
           <SNSBox>
-            <div />
-            <div />
+            <div onClick={onKakaoLoginClick}>
+              <RiKakaoTalkFill />
+            </div>
+            <div id="naver" onClick={onNaverLoginClick}>
+              <SiNaver />
+            </div>
           </SNSBox>
         </Center>
       </Wrapper>
@@ -274,5 +291,29 @@ const SNSBox = styled.div`
     background: lightgray;
     margin: 0 20px;
     border-radius: 100%;
+  }
+  div:first-child {
+    background: #fae100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    svg {
+      fill: #3c1e1e;
+      width: 25px;
+      height: 25px;
+    }
+  }
+  #naver {
+    background: #03c75a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    svg {
+      fill: white;
+      width: 20px;
+      height: 20px;
+    }
   }
 `;

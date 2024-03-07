@@ -23,9 +23,19 @@ export async function login(id) {
   return db.execute(sql, [id]).then((row) => row[0][0]);
 }
 
+export async function socialCheck(id) {
+  const sql = `SELECT count(user_id) AS cnt,any_value(user_pw) AS pass  FROM user where user_id =?`;
+  return db.execute(sql, [id]).then((row) => row[0][0]);
+}
+
 export async function getUserInfo(id) {
   const sql = `select  user_name, user_avatar,user_id,user_email,user_nick,user_phone,DATEDIFF(NOW(), user_createAt) as user_createAt from user where user_id = ? `;
   return db.execute(sql, [id]).then((row) => row[0][0]);
+}
+
+export async function kakaologin(id, user_nick, user_avatar) {
+  const sql = `insert into user (user_id,user_nick,user_avatar,user_enum,user_createAt)values (?,?,?,0,now())`;
+  return db.execute(sql, [id, user_nick, user_avatar]).then((row) => "ok");
 }
 
 export async function updateUser(

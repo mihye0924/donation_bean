@@ -58,7 +58,9 @@ export async function login(req, res) {
 
 export async function getUserInfo(req, res) {
   const { id } = req.query;
+  console.log(id);
   const result = await UserRepository.getUserInfo(id);
+  console.log(result);
   res.json({ ok: true, userinfo: result });
 }
 
@@ -99,5 +101,24 @@ export async function getFevList(req, res) {
     res.json({ ok: true, favList: result });
   } else {
     res.json({ ok: false });
+  }
+}
+
+export async function kakaologin(req, res) {
+  const { id, user_nick, user_avatar } = req.body;
+  const checkExist = await UserRepository.socialCheck(id);
+  console.log(checkExist);
+  if (checkExist.cnt === 1) {
+    return res.json({ ok: true });
+  }
+  if (checkExist.cnt === 0) {
+    const createKakaoAccount = await UserRepository.kakaologin(
+      id,
+      user_nick,
+      user_avatar
+    );
+    if (createKakaoAccount === "ok") {
+      res.json({ ok: true });
+    }
   }
 }

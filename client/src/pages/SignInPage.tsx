@@ -25,7 +25,7 @@ const SignInPage = () => {
   const [idExist, setIdExist] = useState(true);
   const [queryData, setQueryData] = useState<IResponse>();
   const [singInMutation, { loading: mutationLoading, data: mutationData }] =
-    useMutation(`http://localhost:8081/user/signin`);
+    useMutation(`${import.meta.env.VITE_SERVER_URL}/user/signin`);
 
   const onIdExistClick = useCallback(() => {
     axios
@@ -209,11 +209,19 @@ const SignInPage = () => {
                   placeholder="이메일 주소"
                 />
                 <span>@</span>
-                <input
-                  {...register("emailDomain", { required: true })}
-                  type="text"
-                  value={currentSelect === "" ? "" : currentSelect}
-                />
+                {currentSelect !== "" ? (
+                  <input
+                    {...register("emailDomain", { required: true })}
+                    type="text"
+                    value={currentSelect !== "" ? currentSelect : ""}
+                  />
+                ) : (
+                  <input
+                    {...register("emailDomain", { required: true })}
+                    type="text"
+                  />
+                )}
+
                 <select
                   onChange={onSelectChange}
                   value={currentSelect || ""}

@@ -1,6 +1,6 @@
 
 
-export interface DetailDonationDataProps { 
+export interface DetailDonationDataProps {
     donation_no: number;
     user_id: string;
     donation_name: string; 

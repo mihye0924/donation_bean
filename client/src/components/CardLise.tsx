@@ -4,12 +4,12 @@ import Progressbar from "./Progressbar";
 
 
 interface CardProps {
-    to: string;
+    to: number | any;
     imgSrc: string;
     imgUrl: string;
     title: string;
     agency: string;
-    day: number;
+    day: number | string;
     price: number;
     percentage: number;
 }
@@ -32,7 +32,7 @@ const CardList = (props: CardProps) => {
                     <Progressbar percentage={props.percentage} />
                     <div className="text-list">
                         <p className="percent">{props.percentage}%</p>
-                        <p className="price"><span>{props.price}</span>원</p>
+                        <p className="price"><span>{props.price.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",")}</span>원</p>
                     </div>
                 </TextBottom>
             </TextInner>
