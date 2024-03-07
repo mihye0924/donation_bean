@@ -1,10 +1,28 @@
 import * as PaymentRepository from "../repository/PaymentRepository.js";
-export async function insertPayment(req, res) {   
-    const { user_id, donation_no, donation_support, donation_current, payment_division, payment_method, payment_card_name, payment_card_company, payment_card_expiry, 
-        payment_card_num, payment_account_name, payment_account_company, payment_account_transfer, payment_account_num, payment_birth, payment_company_code } = req.body; 
+export async function insertPayment(req, res) {    
+    const { user_id, donation_no, donation_support, donation_current, payment_method, payment_uid, payment_name } = req.body; 
 
-    const result = await PaymentRepository.insertPayment(  user_id, donation_no, donation_support, donation_current, payment_division, payment_method, payment_card_name, payment_card_company, payment_card_expiry, 
-        payment_card_num, payment_account_name, payment_account_company, payment_account_transfer, payment_account_num, payment_birth, payment_company_code);
+    try {
+        const getToken = await axios({
+            url: "https://api.iamport.kr/subscribe/payments/schedule/",
+            method: "post", // POST method
+            headers: { "Content-Type": "application/json" }, // "Content-Type": "application/json"
+            data: {
+                imp_key: process.env.IMP_API_KEY, // REST API 키
+                imp_secret: process.env.IMP_API_SECRET_KEY // REST API Secret
+            }
+        });
+        const { access_token } = getToken.data.response; // 인증 토큰
+
+        console.log(access_token, "access_token")
+
+    } catch (Err) {
+        console.log("err : ", Err)
+        res.send({ success: false })
+    }
+
+
+    const result = await PaymentRepository.insertPayment( user_id, donation_no, donation_support, donation_current, payment_method, payment_uid, payment_name );
     if(result === "ok") { 
         res.json({ ok: true });
     }else{

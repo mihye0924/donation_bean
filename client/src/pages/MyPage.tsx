@@ -131,17 +131,7 @@ const Center = styled.div`
     margin: 0 auto;
   }
 `;
-
-const Center = styled.div`
-  grid-template-columns: repeat(4, 1fr);
-  display: grid;
-  gap: 20px;
-  @media ${media.tablet} {
-    display: flex;
-    flex-direction: column;
-    margin: 0 auto;
-  }
-`;
+ 
 
 const SidBar = styled.div`
   width: 100%;
