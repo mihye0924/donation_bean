@@ -14,6 +14,7 @@ import Button from "@/components/Button";
 import Category from "@/api/main/Category.json";
 import Sort2 from "@/api/main/Sort2.json";
 import DonationStore from "@/store/donationStore";
+import { getUser } from "@/util/userinfo";
 
 const MainPage = () => {
   // Swiper Slide 더미
@@ -94,15 +95,8 @@ const MainPage = () => {
     }
   };
 
-  const {
-    status,
-    changeDonation,
-    setDonation,
-    setRecentDonation,
-    setAmountDonation,
-    setPercentDonation,
-    setExitDonation,
-  } = DonationStore();
+  const { status, changeDonation, setDonation, setRecentDonation, setAmountDonation, setPercentDonation, setExitDonation } = DonationStore();
+  const user = getUser(); 
 
   // 라디오 카테고리 구분
   const [select1, setSelect1] = useState<Option>({ value: "0", label: "전체" });
@@ -167,16 +161,7 @@ const MainPage = () => {
         }
         break;
     }
-  }, [
-    radioLabel,
-    select1,
-    select2.value,
-    setAmountDonation,
-    setExitDonation,
-    setPercentDonation,
-    setRecentDonation,
-    status,
-  ]);
+  }, [radioLabel, select1, select2.value, setAmountDonation, setExitDonation, setPercentDonation, setRecentDonation]);
 
   // 라디오 카테고리 구분
   const handleRadioChange = useCallback(
@@ -198,6 +183,35 @@ const MainPage = () => {
   const handleLimitToggle = () => {
     changeDonation.length > limit && setLimit(limit + 12);
   };
+
+  // 좋아요 데이터 넣기
+  const [submitMutate, {data: likeData }] = useMutation(`${import.meta.env.VITE_SERVER_URL}/payment`);
+  const insertLike = useCallback(() => {
+    const queryData = {
+      user_id: user.id,
+      donation_no: "클릭할 번호 숫자타입으로",
+    };
+    submitMutate(queryData)
+  },[submitMutate, user.id])
+
+     
+//   useEffect(() => { 
+//     if(likeData && likeData.ok) {  
+//         return
+//     }  
+// },[likeData]) 
+
+
+  // 좋아요 데이터 넣기
+  const getLike = useCallback(() => {
+    axios
+    .get(`${import.meta.env.VITE_SERVER_URL}/main/like?user_id=${user.id}&donation_no=${"클릭할 번호 숫자타입으로"}`) 
+    .then((res) => console.log(res.data.result));
+  },[])
+
+  useEffect(() => {
+    getLike()
+  },[getLike])
 
   useEffect(() => {
     setSelect1(status);
