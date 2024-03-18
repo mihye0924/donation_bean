@@ -11,7 +11,7 @@ export async function getLike(user_id, donation_no) {
 
   return db
   .execute(sql, [user_id, donation_no])
-  .then((row) => "ok");
+  .then((row) => row[0][0]);
 }
 
 export async function insertLike(user_id, donation_no) {
@@ -19,5 +19,5 @@ export async function insertLike(user_id, donation_no) {
 
   return db
   .execute(sql, [user_id, donation_no])
-  .then((row) => row[0][0]);
+  .then((row) => "ok");
 }

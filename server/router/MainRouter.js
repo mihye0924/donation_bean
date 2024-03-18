@@ -4,7 +4,7 @@ import { getDonation, getLike, insertLike } from "../controller/MainController.j
 const router = express.Router();
 
 router.get(`/donation`, getDonation); 
-router.get(`/like`, insertLike); 
-router.post(`/like`, getLike); 
+router.post(`/like`, insertLike); 
+router.get(`/like`, getLike); 
 
 export default router;
