@@ -17,6 +17,7 @@ import DonationStore from "@/store/donationStore";
 import { getUser } from "@/util/userinfo";
 import useMutation from "@/hooks/useMutation";
 import { useQuery } from "@tanstack/react-query";
+import { Response } from "@/types/user";
 
 const MainPage = () => {
   // Swiper Slide 더미
@@ -186,24 +187,26 @@ const MainPage = () => {
     changeDonation.length > limit && setLimit(limit + 12);
   };
 
-  // const { data } = useQuery<Response>({
-  //   queryKey: ["user"],
-  //   queryFn: () =>
-  //     axios
-  //       .get(`http://localhost:8081/user/me?id=${user?.id}`)
-  //       .then((res) => res.data),
-  // });
+  const { data } = useQuery<Response>({
+    queryKey: ["user"],
+    queryFn: () =>
+      axios
+        .get(`http://localhost:8081/user/me?id=${user?.id}`)
+        .then((res) => res.data),
+  });
 
 
   // 좋아요 데이터 넣기
-  // const [submitMutate] = useMutation(`${import.meta.env.VITE_SERVER_URL}/payment`);
-  // const insertLike = useCallback((index:number) => {
-  //   const queryData = {
-  //     user_id: user.id,
-  //     donation_no: index
-  //   };
-  //   submitMutate(queryData)
-  // },[submitMutate, user.id])
+  const [submitMutate] = useMutation(`${import.meta.env.VITE_SERVER_URL}/main/like`);
+  const insertLike = useCallback((index:number) => {
+    if(data?.userinfo?.user_id) {
+      const queryData = {
+        user_id: data?.userinfo?.user_id,
+        donation_no: index
+      };
+      submitMutate(queryData)
+    }
+  },[submitMutate])
 
 
   // 좋아요 데이터 넣기
@@ -346,6 +349,7 @@ const MainPage = () => {
                 day={item.donation_period}
                 price={item.donation_goal}
                 heart={true}
+                onClick={() => {insertLike(item.donation_no)}}
                 percentage={Math.floor(paymentAllData(item.donation_no) / item.donation_goal * 100)}
               />
             )
