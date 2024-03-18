@@ -1,25 +1,14 @@
-import styled from 'styled-components';
-import { BsClipboard2Heart } from 'react-icons/bs';
-import { FaRegUser } from 'react-icons/fa6';
-import { FaRegHeart } from 'react-icons/fa';
-import { useQuery } from '@tanstack/react-query';
-import axios from 'axios';
-import { getUser } from '@/util/userinfo';
-import { Link, Outlet, useMatch, useNavigate } from 'react-router-dom';
+import styled from "styled-components";
+import { BsClipboard2Heart } from "react-icons/bs";
+import { FaRegUser } from "react-icons/fa6";
+import { FaRegHeart } from "react-icons/fa";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { getUser } from "@/util/userinfo";
+import { Link, Outlet, useMatch, useNavigate } from "react-router-dom";
+import { Response } from "@/types/user";
 
-interface Response {
-  ok: boolean;
-  userinfo: {
-    user_name: string;
-    user_avatar: string | null;
-    user_id: string;
-    user_email: string;
-    user_nick: string;
-    user_phone: string;
-    user_createAt: number;
-  };
-}
-
+ 
 const MyPage = () => {
   const user = getUser();
   const { data } = useQuery<Response>({
@@ -118,6 +107,7 @@ const Center = styled.div`
     margin: 0 auto;
   }
 `;
+ 
 
 const SidBar = styled.div`
   width: 100%;

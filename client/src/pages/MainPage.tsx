@@ -8,12 +8,14 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import "swiper/css";
 import axios from "axios";
-import { CategoryTypes, DetailDonationDataProps } from "@/types/detail";
+import { CategoryTypes, DetailDonationDataProps, DetailPaymentAllDataProps } from "@/types/detail";
 import CardList from "@/components/CardLise";
 import Button from "@/components/Button";
 import Category from "@/api/main/Category.json";
 import Sort2 from "@/api/main/Sort2.json";
 import DonationStore from "@/store/donationStore";
+import { getUser } from "@/util/userinfo";
+import useMutation from "@/hooks/useMutation";
 
 const MainPage = () => {
   // Swiper Slide 더미
@@ -94,15 +96,8 @@ const MainPage = () => {
     }
   };
 
-  const {
-    status,
-    changeDonation,
-    setDonation,
-    setRecentDonation,
-    setAmountDonation,
-    setPercentDonation,
-    setExitDonation,
-  } = DonationStore();
+  const { status, changeDonation, setDonation, setRecentDonation, setAmountDonation, setPercentDonation, setExitDonation } = DonationStore();
+  const user = getUser(); 
 
   // 라디오 카테고리 구분
   const [select1, setSelect1] = useState<Option>({ value: "0", label: "전체" });
@@ -112,10 +107,11 @@ const MainPage = () => {
 
   // 셀렉트 선택시 리스트 변경 - 전체, 진행중, 종료
   const handleChangeEvent1 = useCallback(() => {
-    console.log(status, "ddd");
+    setSelect1(select1);
+    // console.log(status, "ddd");
     switch (select1.label) {
       case "전체":
-        console.log("전체");
+        // console.log("전체");
         switch (select2.value) {
           case "최신 순":
             setRecentDonation(radioLabel, select1);
@@ -132,7 +128,7 @@ const MainPage = () => {
         }
         break;
       case "진행중":
-        console.log("진행중");
+        // console.log("진행중");
         switch (select2.value) {
           case "최신 순":
             setRecentDonation(radioLabel, select1);
@@ -149,7 +145,7 @@ const MainPage = () => {
         }
         break;
       case "종료":
-        console.log("종료");
+        // console.log("종료");
         switch (select2.value) {
           case "최신 순":
             setRecentDonation(radioLabel, select1);
@@ -166,16 +162,7 @@ const MainPage = () => {
         }
         break;
     }
-  }, [
-    radioLabel,
-    select1,
-    select2.value,
-    setAmountDonation,
-    setExitDonation,
-    setPercentDonation,
-    setRecentDonation,
-    status,
-  ]);
+  }, [radioLabel, select1, select2.value, setAmountDonation, setExitDonation, setPercentDonation, setRecentDonation]);
 
   // 라디오 카테고리 구분
   const handleRadioChange = useCallback(
@@ -197,6 +184,50 @@ const MainPage = () => {
   const handleLimitToggle = () => {
     changeDonation.length > limit && setLimit(limit + 12);
   };
+
+  // 좋아요 데이터 넣기
+  // const [submitMutate] = useMutation(`${import.meta.env.VITE_SERVER_URL}/payment`);
+  // const insertLike = useCallback(() => {
+  //   const queryData = {
+  //     user_id: user.id,
+  //     donation_no: "클릭할 번호 숫자타입으로",
+  //   };
+  //   submitMutate(queryData)
+  // },[submitMutate, user.id])
+ 
+
+
+  // 좋아요 데이터 넣기
+  // const getLike = useCallback(() => {
+  //   axios
+  //   .get(`${import.meta.env.VITE_SERVER_URL}/main/like?user_id=${user.id}&donation_no=${"클릭할 번호 숫자타입으로"}`) 
+  //   .then((res) => console.log(res.data.result));
+  // },[user.id])
+
+  // useEffect(() => {
+  //   getLike()
+  // },[getLike])
+
+
+  // 퍼센트 구하기  
+  const addData = useRef<number[]>([])
+  const paymentAllData = useCallback((index: number) => {  
+    const arr: number[] = []
+    axios
+    .get(`${import.meta.env.VITE_SERVER_URL}/payment/all?donation_no=${index}`) 
+    .then((res) => { 
+      res.data.result.forEach((item: DetailPaymentAllDataProps, index2:number) => { 
+        arr[index2] = Number(item.donation_current)
+      })
+
+      addData.current[index] = arr.reduce((prev, curr) => {
+        return prev + curr 
+        },0)     
+      }) 
+   return addData.current[index]
+},[addData])
+
+ 
 
   useEffect(() => {
     setSelect1(status);
@@ -303,7 +334,7 @@ const MainPage = () => {
                 agency={item.donation_company}
                 day={item.donation_period}
                 price={item.donation_goal}
-                percentage={item.donation_status}
+                percentage={Math.floor(paymentAllData(item.donation_no) / item.donation_goal * 100)}
               />
             )
         )}

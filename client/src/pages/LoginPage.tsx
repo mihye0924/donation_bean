@@ -130,7 +130,7 @@ const media = {
 
 const HeaderPadding = styled.div`
   margin-top: 120px;
-  margin-bottom: 80px;
+  /* margin-bottom: 80px; */
   background-color: #fbfbfb;
   @media ${media.tablet} {
     margin-top: 80px;

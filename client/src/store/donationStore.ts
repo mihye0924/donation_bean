@@ -35,6 +35,7 @@ const DonationStore = create<DonationBaseStore>()(
                 donation_status: 0,
                 checked: false,
                 htmlId: "",
+                percentage: 0
             }
         ],
         changeDonation: [
@@ -52,11 +53,12 @@ const DonationStore = create<DonationBaseStore>()(
                 donation_status: 0,
                 checked: false,
                 htmlId: "",
+                percentage: 0,
             }
         ], 
         status: {
-            label: "",
-            value: ""
+            label: "전체",
+            value: "0"
         },
         category: {
             label : "",

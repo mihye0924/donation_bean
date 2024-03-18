@@ -29,7 +29,7 @@ export async function socialCheck(id) {
 }
 
 export async function getUserInfo(id) {
-  const sql = `select  user_name, user_avatar,user_id,user_email,user_nick,user_phone,DATEDIFF(NOW(), user_createAt) as user_createAt from user where user_id = ? `;
+  const sql = `select  user_name, user_avatar,user_id,user_email,user_nick,user_phone,user_enum,DATEDIFF(NOW(), user_createAt) as user_createAt from user where user_id = ? `;
   return db.execute(sql, [id]).then((row) => row[0][0]);
 }
 
