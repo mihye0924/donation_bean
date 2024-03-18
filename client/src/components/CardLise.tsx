@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import Progressbar from "@/components/Progressbar";
 import CheckBox from "@/components/CheckBox";
+import { useState } from "react";
 
 interface CardProps {
   to: string;
@@ -17,9 +18,20 @@ interface CardProps {
   checked?: boolean;
   name?: string;
   value?: string | number;
+  heart?: boolean;
   onChange?: () => void;
+  onClick?: () => void;
 }
 const CardList = (props: CardProps) => {
+  const onClick = () => {
+    props.onClick
+    if(like === 0) {
+      setLike(1)
+    } else if(like === 1) {
+      setLike(0)
+    }
+  }
+  const [like, setLike] = useState<number>(0)
   return (
     <CardItem>
       {props.check && (
@@ -33,6 +45,13 @@ const CardList = (props: CardProps) => {
           onChange={props.onChange}
         />
       )}
+      {
+        props.heart && (
+          <button onClick={onClick}>
+            <i className={like ? "icon-heart" : "icon-heart_off"} />
+          </button>
+        )
+      }
       <Link to={props.to}>
         <ImageInner>
           <img
@@ -76,7 +95,31 @@ const CardItem = styled.li`
   position: relative;
   border: 1px solid #ddd;
   background-color: #fff;
+  button {
+    position: absolute;
+    z-index: 10;
+    top: 10px;
+    right: 10px;
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: transparent;
+    .icon-heart {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background: url(./images/icon-heart.png) no-repeat center/ contain;
+    }
+    .icon-heart_off {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      background: url(./images/icon-heart_off.png) no-repeat center/ contain;
+    }
+  }
   a {
+    position: relative;
+    z-index: 9;
     display: block;
     width: 100%;
     height: 100%;
@@ -101,6 +144,7 @@ const CardItem = styled.li`
   }
 `;
 const ImageInner = styled.div`
+  position:relative;
   width: 100%;
   height: 165px;
   background-color: #ddd;
