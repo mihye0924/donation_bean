@@ -58,30 +58,30 @@ const CheckBox = (props: CheckboxProps) => {
 
 export default CheckBox;
 
-const InputItem = styled.div`
-  input {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    border: 0;
-  }
-  label {
-    cursor: pointer;
-    display: flex;
-    .icon {
-      position: relative;
-      display: inline-block;
-      margin-right: 10px;
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
-      &::before {
+const InputItem = styled.div` 
+    input{ 
         position: absolute;
-        content: "";
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0; 
+    }
+    label {
+      cursor: pointer;  
+      display: flex; 
+      .icon {
+        position: relative;
+        display: inline-block;
+        margin-right: 10px;
+        width: 25px;
+        height:25px;
+        border-radius: 50%;
+      &::before{ 
+        position: absolute;
+        content: '';
         width: 2px;
         height: 9px;
         z-index: 1;
@@ -91,9 +91,9 @@ const InputItem = styled.div`
         left: 8px;
         border-radius: 5px;
       }
-      &::after {
+      &::after{  
         position: absolute;
-        content: "";
+        content: '';
         z-index: 1;
         display: inline-block;
         width: 2px;
@@ -103,10 +103,46 @@ const InputItem = styled.div`
         transform: translateY(-50%) rotate(40deg);
         left: 14px;
         border-radius: 5px;
+      } 
       }
+      span {
+        flex: 1;
+      }
+    } 
+    &.active{ 
+      .icon {
+        background-color: #f56400 !important;
+        z-index: 1;
+      } 
     }
-    span {
-      flex: 1;
+    &.round { 
+      padding: 10px 0;
+      .icon {   
+        background-color: #bdbdbd;
+      } 
+    } 
+    &.square {  
+      .icon { 
+        margin-right: 0; 
+        border: 1px solid #f56400; 
+        border-radius: 5px;
+        &::before{  
+          background-color: #f56400 !important; 
+        }
+        &::after{  
+          background-color: #f56400  !important;  
+        } 
+      } 
+      &.active{ 
+        .icon {  
+          &::before{  
+            background-color: #fff !important;  
+          }
+          &::after{  
+            background-color: #fff !important;  
+          } 
+        } 
+      }
     }
   }
   &.active {

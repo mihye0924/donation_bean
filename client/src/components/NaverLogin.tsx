@@ -1,26 +1,36 @@
-import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { useEffect } from 'react';
+import { Cookies } from 'react-cookie';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+interface Response {
+  ok: boolean;
+  id: string;
+  token?: string;
+}
 
 const NaverLogin = () => {
-  const match = useLocation();
-  const code = match.search.split("=")[1];
+  const location = useLocation();
+  const code = location.search.split('=')[1].split('&')[0];
+  const navigate = useNavigate();
+  const { data } = useQuery<Response>({
+    queryKey: ['mypageinfo'],
+    queryFn: () => axios.get(`${import.meta.env.VITE_SERVER_URL}/naver/oauth?code=${code}`).then((res) => res.data),
+  });
 
   useEffect(() => {
-    const tokenFn = async () => {
-      await fetch(`https://nid.naver.com/oauth2.0/token`, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded;charset=utf-8",
-        },
-      });
-    };
-    tokenFn();
-  }, []);
+    if (data && data.ok) {
+      const cookie = new Cookies();
+      cookie.set('auth_donation', 'kakaoGuest', { path: '/' });
+      sessionStorage.setItem('info', JSON.stringify({ id: data.id }));
+      sessionStorage.setItem('login_type', JSON.stringify({ type: 'naver',token:data.token })); //setitem
+      navigate('/');
+      console.log(data);
+    }
+  }, [data, navigate]);
 
   return <div>NaverLogin</div>;
 };
 
 export default NaverLogin;
-
-/* 
-https://nid.naver.com/oauth2.0/token?grant_type=authorization_code&client_id=jyvqXeaVOVmV&client_secret=527300A0_COq1_XV33cf&code=EIc5bFrl4RibFls1&state=9kgsGTfH4j7IyAkg  
-*/

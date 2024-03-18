@@ -119,3 +119,39 @@ export async function kakaologin(req, res) {
     }
   }
 }
+
+export async function naverlogin(req, res) {
+  const CLIENT_ID = `QocupXFUwSvjcgU9M9pE`;
+  const CLIENT_PASS = `Iu8PzM8U2t`;
+  const { code } = req.query;
+  const URL = "https://nid.naver.com/oauth2.0/token";
+  const getToken = await fetch(
+    `${URL}?grant_type=authorization_code&client_id=${CLIENT_ID}&client_secret=${CLIENT_PASS}&code=${code}&state=9kgsGTfH4j7IyAkg`
+  );
+  const result = await getToken.json();
+  const { access_token } = result;
+  const response = await fetch("https://openapi.naver.com/v1/nid/me", {
+    headers: {
+      Authorization: `Bearer ${access_token}`,
+    },
+  })
+    .then((res) => res.json())
+    .then((res) => res.response)
+    .catch((err) => console.log(err))
+    .finally();
+
+  const checkExist = await UserRepository.socialCheck(response.id);
+   if (checkExist.cnt === 1) {
+    return res.json({ ok: true,id:response.id,token:access_token });
+  }
+  if (checkExist.cnt === 0) {
+    const createKakaoAccount = await UserRepository.kakaologin(
+      response.id,
+      response.name,
+      response.profile_image
+    );
+    if (createKakaoAccount === "ok") {
+      res.json({ ok: true,id:response.id,token:access_token });
+    }
+  }  
+}

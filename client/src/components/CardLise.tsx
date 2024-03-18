@@ -105,9 +105,13 @@ const ImageInner = styled.div`
   background-color: #ddd;
   img {
     width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
+    height: 165px;
+    background-color: #ddd;
+    img { 
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 `;
 const TextInner = styled.div`
   display: flex;
@@ -133,23 +137,24 @@ const TopTitle = styled.div`
   }
 `;
 const TextBottom = styled.div`
-  span {
-    display: inline-block;
-    margin-bottom: 12px;
-  }
-  .text-list {
-    margin-top: 6px;
-    display: flex;
-    justify-content: space-between;
-    p {
-      display: inline-block;
-      font-size: 18px;
-      &.percent {
-        color: #00b2ff;
-      }
-      span {
-        margin: 0;
-      }
+    span {
+        display: inline-block;
+        margin-bottom: 12px;
+    }
+    .text-list {
+        margin-top: 6px;
+        display: flex;
+        justify-content: space-between;
+        p {
+            display: inline-block;
+            font-size: 18px;
+            &.percent {
+                color: #00B2FF;
+            }
+            span {
+                margin: 0;
+            }
+        }
     }
   }
 `;

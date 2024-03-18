@@ -1,11 +1,11 @@
-import styled from "styled-components";
-import { BsClipboard2Heart } from "react-icons/bs";
-import { FaRegUser } from "react-icons/fa6";
-import { FaRegHeart } from "react-icons/fa";
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { getUser } from "@/util/userinfo";
-import { Link, Outlet, useMatch, useNavigate } from "react-router-dom";
+import styled from 'styled-components';
+import { BsClipboard2Heart } from 'react-icons/bs';
+import { FaRegUser } from 'react-icons/fa6';
+import { FaRegHeart } from 'react-icons/fa';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { getUser } from '@/util/userinfo';
+import { Link, Outlet, useMatch, useNavigate } from 'react-router-dom';
 
 interface Response {
   ok: boolean;
@@ -23,16 +23,13 @@ interface Response {
 const MyPage = () => {
   const user = getUser();
   const { data } = useQuery<Response>({
-    queryKey: ["user"],
-    queryFn: () =>
-      axios
-        .get(`http://localhost:8081/user/me?id=${user?.id}`)
-        .then((res) => res.data),
+    queryKey: ['user'],
+    queryFn: () => axios.get(`http://localhost:8081/user/me?id=${user?.id}`).then((res) => res.data),
   });
 
-  const indexMatch = useMatch("/mypage");
-  const infoMatch = useMatch("/mypage/info");
-  const favMatch = useMatch("/mypage/fav");
+  const indexMatch = useMatch('/mypage');
+  const infoMatch = useMatch('/mypage/info');
+  const favMatch = useMatch('/mypage/fav');
   return (
     <HeaderPadding>
       <Center>
@@ -45,17 +42,13 @@ const MyPage = () => {
             <p>반갑습니다</p>
             <span>
               기부콩과 만난지
-              {data?.userinfo?.user_createAt &&
-                data?.userinfo?.user_createAt + 1}
+              {data?.userinfo?.user_createAt && data?.userinfo?.user_createAt + 1}
               일째
             </span>
           </UserNameBox>
           <ul>
             <li>
-              <Link
-                to={`/mypage`}
-                style={{ color: indexMatch ? "#f56400" : "" }}
-              >
+              <Link to={`/mypage`} style={{ color: indexMatch ? '#f56400' : '' }}>
                 <span>
                   <BsClipboard2Heart />
                 </span>
@@ -63,10 +56,7 @@ const MyPage = () => {
               </Link>
             </li>
             <li>
-              <Link
-                to="/mypage/info"
-                style={{ color: infoMatch ? "#f56400" : "" }}
-              >
+              <Link to="/mypage/info" style={{ color: infoMatch ? '#f56400' : '' }}>
                 <span>
                   <FaRegUser />
                 </span>
@@ -74,10 +64,7 @@ const MyPage = () => {
               </Link>
             </li>
             <li>
-              <Link
-                to="/mypage/fav"
-                style={{ color: favMatch ? "#f56400" : "" }}
-              >
+              <Link to="/mypage/fav" style={{ color: favMatch ? '#f56400' : '' }}>
                 <span>
                   <FaRegHeart />
                 </span>
@@ -97,9 +84,9 @@ const MyPage = () => {
 export default MyPage;
 
 const sizes = {
-  tablet: "768px",
-  desktop: "1200px",
-  mobile: "375px",
+  tablet: '768px',
+  desktop: '1200px',
+  mobile: '375px',
 };
 
 const media = {
@@ -138,7 +125,7 @@ const SidBar = styled.div`
   li {
     padding: 16px 0px 16px 20px;
     border-bottom: 1px solid #ececec;
-    font-family: "NanumSquareNeo-Variable";
+    font-family: 'NanumSquareNeo-Variable';
     &:last-child {
       border-bottom: 0;
     }
@@ -157,7 +144,7 @@ const SidBar = styled.div`
 `;
 
 const UserNameBox = styled.div`
-  font-family: "NanumSquareNeo-Variable";
+  font-family: 'NanumSquareNeo-Variable';
   background: #f56400;
   padding: 30px 15px 20px 15px;
   color: white;

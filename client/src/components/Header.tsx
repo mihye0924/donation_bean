@@ -75,7 +75,8 @@ const Header = () => {
       document.removeEventListener("scroll", () => handleScrollNav());
       window.removeEventListener("resize", () => handleResizeWindow());
     };
-  }, []);
+  }, [handleResizeWindow, handleScrollNav, handleUrl]);
+
   /* 
   }, [handleResizeWindow, handleScrollNav, handleUrl]); */
   //로그아웃 클릭이벤트

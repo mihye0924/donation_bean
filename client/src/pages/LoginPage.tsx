@@ -1,14 +1,14 @@
-import LoadingSpinner from "@/components/LoadingSpinner";
-import useMutation from "@/hooks/useMutation";
-import { getUser } from "@/util/userinfo";
-import { jwtDecode } from "jwt-decode";
-import { useCallback, useEffect, useState } from "react";
-import { Cookies } from "react-cookie";
-import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import styled from "styled-components";
-import { RiKakaoTalkFill } from "react-icons/ri";
-import { SiNaver } from "react-icons/si";
+import LoadingSpinner from '@/components/LoadingSpinner';
+import useMutation from '@/hooks/useMutation';
+import { getUser } from '@/util/userinfo';
+import { jwtDecode } from 'jwt-decode';
+import { useCallback, useEffect, useState } from 'react';
+import { Cookies } from 'react-cookie';
+import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
+import { RiKakaoTalkFill } from 'react-icons/ri';
+import { SiNaver } from 'react-icons/si';
 interface IFrom {
   id: string;
   pass: string;
@@ -16,8 +16,8 @@ interface IFrom {
 
 const LoginPage = () => {
   const onKakaoLoginClick = () => {
-    const REST_API_KEY = "b35378defa1b862c0f8fc59bf0292c25";
-    const REDIRECT_URI = "http://localhost:5173/kakao/oauth";
+    const REST_API_KEY = 'b35378defa1b862c0f8fc59bf0292c25';
+    const REDIRECT_URI = 'http://localhost:5173/kakao/oauth';
     const link = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${REST_API_KEY}&redirect_uri=${REDIRECT_URI}`;
     window.location.href = link;
   };
@@ -37,7 +37,7 @@ const LoginPage = () => {
   }, []);
   const { handleSubmit, register } = useForm<IFrom>();
   const [loginMutate, { loading: LoginLoading, data: LoginData }] = useMutation(
-    `${import.meta.env.VITE_SERVER_URL}/user/login`
+    `${import.meta.env.VITE_SERVER_URL}/user/login`,
   );
 
   useEffect(() => {
@@ -46,16 +46,16 @@ const LoginPage = () => {
     }
     if (LoginData && LoginData.ok === true) {
       const cookie = new Cookies();
-      cookie.set("auth_donation", LoginData?.result?.token);
+      cookie.set('auth_donation', LoginData?.result?.token);
       const userId = jwtDecode(LoginData.result.token);
       if (session) {
-        sessionStorage.setItem("info", JSON.stringify(userId));
+        sessionStorage.setItem('info', JSON.stringify(userId));
       }
       if (session === false) {
-        localStorage.setItem("info", JSON.stringify(userId));
-        sessionStorage.setItem("info", JSON.stringify(userId));
+        localStorage.setItem('info', JSON.stringify(userId));
+        sessionStorage.setItem('info', JSON.stringify(userId));
       }
-      navigate("/");
+      navigate('/');
     }
   }, [LoginData, navigate]);
 
@@ -67,7 +67,7 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (user) {
-      navigate("/");
+      navigate('/');
     }
   }, [user, navigate]);
 
@@ -77,21 +77,13 @@ const LoginPage = () => {
         <Center>
           <Title>로그인</Title>
           <InputBox>
-            <Input
-              {...register("id", { required: true })}
-              type="text"
-              placeholder="아이디"
-            />
-            <Input
-              {...register("pass", { required: true })}
-              type="password"
-              placeholder="비밀번호"
-            />
+            <Input {...register('id', { required: true })} type="text" placeholder="아이디" />
+            <Input {...register('pass', { required: true })} type="password" placeholder="비밀번호" />
           </InputBox>
           <IDSaveArea>
             <SVG
               onClick={onSVGClick}
-              style={{ fill: svgCheck ? "#f56400" : undefined }}
+              style={{ fill: svgCheck ? '#f56400' : undefined }}
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 512 512"
             >
@@ -99,9 +91,7 @@ const LoginPage = () => {
             </SVG>
             <span>아이디저장</span>
           </IDSaveArea>
-          <Button>
-            {LoginLoading ? <LoadingSpinner size={10} /> : "로그인"}
-          </Button>
+          <Button>{LoginLoading ? <LoadingSpinner size={10} /> : '로그인'}</Button>
           <FindInfo>
             <li>아이디찾기·비밀번호찾기</li>
             <li>
@@ -130,8 +120,8 @@ const LoginPage = () => {
 export default LoginPage;
 
 const sizes = {
-  tablet: "768px",
-  desktop: "1200px",
+  tablet: '768px',
+  desktop: '1200px',
 };
 const media = {
   tablet: `(min-width: ${sizes.tablet})`,
@@ -177,7 +167,7 @@ const Title = styled.h1`
     margin-bottom: 40px;
     font-weight: 600;
   }
-  font-family: "NanumSquareNeo-Variable";
+  font-family: 'NanumSquareNeo-Variable';
   text-align: center;
   font-size: 20px;
   margin-bottom: 20px;
@@ -258,7 +248,7 @@ const FindInfo = styled.ul`
     &::after {
       margin-left: 15px;
       color: #d9d9d9;
-      content: "|";
+      content: '|';
     }
   }
 `;

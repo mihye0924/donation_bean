@@ -466,6 +466,9 @@ const EmailCheck = styled.div`
     @media ${media.tablet} {
       width: 27%;
     }
+    @media ${media.tablet} {
+      width: 27%;
+    }
   }
   .select {
     flex: 1;

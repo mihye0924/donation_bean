@@ -1,13 +1,13 @@
-import { Cookies } from "react-cookie";
+import { Cookies } from 'react-cookie';
 
 const cookies = new Cookies();
 
 export const getUser = () => {
-  const GetCookie = cookies.get("auth_donation");
+  const GetCookie = cookies.get('auth_donation');
   let userinfo = null;
 
-  const userInfoFromLocal = localStorage.getItem("info");
-  const userInfoFromSession = sessionStorage.getItem("info");
+  const userInfoFromLocal = localStorage.getItem('info');
+  const userInfoFromSession = sessionStorage.getItem('info');
 
   if (GetCookie && userInfoFromLocal) {
     userinfo = JSON.parse(userInfoFromLocal);
@@ -21,19 +21,30 @@ export const getUser = () => {
 };
 
 export const removeUser = () => {
-  const userLoginType = sessionStorage.getItem("login_type");
+  const userLoginType = sessionStorage.getItem('login_type');
+
   if (userLoginType) {
-    cookies.remove("auth_donation", { path: "/" });
-    localStorage.removeItem("login_type");
+    if(JSON.parse(userLoginType).type === 'naver'){
+      cookies.remove('auth_donation', { path: '/' });
+      sessionStorage.removeItem('login_type');
+    }
+    cookies.remove('auth_donation', { path: '/' });
+    sessionStorage.removeItem('login_type');
     const YOUR_REST_API_KEY = `b35378defa1b862c0f8fc59bf0292c25`;
     const YOUR_LOGOUT_REDIRECT_URI = `http://localhost:5173/kakao/oauth/logout`;
     const link = `https://kauth.kakao.com/oauth/logout?client_id=${YOUR_REST_API_KEY}&logout_redirect_uri=${YOUR_LOGOUT_REDIRECT_URI}`;
     window.location.href = link;
   }
-  cookies.remove("auth_donation");
-  localStorage.removeItem("info");
-  sessionStorage.removeItem("info");
-  sessionStorage.removeItem("img");
+  cookies.remove('auth_donation');
+  localStorage.removeItem('info');
+  localStorage.removeItem('login_type');
+  sessionStorage.removeItem('info');
+  sessionStorage.removeItem('img');
+};
+
+export const socialEnum = () => {
+  cookies.get('auth_donation') === 'kakaoGuest';
+  return true;
 };
 
 /* export const kakaoLogout = () => {
